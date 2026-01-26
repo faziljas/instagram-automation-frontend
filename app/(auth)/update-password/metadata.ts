@@ -1,6 +1,8 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Update Password | InstagramAuto',
-  description: 'Set a new password for your InstagramAuto account',
+  title: {
+    absolute: 'LogicDM - Update Password',
+  },
+  description: 'Set a new password for your LogicDM account',
 };
