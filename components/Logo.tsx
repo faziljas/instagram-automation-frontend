@@ -44,23 +44,26 @@ export default function Logo({ className = '', size = 'md', variant = 'light' }:
               zIndex: 2,
             }}
           >
-            {/* SVG conversation bubble - circular with downward tail */}
+            {/* SVG conversation/DM bubble - rounded rectangle with downward tail */}
             <svg
-              viewBox="0 0 20 20"
+              viewBox="0 0 24 20"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
               style={{ width: '100%', height: '100%' }}
             >
-              {/* Main bubble body - circular */}
-              <circle
-                cx="10"
-                cy="8"
-                r="6"
+              {/* Main bubble body - rounded rectangle (chat bubble shape) */}
+              <rect
+                x="1"
+                y="1"
+                width="22"
+                height="14"
+                rx="4"
+                ry="4"
                 fill={bubbleColor}
               />
               {/* Small triangular tail pointing down, centered - touches top of stem */}
               <path
-                d="M10 14 L7.5 18 L12.5 18 Z"
+                d="M12 15 L9 19 L12 17 L15 19 Z"
                 fill={bubbleColor}
               />
             </svg>
