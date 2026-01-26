@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { XMarkIcon, PaperAirplaneIcon } from '@heroicons/react/24/outline';
 import { post } from '@/utils/api';
 
@@ -22,6 +23,25 @@ export default function ReportIssueModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const [mounted, setMounted] = useState(false);
+
+  // Handle mounting for portal
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
+
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,29 +85,46 @@ export default function ReportIssueModal({
     }
   };
 
-  if (!isOpen) return null;
+  const handleClose = () => {
+    if (!isSubmitting) {
+      onClose();
+      setDescription('');
+      setBody('');
+      setErrorMessage('');
+      setSubmitStatus('idle');
+    }
+  };
 
-  return (
-    <div className="fixed inset-0 z-[100] overflow-y-auto">
+  if (!isOpen || !mounted) return null;
+
+  const modalContent = (
+    <div className="fixed inset-0 z-[9999] overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="report-issue-title">
       <div className="flex items-center justify-center min-h-screen px-4 py-8">
         {/* Backdrop */}
         <div
-          className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity z-[99]"
-          onClick={onClose}
+          className="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity z-[9998]"
+          onClick={handleClose}
+          aria-hidden="true"
         />
 
         {/* Modal */}
-        <div className="relative bg-white rounded-2xl shadow-xl max-w-2xl w-full p-6 z-[100] my-8">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">Report an Issue</h2>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
-              type="button"
-            >
-              <XMarkIcon className="h-6 w-6" />
-            </button>
+        <div className="relative bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-6 z-[9999] my-8 border-2 border-gray-200">
+          {/* Header with distinct styling */}
+          <div className="mb-6 pb-4 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 id="report-issue-title" className="text-2xl font-bold text-gray-900">Report an Issue</h2>
+                <p className="text-sm text-gray-500 mt-1">Help us improve by reporting any issues you encounter</p>
+              </div>
+              <button
+                onClick={handleClose}
+                className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-100"
+                type="button"
+                aria-label="Close modal"
+              >
+                <XMarkIcon className="h-6 w-6" />
+              </button>
+            </div>
           </div>
 
           {/* Success Message */}
@@ -179,7 +216,7 @@ export default function ReportIssueModal({
             <div className="flex items-center justify-end space-x-3 pt-4 border-t border-gray-200">
               <button
                 type="button"
-                onClick={onClose}
+                onClick={handleClose}
                 disabled={isSubmitting}
                 className="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -208,4 +245,7 @@ export default function ReportIssueModal({
       </div>
     </div>
   );
+
+  // Render modal in portal to ensure it's above everything
+  return typeof window !== 'undefined' ? createPortal(modalContent, document.body) : null;
 }
