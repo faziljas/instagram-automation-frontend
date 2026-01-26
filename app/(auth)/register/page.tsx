@@ -129,18 +129,39 @@ function RegisterPageContent() {
         return;
       }
 
-      if (data.user) {
-        // If email confirmation is required, show success message
-        if (data.user.confirmed_at === null) {
-          setError(null);
-          // Show success message - email confirmation sent
-          alert('Account created successfully! Please check your email to confirm your account before signing in.');
-          router.push('/login');
-        } else {
-          // User is already confirmed (shouldn't happen often, but handle it)
-          await fetchUser();
-          router.push('/dashboard');
+      // IMPORTANT: Supabase doesn't return an error for duplicate emails (security feature)
+      // Instead, it returns success with user but NO session when email already exists
+      // Check if user exists but session is null - this means email is already registered
+      // We can detect existing users by checking:
+      // 1. If user is confirmed (confirmed_at is not null)
+      // 2. If user has logged in before (last_sign_in_at exists)
+      // 3. If user was created more than a few seconds ago (not a fresh signup)
+      if (data.user && !data.session) {
+        const userCreatedAt = data.user.created_at ? new Date(data.user.created_at) : null;
+        const now = new Date();
+        const isRecentlyCreated = userCreatedAt && (now.getTime() - userCreatedAt.getTime()) <= 5000;
+        
+        // If user is confirmed, has logged in before, or was created more than 5 seconds ago, it's a duplicate
+        if (data.user.confirmed_at || data.user.last_sign_in_at || !isRecentlyCreated) {
+          setError('An account with this email already exists. If you signed up with Google, please use "Sign up with Google" instead. Otherwise, please sign in.');
+          setIsLoading(false);
+          return;
         }
+        
+        // Otherwise, it's a new user waiting for email confirmation
+        // Fall through to show success message below
+      }
+
+      if (data.user && data.session) {
+        // New user successfully created with session (email confirmation not required)
+        await fetchUser();
+        router.push('/dashboard');
+      } else if (data.user && !data.session) {
+        // New user created but waiting for email confirmation
+        setError(null);
+        // Show success message - email confirmation sent
+        alert('Account created successfully! Please check your email to confirm your account before signing in.');
+        router.push('/login');
       } else {
         // No user returned - this shouldn't happen but handle it
         setError('Failed to create account. Please try again.');
