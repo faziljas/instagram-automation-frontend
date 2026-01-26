@@ -31,15 +31,15 @@ export default function Logo({ className = '', size = 'md', variant = 'light' }:
         {/* "Logic" as a single continuous word */}
         <span className="relative inline-block">
           Logic
-          {/* Cover the original dot of 'i' with background color */}
+          {/* Cover the original dot of 'i' with background color - larger to ensure complete coverage */}
           <span
             className="absolute"
             style={{
               // Position exactly over the 'i' dot
               left: 'calc(2.2em + 0.5em)',
               top: '0',
-              width: '0.2em',
-              height: '0.2em',
+              width: '0.25em',
+              height: '0.25em',
               backgroundColor: variant === 'light' ? '#0f172a' : 'white',
               transform: 'translateX(-50%)',
               borderRadius: '50%',
@@ -47,13 +47,13 @@ export default function Logo({ className = '', size = 'md', variant = 'light' }:
             }}
           />
           
-          {/* Conversation bubble positioned exactly over the dot of 'i' */}
+          {/* Conversation bubble positioned exactly at the top where the dot would be */}
           <span
             className="absolute pointer-events-none"
             style={{
               // Position calculation: "Log" is ~2.2em, then 'i' dot is at ~0.5em into 'i'
               left: 'calc(2.2em + 0.5em)',
-              top: '-0.05em', // Position to exactly replace the dot
+              top: '-0.15em', // Moved higher to be at the top of where dot would be
               width: bubbleSize[size],
               height: bubbleSize[size],
               transform: 'translateX(-50%)',
