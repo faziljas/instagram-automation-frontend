@@ -219,8 +219,12 @@ function ForgotPasswordPageContent() {
       <div className="w-full lg:w-[45%] bg-white flex flex-col justify-center px-8 lg:px-24 relative">
         {/* Logo */}
         <div className="absolute top-8 left-8 lg:left-24">
-          <Link href="/login" className="text-2xl font-bold text-slate-900">
-            InstagramAuto
+          <Link href="/login">
+            <img 
+              src="/logo.png" 
+              alt="LogicDM" 
+              className="h-8 w-auto"
+            />
           </Link>
         </div>
 

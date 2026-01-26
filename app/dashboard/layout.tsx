@@ -68,7 +68,11 @@ export default function DashboardLayout({
           }`}
         >
           <div className="flex items-center justify-between h-16 px-6 border-b border-gray-800">
-            <span className="text-xl font-bold text-white">LogicDM</span>
+            <img 
+              src="/logo.png" 
+              alt="LogicDM" 
+              className="h-8 w-auto"
+            />
             <button
               onClick={() => setSidebarOpen(false)}
               className="text-gray-400 hover:text-white"
@@ -128,7 +132,11 @@ export default function DashboardLayout({
         <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
           <div className="flex flex-col flex-grow bg-[#0f172a] overflow-y-auto">
             <div className="flex items-center h-20 px-6 border-b border-gray-800">
-              <span className="text-xl font-bold text-white">LogicDM</span>
+              <img 
+                src="/logo.png" 
+                alt="LogicDM" 
+                className="h-8 w-auto"
+              />
             </div>
             <nav className="flex-1 px-4 py-6 space-y-1">
               {navigation.map((item) => {
