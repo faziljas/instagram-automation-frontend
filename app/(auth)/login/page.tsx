@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
+import Logo from '@/components/Logo';
 
 function LoginPageContent() {
   const router = useRouter();
@@ -130,11 +131,7 @@ function LoginPageContent() {
       <div className="w-full lg:w-[45%] bg-white flex flex-col justify-center px-8 lg:px-24 relative">
         {/* Logo */}
         <div className="absolute top-8 left-8 lg:left-24">
-          <img 
-            src="/logo.png" 
-            alt="LogicDM" 
-            className="h-12 w-auto"
-          />
+          <Logo size="md" variant="dark" />
         </div>
 
         {/* Form Content */}

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { z } from 'zod';
 import { supabase } from '@/lib/supabase';
 import { get } from '@/utils/api';
+import Logo from '@/components/Logo';
 
 // Zod validation schema
 const forgotPasswordSchema = z.object({
@@ -220,11 +221,7 @@ function ForgotPasswordPageContent() {
         {/* Logo */}
         <div className="absolute top-8 left-8 lg:left-24">
           <Link href="/login">
-            <img 
-              src="/logo.png" 
-              alt="LogicDM" 
-              className="h-12 w-auto"
-            />
+            <Logo size="md" variant="dark" />
           </Link>
         </div>
 
