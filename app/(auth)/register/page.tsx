@@ -103,8 +103,12 @@ function RegisterPageContent() {
     setIsLoading(true);
 
     try {
+      // Normalize email to lowercase before sending to Supabase
+      // This prevents case-sensitivity issues (Supabase has a bug where emails are case-sensitive)
+      const normalizedEmail = formData.email.trim().toLowerCase();
+      
       const { data, error } = await supabase.auth.signUp({
-        email: formData.email.trim(),
+        email: normalizedEmail,
         password: formData.password,
         options: {
           emailRedirectTo: 'https://www.logicdm.app/auth/callback',
@@ -136,10 +140,26 @@ function RegisterPageContent() {
       // 1. If user is confirmed (confirmed_at is not null)
       // 2. If user has logged in before (last_sign_in_at exists)
       // 3. If user was created more than a few seconds ago (not a fresh signup)
+      // 4. Also check our backend database (case-insensitive) to catch case-sensitivity issues
       if (data.user && !data.session) {
         const userCreatedAt = data.user.created_at ? new Date(data.user.created_at) : null;
         const now = new Date();
         const isRecentlyCreated = userCreatedAt && (now.getTime() - userCreatedAt.getTime()) <= 5000;
+        
+        // Check backend database for existing user (case-insensitive check)
+        // This catches Supabase's case-sensitivity bug where FAZIL.JAS@GMAIL.COM != fazil.jas@gmail.com
+        try {
+          const { get } = await import('@/utils/api');
+          const backendCheck = await get(`/auth/check-email/${encodeURIComponent(normalizedEmail)}`).catch(() => null);
+          if (backendCheck?.exists) {
+            setError('An account with this email already exists. If you signed up with Google, please use "Sign up with Google" instead. Otherwise, please sign in.');
+            setIsLoading(false);
+            return;
+          }
+        } catch (err) {
+          // If backend check fails, continue with Supabase detection logic
+          console.warn('Backend email check failed, using Supabase detection:', err);
+        }
         
         // If user is confirmed, has logged in before, or was created more than 5 seconds ago, it's a duplicate
         if (data.user.confirmed_at || data.user.last_sign_in_at || !isRecentlyCreated) {
