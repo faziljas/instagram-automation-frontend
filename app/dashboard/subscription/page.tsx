@@ -98,15 +98,6 @@ export default function SubscriptionPage() {
         
         // Update SWR cache with fresh data
         await refetchSubscription(freshData, { revalidate: false });
-      } catch (error) {
-        console.error(`❌ Poll [${pollCount}] failed:`, error);
-        // If it's a 401, stop polling (session expired)
-        if (error instanceof Error && error.message.includes('401')) {
-          console.warn('⚠️ Session expired during polling, stopping...');
-          clearInterval(pollInterval);
-          setIsPolling(false);
-        }
-      }
         
         // Stop polling after max attempts
         if (pollCount >= maxPolls) {
@@ -137,6 +128,22 @@ export default function SubscriptionPage() {
           await refetchSubscription(undefined, { revalidate: true });
         } catch (e) {
           console.error('Failed to refetch via SWR:', e);
+        }
+        
+        // Stop polling after max attempts (even on error)
+        if (pollCount >= maxPolls) {
+          console.log('⏱️ Max polling attempts reached');
+          clearInterval(pollInterval);
+          setIsPolling(false);
+          if (pollingTimeoutRef.current) {
+            clearTimeout(pollingTimeoutRef.current);
+            pollingTimeoutRef.current = null;
+          }
+          setSuccessMessage('Thanks for upgrading! Your subscription is being processed. Please refresh the page in a moment.');
+          setTimeout(() => {
+            setSuccessMessage(null);
+            router.replace('/dashboard/subscription');
+          }, 10000);
         }
       }
     }, 1500); // Poll every 1.5 seconds
@@ -213,42 +220,25 @@ export default function SubscriptionPage() {
           console.warn('⚠️ Verification endpoint returned error, but continuing with polling:', error);
           setSuccessMessage('Thanks for upgrading! Your subscription is being processed...');
         }
-          
-          // Always start polling regardless of verification result
-          // The Stripe webhook will process the subscription even if verification fails
-          setIsPolling(true);
-          
-          // Set timeout to stop polling after 60 seconds
-          const timeout = setTimeout(() => {
-            setIsPolling(false);
-            setSuccessMessage('Thanks for upgrading! Your subscription is being processed. Please refresh the page in a moment.');
-            setTimeout(() => {
-              setSuccessMessage(null);
-              router.replace('/dashboard/subscription');
-            }, 10000);
-          }, 60000); // 60 seconds
-          
-          pollingTimeoutRef.current = timeout;
-          
-          // Immediate refetch with forced revalidation
-          refetchSubscription(undefined, { revalidate: true });
-        } catch (error) {
-          console.warn('⚠️ Error calling verification endpoint, but continuing with polling:', error);
-          setSuccessMessage('Thanks for upgrading! Your subscription is being processed...');
-          
-          // Start polling anyway - webhook will process it
-          setIsPolling(true);
-          const timeout = setTimeout(() => {
-            setIsPolling(false);
-            setSuccessMessage('Thanks for upgrading! Your subscription is being processed. Please refresh the page in a moment.');
-            setTimeout(() => {
-              setSuccessMessage(null);
-              router.replace('/dashboard/subscription');
-            }, 10000);
-          }, 60000); // 60 seconds
-          pollingTimeoutRef.current = timeout;
-          refetchSubscription(undefined, { revalidate: true });
-        }
+        
+        // Always start polling regardless of verification result
+        // The Stripe webhook will process the subscription even if verification fails
+        setIsPolling(true);
+        
+        // Set timeout to stop polling after 60 seconds
+        const timeout = setTimeout(() => {
+          setIsPolling(false);
+          setSuccessMessage('Thanks for upgrading! Your subscription is being processed. Please refresh the page in a moment.');
+          setTimeout(() => {
+            setSuccessMessage(null);
+            router.replace('/dashboard/subscription');
+          }, 10000);
+        }, 60000); // 60 seconds
+        
+        pollingTimeoutRef.current = timeout;
+        
+        // Immediate refetch with forced revalidation
+        refetchSubscription(undefined, { revalidate: true });
       };
       
       verifySubscription();
