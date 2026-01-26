@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 
-const defaultTitle = 'Instagram Automation SaaS';
+const defaultTitle = 'LogicDM Automation';
 const defaultDescription = 'Automate your Instagram marketing and engagement with powerful automation rules, scheduled posts, and analytics.';
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://instagramauto.com';
 

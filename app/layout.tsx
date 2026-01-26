@@ -11,8 +11,8 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://instagramauto.com';
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'Instagram Automation SaaS',
-    template: '%s | Instagram Automation SaaS',
+    default: 'LogicDM Automation',
+    template: '%s | LogicDM Automation',
   },
   description: 'Automate your Instagram marketing and engagement with powerful automation rules, scheduled posts, and analytics. Grow your audience effortlessly.',
   keywords: ['Instagram automation', 'Instagram marketing', 'social media automation', 'Instagram growth', 'auto like', 'auto follow', 'scheduled posts'],
@@ -31,21 +31,21 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: siteUrl,
-    siteName: 'Instagram Automation SaaS',
-    title: 'Instagram Automation SaaS - Automate Your Instagram Marketing',
+    siteName: 'LogicDM Automation',
+    title: 'LogicDM Automation - Automate Your Instagram Marketing',
     description: 'Automate your Instagram marketing and engagement with powerful automation rules, scheduled posts, and analytics.',
     images: [
       {
         url: `${siteUrl}/og-image.png`,
         width: 1200,
         height: 630,
-        alt: 'Instagram Automation SaaS',
+        alt: 'LogicDM Automation',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Instagram Automation SaaS',
+    title: 'LogicDM Automation',
     description: 'Automate your Instagram marketing and engagement with powerful automation rules.',
     images: [`${siteUrl}/og-image.png`],
     creator: '@instagramauto',
