@@ -107,7 +107,7 @@ function RegisterPageContent() {
         email: formData.email.trim(),
         password: formData.password,
         options: {
-          emailRedirectTo: typeof window !== 'undefined' ? window.location.origin + '/dashboard' : '/dashboard',
+          emailRedirectTo: 'https://www.logicdm.app/auth/callback',
         },
       });
 

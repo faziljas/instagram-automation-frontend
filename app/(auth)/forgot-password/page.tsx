@@ -56,7 +56,7 @@ function ForgotPasswordForm() {
     setIsSubmitting(true);
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(formData.email.trim(), {
-        redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/reset-password` : '/reset-password',
+        redirectTo: 'https://www.logicdm.app/update-password',
       });
 
       if (error) {
