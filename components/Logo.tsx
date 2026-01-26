@@ -8,16 +8,23 @@ interface LogoProps {
 
 export default function Logo({ className = '', size = 'md', variant = 'light' }: LogoProps) {
   const sizeClasses = {
-    sm: 'text-lg',
-    md: 'text-xl',
-    lg: 'text-2xl',
+    sm: 'text-xl',
+    md: 'text-2xl',
+    lg: 'text-3xl',
+  };
+
+  // Bubble size based on logo size
+  const bubbleSizes = {
+    sm: 'w-4 h-4',
+    md: 'w-5 h-5',
+    lg: 'w-6 h-6',
   };
 
   // Color for "Logic" text - white for dark backgrounds, dark blue for light backgrounds
   const logicColor = variant === 'light' ? 'text-white' : 'text-[#1A2044]';
-  // Conversation bubble color - bright blue for dark backgrounds, blue-500 for light
-  const bubbleColor = variant === 'light' ? 'bg-blue-400' : 'bg-blue-500';
-  const bubbleBorderColor = variant === 'light' ? 'border-blue-400' : 'border-blue-500';
+  // Conversation bubble color - light blue for dark backgrounds, blue-500 for light
+  const bubbleBgColor = variant === 'light' ? 'bg-blue-400' : 'bg-blue-500';
+  const bubbleHighlightColor = variant === 'light' ? 'bg-blue-300' : 'bg-blue-400';
 
   return (
     <div className={`flex items-center ${className}`}>
@@ -28,19 +35,28 @@ export default function Logo({ className = '', size = 'md', variant = 'light' }:
           {/* 'i' with conversation bubble instead of dot */}
           <span className="relative inline-block">
             i
-            {/* Conversation bubble above 'i' */}
+            {/* Conversation bubble above 'i' - balloon style */}
             <span 
-              className={`absolute -top-2.5 left-1/2 -translate-x-1/2 w-3 h-3 ${bubbleColor} rounded-full`}
+              className={`absolute left-1/2 -translate-x-1/2 ${bubbleSizes[size]} ${bubbleBgColor} rounded-full relative`}
               style={{
-                boxShadow: `0 0 0 1px ${variant === 'light' ? 'rgba(96, 165, 250, 0.8)' : 'rgba(59, 130, 246, 0.8)'}`
+                top: size === 'sm' ? '-0.5rem' : size === 'md' ? '-0.6rem' : '-0.7rem',
+                boxShadow: variant === 'light' 
+                  ? '0 2px 4px rgba(0, 0, 0, 0.2), inset 0 -1px 2px rgba(0, 0, 0, 0.1)' 
+                  : '0 2px 4px rgba(0, 0, 0, 0.3), inset 0 -1px 2px rgba(0, 0, 0, 0.2)',
               }}
             >
-              {/* Small tail pointing down to 'i' */}
+              {/* Highlight/shine effect on top-right */}
               <span 
-                className={`absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[2px] border-r-[2px] border-t-[3px] border-transparent`}
+                className={`absolute top-1 right-1 w-1.5 h-1.5 ${bubbleHighlightColor} rounded-full opacity-60`}
+                style={{
+                  filter: 'blur(2px)',
+                }}
+              />
+              {/* Thin line/string connecting to 'i' */}
+              <span 
+                className="absolute top-full left-1/2 -translate-x-1/2 w-px bg-blue-400 opacity-40"
                 style={{ 
-                  marginTop: '-1px',
-                  borderTopColor: variant === 'light' ? 'rgb(96, 165, 250)' : 'rgb(59, 130, 246)'
+                  height: size === 'sm' ? '0.25rem' : size === 'md' ? '0.3rem' : '0.35rem',
                 }}
               />
             </span>
