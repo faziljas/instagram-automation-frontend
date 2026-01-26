@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Subtle grid pattern background for dashboard main content */
+@layer components {
+  .dashboard-main-bg {
+    background-color: rgb(243 244 246); /* gray-100 – distinct off-white */
+    background-image:
+      linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  /* Supabase Auth UI Custom Styling */
+  .supabase-auth-container {
+    @apply w-full;
+  }
+
+  .supabase-auth-container button[type="submit"] {
+    @apply bg-slate-900 hover:bg-slate-800 text-white;
+  }
+
+  .supabase-auth-container a {
+    @apply text-blue-600 hover:text-blue-500;
+  }
+}
