@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { useFetch } from '@/hooks/useFetch';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
+import UserProfileMenu from '@/components/UserProfileMenu';
 import {
   Bars3Icon,
   XMarkIcon,
@@ -45,10 +46,6 @@ export default function DashboardLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { data: subscriptionData } = useFetch<SubscriptionResponse>('/users/subscription');
 
-  const handleLogout = () => {
-    logout();
-    router.push('/login');
-  };
 
   // Check if user is on Pro or Enterprise plan
   const isProOrEnterprise = subscriptionData?.plan_tier === 'pro' || subscriptionData?.plan_tier === 'enterprise';
@@ -71,7 +68,7 @@ export default function DashboardLayout({
           }`}
         >
           <div className="flex items-center justify-between h-16 px-6 border-b border-gray-800">
-            <span className="text-xl font-bold text-white">InstagramAuto</span>
+            <span className="text-xl font-bold text-white">LogicDM</span>
             <button
               onClick={() => setSidebarOpen(false)}
               className="text-gray-400 hover:text-white"
@@ -121,17 +118,9 @@ export default function DashboardLayout({
               </div>
             )}
             
-            {/* Logout button */}
+            {/* User Profile Menu */}
             <div className="px-4 pb-6 border-t border-gray-800 pt-4">
-              <button
-                onClick={handleLogout}
-                className="w-full flex items-center justify-center px-4 py-3 text-sm font-medium text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-all duration-200"
-              >
-                <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-                Logout
-              </button>
+              <UserProfileMenu />
             </div>
         </div>
 
@@ -139,7 +128,7 @@ export default function DashboardLayout({
         <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
           <div className="flex flex-col flex-grow bg-[#0f172a] overflow-y-auto">
             <div className="flex items-center h-20 px-6 border-b border-gray-800">
-              <span className="text-xl font-bold text-white">InstagramAuto</span>
+              <span className="text-xl font-bold text-white">LogicDM</span>
             </div>
             <nav className="flex-1 px-4 py-6 space-y-1">
               {navigation.map((item) => {
@@ -181,17 +170,9 @@ export default function DashboardLayout({
               </div>
             )}
             
-            {/* Logout button */}
+            {/* User Profile Menu */}
             <div className="px-4 pb-6 border-t border-gray-800 pt-4">
-              <button
-                onClick={handleLogout}
-                className="w-full flex items-center justify-center px-4 py-3 text-sm font-medium text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-all duration-200"
-              >
-                <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-                Logout
-              </button>
+              <UserProfileMenu />
             </div>
           </div>
         </div>
