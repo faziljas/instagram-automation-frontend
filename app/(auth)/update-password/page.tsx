@@ -241,7 +241,7 @@ function UpdatePasswordPageContent() {
               <img 
                 src="/logo.png" 
                 alt="LogicDM" 
-                className="h-8 w-auto"
+                className="h-12 w-auto"
               />
             </Link>
           </div>
@@ -278,7 +278,7 @@ function UpdatePasswordPageContent() {
             <img 
               src="/logo.png" 
               alt="LogicDM" 
-              className="h-8 w-auto"
+              className="h-12 w-auto"
             />
           </Link>
         </div>

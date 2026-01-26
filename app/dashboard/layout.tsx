@@ -67,12 +67,14 @@ export default function DashboardLayout({
             sidebarOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
         >
-          <div className="flex items-center justify-between h-16 px-6 border-b border-gray-800">
-            <img 
-              src="/logo.png" 
-              alt="LogicDM" 
-              className="h-8 w-auto"
-            />
+          <div className="flex items-center justify-between h-20 px-6 border-b border-gray-800">
+            <div className="flex items-center">
+              <img 
+                src="/logo.png" 
+                alt="LogicDM" 
+                className="h-14 w-auto"
+              />
+            </div>
             <button
               onClick={() => setSidebarOpen(false)}
               className="text-gray-400 hover:text-white"
@@ -131,11 +133,11 @@ export default function DashboardLayout({
         {/* Sidebar for desktop */}
         <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
           <div className="flex flex-col flex-grow bg-[#0f172a] overflow-y-auto">
-            <div className="flex items-center h-20 px-6 border-b border-gray-800">
+            <div className="flex items-center justify-center h-24 px-6 border-b border-gray-800">
               <img 
                 src="/logo.png" 
                 alt="LogicDM" 
-                className="h-8 w-auto"
+                className="h-16 w-auto"
               />
             </div>
             <nav className="flex-1 px-4 py-6 space-y-1">
