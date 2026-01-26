@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useFetch } from '@/hooks/useFetch';
 import { usePost } from '@/hooks/useApi';
+import { useAuth } from '@/hooks/useAuth';
+import { get, post } from '@/utils/api';
 import {
   CheckCircleIcon,
   XCircleIcon,
@@ -42,6 +44,7 @@ const PLAN_FEATURES: Record<string, string[]> = {
 
 export default function SubscriptionPage() {
   const router = useRouter();
+  const { session } = useAuth();
   const { data: subscriptionData, isLoading, mutate: refetchSubscription } = useFetch<SubscriptionResponse>('/users/subscription');
   const { execute: cancelSubscription, loading: cancelLoading } = usePost();
   const { execute: createCheckoutSession, loading: checkoutLoading } = usePost();
@@ -60,48 +63,50 @@ export default function SubscriptionPage() {
     
     const pollInterval = setInterval(async () => {
       pollCount++;
+      
+      // Check if we have a valid session before polling
+      if (!session?.access_token) {
+        console.warn(`⚠️ Poll [${pollCount}] skipped - no valid session`);
+        return;
+      }
+      
       try {
-        // Direct fetch with cache-busting to bypass SWR cache
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-        const token = localStorage.getItem('accessToken');
+        // Use API utility which handles token injection properly
         const timestamp = Date.now();
+        const freshData = await get<SubscriptionResponse>(`/users/subscription?_t=${timestamp}`);
         
-        const response = await fetch(`${apiUrl}/users/subscription?_t=${timestamp}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          cache: 'no-store', // Force no cache
-        });
+        console.log(`🔄 Poll [${pollCount}/${maxPolls}] - Plan: ${freshData?.plan_tier}, Status: ${freshData?.status}, Stripe ID: ${freshData?.stripe_subscription_id}`);
         
-        if (response.ok) {
-          const freshData = await response.json();
-          console.log(`🔄 Poll [${pollCount}/${maxPolls}] - Plan: ${freshData?.plan_tier}, Status: ${freshData?.status}, Stripe ID: ${freshData?.stripe_subscription_id}`);
-          
-          // Check if plan has changed from free
-          if (freshData && freshData.plan_tier && freshData.plan_tier !== 'free') {
-            console.log('✅ Plan changed detected! Updating UI...');
-            // Update SWR cache with fresh data and trigger revalidation
-            await refetchSubscription(freshData, { revalidate: true });
-            return; // Exit early, the watch effect will handle UI update
-          }
-          
-          // Also check if stripe_subscription_id exists - indicates subscription was created
-          // This means upgrade is in progress, webhook just needs to process it
-          if (freshData && freshData.stripe_subscription_id && freshData.plan_tier === 'free') {
-            console.log('🔄 Stripe subscription ID found! Subscription created, waiting for webhook...');
-            // Update message to be more specific
-            setSuccessMessage('Thanks for upgrading! Your subscription is being processed by our system...');
-            // Reset poll count to give more time for webhook to process
-            // (This extends polling if subscription ID exists)
-            pollCount = Math.max(0, pollCount - 5); // Give 5 more polls (7.5 seconds)
-          }
-          
-          // Update SWR cache with fresh data
-          await refetchSubscription(freshData, { revalidate: false });
-        } else {
-          console.error(`❌ Poll [${pollCount}] failed:`, response.status);
+        // Check if plan has changed from free
+        if (freshData && freshData.plan_tier && freshData.plan_tier !== 'free') {
+          console.log('✅ Plan changed detected! Updating UI...');
+          // Update SWR cache with fresh data and trigger revalidation
+          await refetchSubscription(freshData, { revalidate: true });
+          return; // Exit early, the watch effect will handle UI update
         }
+        
+        // Also check if stripe_subscription_id exists - indicates subscription was created
+        // This means upgrade is in progress, webhook just needs to process it
+        if (freshData && freshData.stripe_subscription_id && freshData.plan_tier === 'free') {
+          console.log('🔄 Stripe subscription ID found! Subscription created, waiting for webhook...');
+          // Update message to be more specific
+          setSuccessMessage('Thanks for upgrading! Your subscription is being processed by our system...');
+          // Reset poll count to give more time for webhook to process
+          // (This extends polling if subscription ID exists)
+          pollCount = Math.max(0, pollCount - 5); // Give 5 more polls (7.5 seconds)
+        }
+        
+        // Update SWR cache with fresh data
+        await refetchSubscription(freshData, { revalidate: false });
+      } catch (error) {
+        console.error(`❌ Poll [${pollCount}] failed:`, error);
+        // If it's a 401, stop polling (session expired)
+        if (error instanceof Error && error.message.includes('401')) {
+          console.warn('⚠️ Session expired during polling, stopping...');
+          clearInterval(pollInterval);
+          setIsPolling(false);
+        }
+      }
         
         // Stop polling after max attempts
         if (pollCount >= maxPolls) {
@@ -120,6 +125,13 @@ export default function SubscriptionPage() {
         }
       } catch (error) {
         console.error(`❌ Error polling subscription [${pollCount}]:`, error);
+        // If it's a 401, stop polling (session expired)
+        if (error instanceof Error && error.message.includes('401')) {
+          console.warn('⚠️ Session expired during polling, stopping...');
+          clearInterval(pollInterval);
+          setIsPolling(false);
+          return;
+        }
         // Still try SWR mutate as fallback
         try {
           await refetchSubscription(undefined, { revalidate: true });
@@ -132,7 +144,7 @@ export default function SubscriptionPage() {
     return () => {
       clearInterval(pollInterval);
     };
-  }, [isPolling, refetchSubscription, router]);
+  }, [isPolling, refetchSubscription, router, session]);
 
   // Watch for plan changes when polling
   useEffect(() => {
@@ -183,32 +195,24 @@ export default function SubscriptionPage() {
       
       // Immediately verify and sync subscription from Stripe
       const verifySubscription = async () => {
+        // Check if we have a valid session before verifying
+        if (!session?.access_token) {
+          console.warn('⚠️ No valid session, skipping verification but starting polling');
+          setSuccessMessage('Thanks for upgrading! Your subscription is being processed...');
+          setIsPolling(true);
+          return;
+        }
+        
         try {
           console.log('🔄 Verifying checkout session:', sessionId);
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/stripe/verify-checkout-session`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-            },
-            body: JSON.stringify({ session_id: sessionId })
-          });
-          
-          if (response.ok) {
-            const data = await response.json();
-            console.log('✅ Subscription verified:', data);
-            setSuccessMessage('Thanks for upgrading! Your subscription is being processed...');
-          } else {
-            // Handle error response - might be 500 or other error
-            let errorData;
-            try {
-              errorData = await response.json();
-            } catch (e) {
-              errorData = { detail: `Server error (${response.status})` };
-            }
-            console.warn('⚠️ Verification endpoint returned error, but continuing with polling:', errorData);
-            setSuccessMessage('Thanks for upgrading! Your subscription is being processed...');
-          }
+          const data = await post('/api/stripe/verify-checkout-session', { session_id: sessionId });
+          console.log('✅ Subscription verified:', data);
+          setSuccessMessage('Thanks for upgrading! Your subscription is being processed...');
+        } catch (error) {
+          // Handle error response - might be 500 or other error
+          console.warn('⚠️ Verification endpoint returned error, but continuing with polling:', error);
+          setSuccessMessage('Thanks for upgrading! Your subscription is being processed...');
+        }
           
           // Always start polling regardless of verification result
           // The Stripe webhook will process the subscription even if verification fails
