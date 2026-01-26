@@ -80,9 +80,8 @@ api.interceptors.response.use(
 
     // Handle 401 Unauthorized
     if (error.response?.status === 401) {
-      // Don't redirect if this is a login/register request - let the form handle the error
-      const isAuthRequest = originalRequest.url?.includes('/auth/login') || 
-                           originalRequest.url?.includes('/auth/register');
+      // Don't redirect if this is a sync-user request - let the auth context handle the error
+      const isAuthRequest = originalRequest.url?.includes('/auth/sync-user');
       
       console.log('[API Interceptor] Is auth request?', isAuthRequest);
       
