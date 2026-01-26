@@ -1,15 +1,21 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { XMarkIcon, PaperAirplaneIcon } from '@heroicons/react/24/outline';
-import { post } from '@/utils/api';
+import { XMarkIcon, PaperAirplaneIcon, PaperClipIcon, XCircleIcon } from '@heroicons/react/24/outline';
+import api from '@/utils/api';
 
 interface ReportIssueModalProps {
   isOpen: boolean;
   onClose: () => void;
   userEmail: string;
   userName: string;
+}
+
+interface FilePreview {
+  file: File;
+  preview: string;
+  id: string;
 }
 
 export default function ReportIssueModal({
@@ -20,10 +26,12 @@ export default function ReportIssueModal({
 }: ReportIssueModalProps) {
   const [description, setDescription] = useState('');
   const [body, setBody] = useState('');
+  const [attachments, setAttachments] = useState<FilePreview[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const [mounted, setMounted] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Handle mounting for portal
   useEffect(() => {
@@ -43,6 +51,61 @@ export default function ReportIssueModal({
     };
   }, [isOpen]);
 
+  // Cleanup preview URLs on unmount
+  useEffect(() => {
+    return () => {
+      attachments.forEach((attachment) => {
+        if (attachment.preview.startsWith('blob:')) {
+          URL.revokeObjectURL(attachment.preview);
+        }
+      });
+    };
+  }, [attachments]);
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'video/mp4', 'video/mpeg', 'video/quicktime', 'video/x-msvideo'];
+
+    Array.from(files).forEach((file) => {
+      // Check file size
+      if (file.size > maxSize) {
+        setErrorMessage(`File "${file.name}" is too large. Maximum size is 10MB.`);
+        return;
+      }
+
+      // Check file type
+      if (!allowedTypes.includes(file.type)) {
+        setErrorMessage(`File "${file.name}" is not a supported format. Please use images (JPG, PNG, GIF, WEBP) or videos (MP4, MOV, AVI).`);
+        return;
+      }
+
+      // Create preview
+      const preview = URL.createObjectURL(file);
+      const id = Math.random().toString(36).substring(7);
+      
+      setAttachments((prev) => [...prev, { file, preview, id }]);
+      setErrorMessage('');
+    });
+
+    // Reset input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const removeAttachment = (id: string) => {
+    setAttachments((prev) => {
+      const attachment = prev.find((a) => a.id === id);
+      if (attachment && attachment.preview.startsWith('blob:')) {
+        URL.revokeObjectURL(attachment.preview);
+      }
+      return prev.filter((a) => a.id !== id);
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -56,16 +119,34 @@ export default function ReportIssueModal({
     setErrorMessage('');
 
     try {
-      await post('/support/report-issue', {
-        description: description.trim(),
-        body: body.trim(),
-        user_email: userEmail,
-        user_name: userName,
+      // Create FormData for file upload
+      const formData = new FormData();
+      formData.append('description', description.trim());
+      formData.append('body', body.trim());
+      formData.append('user_email', userEmail);
+      formData.append('user_name', userName);
+      
+      // Append attachments
+      attachments.forEach((attachment) => {
+        formData.append('attachments', attachment.file);
+      });
+
+      await api.post('/support/report-issue', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
 
       setSubmitStatus('success');
       setDescription('');
       setBody('');
+      // Cleanup attachments
+      attachments.forEach((attachment) => {
+        if (attachment.preview.startsWith('blob:')) {
+          URL.revokeObjectURL(attachment.preview);
+        }
+      });
+      setAttachments([]);
 
       // Close modal after 2 seconds
       setTimeout(() => {
@@ -92,7 +173,22 @@ export default function ReportIssueModal({
       setBody('');
       setErrorMessage('');
       setSubmitStatus('idle');
+      // Cleanup attachments
+      attachments.forEach((attachment) => {
+        if (attachment.preview.startsWith('blob:')) {
+          URL.revokeObjectURL(attachment.preview);
+        }
+      });
+      setAttachments([]);
     }
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
   };
 
   if (!isOpen || !mounted) return null;
@@ -108,7 +204,7 @@ export default function ReportIssueModal({
         />
 
         {/* Modal */}
-        <div className="relative bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-6 z-[9999] my-8 border-2 border-gray-200">
+        <div className="relative bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-6 z-[9999] my-8 border-2 border-gray-200 max-h-[90vh] overflow-y-auto">
           {/* Header with distinct styling */}
           <div className="mb-6 pb-4 border-b border-gray-200">
             <div className="flex items-center justify-between">
@@ -203,6 +299,78 @@ export default function ReportIssueModal({
                   }
                 }}
               />
+            </div>
+
+            {/* Attachments Section */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Attachments (Optional)
+              </label>
+              <div className="space-y-3">
+                {/* File Input */}
+                <div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    id="attachments"
+                    name="attachments"
+                    accept="image/*,video/*"
+                    multiple
+                    onChange={handleFileSelect}
+                    disabled={isSubmitting}
+                    className="hidden"
+                  />
+                  <label
+                    htmlFor="attachments"
+                    className="flex items-center justify-center px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <PaperClipIcon className="h-5 w-5 text-gray-400 mr-2" />
+                    <span className="text-sm text-gray-600">
+                      Click to attach photos or videos (Max 10MB per file)
+                    </span>
+                  </label>
+                </div>
+
+                {/* File Previews */}
+                {attachments.length > 0 && (
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {attachments.map((attachment) => (
+                      <div
+                        key={attachment.id}
+                        className="relative group border border-gray-200 rounded-lg overflow-hidden bg-gray-50"
+                      >
+                        {attachment.file.type.startsWith('image/') ? (
+                          <img
+                            src={attachment.preview}
+                            alt={attachment.file.name}
+                            className="w-full h-32 object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-32 flex items-center justify-center bg-gray-100">
+                            <svg className="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                            </svg>
+                          </div>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => removeAttachment(attachment.id)}
+                          className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                          disabled={isSubmitting}
+                        >
+                          <XCircleIcon className="h-4 w-4" />
+                        </button>
+                        <div className="p-2">
+                          <p className="text-xs text-gray-600 truncate" title={attachment.file.name}>
+                            {attachment.file.name}
+                          </p>
+                          <p className="text-xs text-gray-400">{formatFileSize(attachment.file.size)}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Validation Error */}
