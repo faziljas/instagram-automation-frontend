@@ -125,7 +125,7 @@ function RegisterPageContent() {
             error.message?.includes('User already registered')) {
           // Try to check if it's a Google OAuth user by attempting to get user info
           // Note: We can't directly check providers without admin access, but we can provide helpful message
-          errorMessage = 'An account with this email already exists. If you signed up with Google, please use "Sign up with Google" instead. Otherwise, please sign in.';
+          errorMessage = 'This email is already registered. Please log in instead.';
         }
         
         setError(errorMessage);
@@ -152,7 +152,7 @@ function RegisterPageContent() {
           const { get } = await import('@/utils/api');
           const backendCheck = await get(`/auth/check-email/${encodeURIComponent(normalizedEmail)}`).catch(() => null);
           if (backendCheck?.exists) {
-            setError('An account with this email already exists. If you signed up with Google, please use "Sign up with Google" instead. Otherwise, please sign in.');
+            setError('This email is already registered. Please log in instead.');
             setIsLoading(false);
             return;
           }
@@ -163,7 +163,7 @@ function RegisterPageContent() {
         
         // If user is confirmed, has logged in before, or was created more than 5 seconds ago, it's a duplicate
         if (data.user.confirmed_at || data.user.last_sign_in_at || !isRecentlyCreated) {
-          setError('An account with this email already exists. If you signed up with Google, please use "Sign up with Google" instead. Otherwise, please sign in.');
+          setError('This email is already registered. Please log in instead.');
           setIsLoading(false);
           return;
         }
