@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { z } from 'zod';
 import { supabase } from '@/lib/supabase';
+import { get } from '@/utils/api';
 
 // Zod validation schema
 const forgotPasswordSchema = z.object({
@@ -55,14 +56,49 @@ function ForgotPasswordForm() {
     // Submit password reset request using Supabase
     setIsSubmitting(true);
     try {
+      // First, check if user exists in our backend database
+      const normalizedEmail = formData.email.trim().toLowerCase();
+      try {
+        const backendCheck = await get(`/auth/check-email/${encodeURIComponent(normalizedEmail)}`).catch(() => null);
+        
+        // If user doesn't exist in backend, inform them to sign up
+        if (!backendCheck?.exists) {
+          setSubmitError('This email is not registered. Please sign up to create an account.');
+          setIsSubmitting(false);
+          return;
+        }
+      } catch (backendError) {
+        // If backend check fails, continue with Supabase reset (don't block user)
+        console.warn('Backend email check failed, continuing with Supabase:', backendError);
+      }
+
+      // User exists in backend, proceed with Supabase password reset
       const { error } = await supabase.auth.resetPasswordForEmail(formData.email.trim(), {
         redirectTo: 'https://www.logicdm.app/update-password',
       });
 
       if (error) {
         console.error('Password reset request failed:', error);
-        // Supabase will return an error if email doesn't exist, but for security
-        // we still show success message to prevent email enumeration
+        
+        // Check if the error indicates the user doesn't exist in Supabase
+        // This can happen if user was deleted from Supabase but still exists in our DB
+        const errorMessage = error.message?.toLowerCase() || '';
+        const isUserNotFound = 
+          errorMessage.includes('user not found') ||
+          errorMessage.includes('email not found') ||
+          errorMessage.includes('does not exist') ||
+          errorMessage.includes('no user found') ||
+          error.code === 'user_not_found';
+        
+        if (isUserNotFound) {
+          // User exists in our DB but not in Supabase (deleted from Supabase)
+          setSubmitError('This email is not registered. Please sign up to create an account.');
+          setIsSubmitting(false);
+          return;
+        }
+        
+        // For other errors, still show success to prevent email enumeration
+        // (but log the error for debugging)
         setIsSuccess(true);
       } else {
         setIsSuccess(true);
@@ -141,7 +177,15 @@ function ForgotPasswordForm() {
         {/* Submit Error */}
         {submitError && (
           <div className="rounded-md bg-red-50 p-4 border border-red-200">
-            <p className="text-sm text-red-800">{submitError}</p>
+            <p className="text-sm text-red-800 mb-2">{submitError}</p>
+            {submitError.includes('not registered') && (
+              <Link
+                href="/register"
+                className="text-sm font-medium text-red-700 hover:text-red-800 underline"
+              >
+                Sign up here →
+              </Link>
+            )}
           </div>
         )}
 
