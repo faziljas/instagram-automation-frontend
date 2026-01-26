@@ -2,9 +2,9 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: {
-    absolute: 'LogicDM Automations',
+    absolute: 'LogicDM Rules',
   },
-  description: 'Manage your Instagram automation campaigns and view analytics.',
+  description: 'Create and manage your Instagram automation rules for likes, comments, follows, and more.',
   robots: {
     index: false,
     follow: false,

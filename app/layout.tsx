@@ -11,8 +11,7 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://instagramauto.com';
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'LogicDM Automation',
-    template: '%s | LogicDM Automation',
+    default: 'LogicDM',
   },
   description: 'Automate your Instagram marketing and engagement with powerful automation rules, scheduled posts, and analytics. Grow your audience effortlessly.',
   keywords: ['Instagram automation', 'Instagram marketing', 'social media automation', 'Instagram growth', 'auto like', 'auto follow', 'scheduled posts'],
