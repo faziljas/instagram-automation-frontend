@@ -73,6 +73,7 @@ export default function DashboardLayout({
                 src="/logo.png" 
                 alt="LogicDM" 
                 className="h-14 w-auto"
+                style={{ mixBlendMode: 'darken' }}
               />
             </div>
             <button
@@ -138,6 +139,7 @@ export default function DashboardLayout({
                 src="/logo.png" 
                 alt="LogicDM" 
                 className="h-16 w-auto"
+                style={{ mixBlendMode: 'darken' }}
               />
             </div>
             <nav className="flex-1 px-4 py-6 space-y-1">
