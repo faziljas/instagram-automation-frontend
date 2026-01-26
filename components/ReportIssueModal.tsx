@@ -68,22 +68,23 @@ export default function ReportIssueModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
-      <div className="flex items-center justify-center min-h-screen px-4">
+    <div className="fixed inset-0 z-[100] overflow-y-auto">
+      <div className="flex items-center justify-center min-h-screen px-4 py-8">
         {/* Backdrop */}
         <div
-          className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+          className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity z-[99]"
           onClick={onClose}
         />
 
         {/* Modal */}
-        <div className="relative bg-white rounded-2xl shadow-xl max-w-2xl w-full p-6">
+        <div className="relative bg-white rounded-2xl shadow-xl max-w-2xl w-full p-6 z-[100] my-8">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-900">Report an Issue</h2>
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600 transition-colors"
+              type="button"
             >
               <XMarkIcon className="h-6 w-6" />
             </button>
@@ -106,7 +107,7 @@ export default function ReportIssueModal({
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6" noValidate>
             {/* Description Field */}
             <div>
               <label
@@ -118,12 +119,22 @@ export default function ReportIssueModal({
               <input
                 type="text"
                 id="description"
+                name="description"
                 value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                onChange={(e) => {
+                  setDescription(e.target.value);
+                  setErrorMessage(''); // Clear error when user types
+                }}
                 placeholder="Brief description of the issue"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
                 required
                 disabled={isSubmitting}
+                onInvalid={(e) => {
+                  e.preventDefault();
+                  if (!description.trim()) {
+                    setErrorMessage('Please fill in all fields');
+                  }
+                }}
               />
             </div>
 
@@ -137,13 +148,23 @@ export default function ReportIssueModal({
               </label>
               <textarea
                 id="body"
+                name="body"
                 value={body}
-                onChange={(e) => setBody(e.target.value)}
+                onChange={(e) => {
+                  setBody(e.target.value);
+                  setErrorMessage(''); // Clear error when user types
+                }}
                 placeholder="Please provide detailed information about the issue..."
                 rows={8}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all resize-none"
                 required
                 disabled={isSubmitting}
+                onInvalid={(e) => {
+                  e.preventDefault();
+                  if (!body.trim()) {
+                    setErrorMessage('Please fill in all fields');
+                  }
+                }}
               />
             </div>
 
