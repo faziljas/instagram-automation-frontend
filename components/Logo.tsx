@@ -27,36 +27,20 @@ export default function Logo({ className = '', size = 'md', variant = 'light' }:
 
   return (
     <div className={`flex items-center ${className}`}>
-      <div className={`font-bold ${sizeClasses[size]} flex items-baseline leading-none ${textColor}`}>
-        {/* "Logic" as a single continuous word */}
+      <div className={`font-bold ${sizeClasses[size]} flex items-center leading-none ${textColor}`}>
+        {/* "Logic" - render as one word, but wrap only "i" */}
+        <span className={textColor}>Log</span>
         <span className="relative inline-block">
-          Logic
-          {/* Cover the original dot of 'i' with background color - larger to ensure complete coverage */}
-          <span
-            className="absolute"
-            style={{
-              // Position exactly over the 'i' dot
-              left: 'calc(2.2em + 0.5em)',
-              top: '0',
-              width: '0.25em',
-              height: '0.25em',
-              backgroundColor: variant === 'light' ? '#0f172a' : 'white',
-              transform: 'translateX(-50%)',
-              borderRadius: '50%',
-              zIndex: 1,
-            }}
-          />
-          
-          {/* Conversation bubble positioned exactly at the top where the dot would be */}
+          i
+          {/* Conversation bubble positioned exactly over the "i" dot */}
           <span
             className="absolute pointer-events-none"
             style={{
-              // Position calculation: "Log" is ~2.2em, then 'i' dot is at ~0.5em into 'i'
-              left: 'calc(2.2em + 0.5em)',
-              top: '-0.15em', // Moved higher to be at the top of where dot would be
+              top: '-0.5em',
+              left: '50%',
+              transform: 'translateX(-50%)',
               width: bubbleSize[size],
               height: bubbleSize[size],
-              transform: 'translateX(-50%)',
               zIndex: 2,
             }}
           >
@@ -91,7 +75,22 @@ export default function Logo({ className = '', size = 'md', variant = 'light' }:
               />
             </svg>
           </span>
+          {/* Optional: Cover the original dot of 'i' if visible */}
+          <span
+            className="absolute"
+            style={{
+              top: '0',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: '0.25em',
+              height: '0.25em',
+              backgroundColor: variant === 'light' ? '#0f172a' : 'white',
+              borderRadius: '50%',
+              zIndex: 1,
+            }}
+          />
         </span>
+        <span className={textColor}>c</span>
         
         {/* "DM" with gradient - immediately following Logic */}
         <span 
