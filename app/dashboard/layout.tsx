@@ -99,27 +99,40 @@ export default function DashboardLayout({
               );
             })}
           </nav>
-          {/* Upgrade Card - Only show if user is not on Pro or Enterprise */}
-          {!isProOrEnterprise && (
-            <div className="px-4 pb-6 mt-auto">
-              <div className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl p-6 border border-blue-500/20">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-white font-semibold text-sm">Pro</span>
-                  <SparklesIcon className="h-5 w-5 text-white/80" />
+            {/* Upgrade Card - Only show if user is not on Pro or Enterprise */}
+            {!isProOrEnterprise && (
+              <div className="px-4 pb-4 mt-auto">
+                <div className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl p-6 border border-blue-500/20">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-white font-semibold text-sm">Pro</span>
+                    <SparklesIcon className="h-5 w-5 text-white/80" />
+                  </div>
+                  <p className="text-white/90 text-xs mb-4">
+                    Unlock advanced features and unlimited automation
+                  </p>
+                  <Link
+                    href="/dashboard/subscription"
+                    onClick={() => setSidebarOpen(false)}
+                    className="block w-full text-center bg-white text-blue-600 text-sm font-medium py-2 rounded-lg hover:bg-white/90 transition-colors"
+                  >
+                    Upgrade
+                  </Link>
                 </div>
-                <p className="text-white/90 text-xs mb-4">
-                  Unlock advanced features and unlimited automation
-                </p>
-                <Link
-                  href="/dashboard/subscription"
-                  onClick={() => setSidebarOpen(false)}
-                  className="block w-full text-center bg-white text-blue-600 text-sm font-medium py-2 rounded-lg hover:bg-white/90 transition-colors"
-                >
-                  Upgrade
-                </Link>
               </div>
+            )}
+            
+            {/* Logout button */}
+            <div className="px-4 pb-6 border-t border-gray-800 pt-4">
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center justify-center px-4 py-3 text-sm font-medium text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-all duration-200"
+              >
+                <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                Logout
+              </button>
             </div>
-          )}
         </div>
 
         {/* Sidebar for desktop */}
@@ -149,7 +162,7 @@ export default function DashboardLayout({
             </nav>
             {/* Upgrade Card - Only show if user is not on Pro or Enterprise */}
             {!isProOrEnterprise && (
-              <div className="px-4 pb-6">
+              <div className="px-4 pb-4">
                 <div className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl p-6 border border-blue-500/20">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-white font-semibold text-sm">Pro</span>
@@ -167,6 +180,19 @@ export default function DashboardLayout({
                 </div>
               </div>
             )}
+            
+            {/* Logout button */}
+            <div className="px-4 pb-6 border-t border-gray-800 pt-4">
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center justify-center px-4 py-3 text-sm font-medium text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-all duration-200"
+              >
+                <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                Logout
+              </button>
+            </div>
           </div>
         </div>
 
@@ -186,17 +212,9 @@ export default function DashboardLayout({
               {/* Spacer for mobile */}
               <div className="flex-1 lg:hidden" />
 
-              {/* User menu */}
-              <div className="flex items-center space-x-4">
-                <div className="text-sm text-gray-900 font-semibold">
-                  {user?.firstName} {user?.lastName}
-                </div>
-                <button
-                  onClick={handleLogout}
-                  className="px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-red-500 to-red-600 rounded-xl hover:from-red-600 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200 shadow-md hover:shadow-lg hover:scale-105"
-                >
-                  Logout
-                </button>
+              {/* User info */}
+              <div className="text-sm text-gray-900 font-semibold">
+                {user?.firstName} {user?.lastName}
               </div>
             </div>
           </header>
