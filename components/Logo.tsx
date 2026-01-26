@@ -20,9 +20,9 @@ export default function Logo({ className = '', size = 'md', variant = 'light' }:
 
   // Bubble size relative to font size
   const bubbleSize = {
-    sm: '0.35em',
-    md: '0.4em',
-    lg: '0.45em',
+    sm: '0.4em',
+    md: '0.45em',
+    lg: '0.5em',
   };
 
   return (
@@ -31,48 +31,62 @@ export default function Logo({ className = '', size = 'md', variant = 'light' }:
         {/* "Logic" as a single continuous word */}
         <span className="relative inline-block">
           Logic
-          {/* Conversation bubble positioned over the dot of 'i' */}
+          {/* Cover the original dot of 'i' with background color */}
+          <span
+            className="absolute"
+            style={{
+              // Position exactly over the 'i' dot
+              left: 'calc(2.2em + 0.5em)',
+              top: '0',
+              width: '0.2em',
+              height: '0.2em',
+              backgroundColor: variant === 'light' ? '#0f172a' : 'white',
+              transform: 'translateX(-50%)',
+              borderRadius: '50%',
+              zIndex: 1,
+            }}
+          />
+          
+          {/* Conversation bubble positioned exactly over the dot of 'i' */}
           <span
             className="absolute pointer-events-none"
             style={{
-              // Position calculation: "Log" is ~3 characters, then 'i' starts
-              // The dot of 'i' is typically at ~0.5em from the start of 'i'
-              // So: width of "Log" (approximately 2.2em for 3 chars) + 0.5em for 'i' dot position
+              // Position calculation: "Log" is ~2.2em, then 'i' dot is at ~0.5em into 'i'
               left: 'calc(2.2em + 0.5em)',
-              top: '-0.05em', // Slightly above to cover/replace the dot
+              top: '-0.05em', // Position to exactly replace the dot
               width: bubbleSize[size],
               height: bubbleSize[size],
               transform: 'translateX(-50%)',
+              zIndex: 2,
             }}
           >
-            {/* SVG conversation bubble - message bubble style with tail */}
+            {/* SVG conversation bubble - oval/ellipse shape with tail */}
             <svg
               viewBox="0 0 24 24"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
               style={{ width: '100%', height: '100%' }}
             >
-              {/* Main bubble body - rounded rectangle */}
-              <rect
-                x="3"
-                y="2"
-                width="18"
-                height="14"
-                rx="3"
+              {/* Main bubble body - oval/ellipse */}
+              <ellipse
+                cx="12"
+                cy="10"
+                rx="9"
+                ry="7"
                 fill={bubbleColor}
               />
               {/* Bubble highlight/shine */}
               <ellipse
                 cx="9"
-                cy="7"
+                cy="8"
                 rx="3"
                 ry="2"
                 fill="white"
-                opacity="0.4"
+                opacity="0.5"
               />
               {/* Small tail pointing down (left side) */}
               <path
-                d="M8 16L6 20L10 18L8 16Z"
+                d="M7 16L5 20L9 18L7 16Z"
                 fill={bubbleColor}
               />
             </svg>
