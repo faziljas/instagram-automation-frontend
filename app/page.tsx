@@ -110,65 +110,97 @@ export default function HomePage() {
                   <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                     <span className="text-white text-xs font-bold">LD</span>
                   </div>
-                  <div className="h-4 w-24 bg-gray-700/80 rounded"></div>
+                  <div className="h-4 w-32 bg-gray-700/80 rounded"></div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
+                  <div className="h-3 w-16 bg-gray-700/60 rounded"></div>
                   <div className="h-8 w-8 bg-gray-700/80 rounded-full"></div>
                 </div>
               </div>
               
               {/* Mock Dashboard Content */}
               <div className="flex-1 grid grid-cols-3 gap-4">
-                {/* Stats Card 1 */}
-                <div className="bg-gray-800/60 rounded-lg p-5 border border-gray-700/30">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="h-3 w-16 bg-gray-600/60 rounded"></div>
-                    <div className="h-4 w-4 bg-blue-500/40 rounded"></div>
+                {/* Stats Card 1 - DMs Sent */}
+                <div className="bg-gray-800/60 rounded-lg p-5 border border-gray-700/30 flex flex-col">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="h-3 w-20 bg-gray-600/60 rounded"></div>
+                    <div className="h-5 w-5 bg-blue-500/50 rounded flex items-center justify-center">
+                      <div className="h-2 w-2 bg-blue-400 rounded-full"></div>
+                    </div>
                   </div>
-                  <div className="h-8 w-20 bg-gray-600/40 rounded mb-2"></div>
-                  <div className="h-2 w-full bg-gray-700/40 rounded-full overflow-hidden">
-                    <div className="h-full w-3/4 bg-blue-500/60"></div>
+                  <div className="mb-3">
+                    <div className="h-10 w-28 bg-gray-600/50 rounded mb-2"></div>
+                    <div className="h-1.5 w-full bg-gray-700/50 rounded-full overflow-hidden">
+                      <div className="h-full w-[75%] bg-gradient-to-r from-blue-500 to-blue-400"></div>
+                    </div>
                   </div>
-                  <div className="mt-3 space-y-1.5">
-                    <div className="h-2 w-full bg-gray-700/30 rounded"></div>
-                    <div className="h-2 w-4/5 bg-gray-700/30 rounded"></div>
+                  <div className="mt-auto space-y-2">
+                    <div className="flex items-center gap-2">
+                      <div className="h-1.5 w-1.5 bg-blue-400 rounded-full"></div>
+                      <div className="h-2 w-24 bg-gray-600/40 rounded"></div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="h-1.5 w-1.5 bg-blue-400 rounded-full"></div>
+                      <div className="h-2 w-20 bg-gray-600/40 rounded"></div>
+                    </div>
                   </div>
                 </div>
                 
-                {/* Stats Card 2 */}
-                <div className="bg-gray-800/60 rounded-lg p-5 border border-gray-700/30">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="h-3 w-20 bg-gray-600/60 rounded"></div>
-                    <div className="h-4 w-4 bg-purple-500/40 rounded"></div>
+                {/* Stats Card 2 - Leads Captured */}
+                <div className="bg-gray-800/60 rounded-lg p-5 border border-gray-700/30 flex flex-col">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="h-3 w-24 bg-gray-600/60 rounded"></div>
+                    <div className="h-5 w-5 bg-purple-500/50 rounded flex items-center justify-center">
+                      <div className="h-2 w-2 bg-purple-400 rounded-full"></div>
+                    </div>
                   </div>
-                  <div className="h-8 w-24 bg-gray-600/40 rounded mb-2"></div>
-                  <div className="h-2 w-full bg-gray-700/40 rounded-full overflow-hidden">
-                    <div className="h-full w-2/3 bg-purple-500/60"></div>
+                  <div className="mb-3">
+                    <div className="h-10 w-32 bg-gray-600/50 rounded mb-2"></div>
+                    <div className="h-1.5 w-full bg-gray-700/50 rounded-full overflow-hidden">
+                      <div className="h-full w-[60%] bg-gradient-to-r from-purple-500 to-purple-400"></div>
+                    </div>
                   </div>
-                  <div className="mt-3 space-y-1.5">
-                    <div className="h-2 w-full bg-gray-700/30 rounded"></div>
-                    <div className="h-2 w-3/4 bg-gray-700/30 rounded"></div>
+                  <div className="mt-auto space-y-2">
+                    <div className="flex items-center gap-2">
+                      <div className="h-1.5 w-1.5 bg-purple-400 rounded-full"></div>
+                      <div className="h-2 w-28 bg-gray-600/40 rounded"></div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="h-1.5 w-1.5 bg-purple-400 rounded-full"></div>
+                      <div className="h-2 w-22 bg-gray-600/40 rounded"></div>
+                    </div>
                   </div>
                 </div>
                 
                 {/* Automation Rules Card */}
-                <div className="bg-gray-800/60 rounded-lg p-5 border border-gray-700/30">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="h-3 w-28 bg-gray-600/60 rounded"></div>
-                    <div className="h-4 w-4 bg-green-500/40 rounded"></div>
+                <div className="bg-gray-800/60 rounded-lg p-5 border border-gray-700/30 flex flex-col">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="h-3 w-32 bg-gray-600/60 rounded"></div>
+                    <div className="h-5 w-5 bg-green-500/50 rounded flex items-center justify-center">
+                      <div className="h-2 w-2 bg-green-400 rounded-full"></div>
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 p-2 bg-gray-700/30 rounded">
-                      <div className="h-2 w-2 bg-green-500/60 rounded-full"></div>
-                      <div className="h-2 w-20 bg-gray-600/40 rounded"></div>
+                  <div className="flex-1 space-y-2.5">
+                    <div className="flex items-center gap-3 p-2.5 bg-gray-700/40 rounded-lg border border-gray-600/30">
+                      <div className="h-2.5 w-2.5 bg-green-500 rounded-full flex-shrink-0"></div>
+                      <div className="flex-1">
+                        <div className="h-2.5 w-full bg-gray-600/50 rounded mb-1.5"></div>
+                        <div className="h-2 w-3/4 bg-gray-600/30 rounded"></div>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 p-2 bg-gray-700/30 rounded">
-                      <div className="h-2 w-2 bg-green-500/60 rounded-full"></div>
-                      <div className="h-2 w-24 bg-gray-600/40 rounded"></div>
+                    <div className="flex items-center gap-3 p-2.5 bg-gray-700/40 rounded-lg border border-gray-600/30">
+                      <div className="h-2.5 w-2.5 bg-green-500 rounded-full flex-shrink-0"></div>
+                      <div className="flex-1">
+                        <div className="h-2.5 w-full bg-gray-600/50 rounded mb-1.5"></div>
+                        <div className="h-2 w-4/5 bg-gray-600/30 rounded"></div>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 p-2 bg-gray-700/30 rounded">
-                      <div className="h-2 w-2 bg-green-500/60 rounded-full"></div>
-                      <div className="h-2 w-18 bg-gray-600/40 rounded"></div>
+                    <div className="flex items-center gap-3 p-2.5 bg-gray-700/40 rounded-lg border border-gray-600/30">
+                      <div className="h-2.5 w-2.5 bg-green-500 rounded-full flex-shrink-0"></div>
+                      <div className="flex-1">
+                        <div className="h-2.5 w-full bg-gray-600/50 rounded mb-1.5"></div>
+                        <div className="h-2 w-2/3 bg-gray-600/30 rounded"></div>
+                      </div>
                     </div>
                   </div>
                 </div>
