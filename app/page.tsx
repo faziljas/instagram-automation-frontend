@@ -110,10 +110,10 @@ export default function HomePage() {
                   <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                     <span className="text-white text-xs font-bold">LD</span>
                   </div>
-                  <div className="h-4 w-32 bg-gray-700/80 rounded"></div>
+                  <span className="text-gray-300 text-sm font-medium">Dashboard</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="h-3 w-16 bg-gray-700/60 rounded"></div>
+                  <span className="text-gray-400 text-xs">fazil.jas</span>
                   <div className="h-8 w-8 bg-gray-700/80 rounded-full"></div>
                 </div>
               </div>
@@ -123,25 +123,26 @@ export default function HomePage() {
                 {/* Stats Card 1 - DMs Sent */}
                 <div className="bg-gray-800/60 rounded-lg p-5 border border-gray-700/30 flex flex-col">
                   <div className="flex items-center justify-between mb-4">
-                    <div className="h-3 w-20 bg-gray-600/60 rounded"></div>
+                    <span className="text-gray-400 text-xs font-medium">DMs Sent</span>
                     <div className="h-5 w-5 bg-blue-500/50 rounded flex items-center justify-center">
-                      <div className="h-2 w-2 bg-blue-400 rounded-full"></div>
+                      <ChatBubbleLeftRightIcon className="h-3 w-3 text-blue-400" />
                     </div>
                   </div>
                   <div className="mb-3">
-                    <div className="h-10 w-28 bg-gray-600/50 rounded mb-2"></div>
+                    <div className="text-3xl font-bold text-white mb-2">847</div>
                     <div className="h-1.5 w-full bg-gray-700/50 rounded-full overflow-hidden">
                       <div className="h-full w-[75%] bg-gradient-to-r from-blue-500 to-blue-400"></div>
                     </div>
+                    <div className="text-xs text-gray-500 mt-1">75% of 1,000 limit</div>
                   </div>
                   <div className="mt-auto space-y-2">
                     <div className="flex items-center gap-2">
                       <div className="h-1.5 w-1.5 bg-blue-400 rounded-full"></div>
-                      <div className="h-2 w-24 bg-gray-600/40 rounded"></div>
+                      <span className="text-xs text-gray-400">Today: 23 DMs</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="h-1.5 w-1.5 bg-blue-400 rounded-full"></div>
-                      <div className="h-2 w-20 bg-gray-600/40 rounded"></div>
+                      <span className="text-xs text-gray-400">This week: 156 DMs</span>
                     </div>
                   </div>
                 </div>
@@ -149,25 +150,26 @@ export default function HomePage() {
                 {/* Stats Card 2 - Leads Captured */}
                 <div className="bg-gray-800/60 rounded-lg p-5 border border-gray-700/30 flex flex-col">
                   <div className="flex items-center justify-between mb-4">
-                    <div className="h-3 w-24 bg-gray-600/60 rounded"></div>
+                    <span className="text-gray-400 text-xs font-medium">Leads Captured</span>
                     <div className="h-5 w-5 bg-purple-500/50 rounded flex items-center justify-center">
-                      <div className="h-2 w-2 bg-purple-400 rounded-full"></div>
+                      <BoltIcon className="h-3 w-3 text-purple-400" />
                     </div>
                   </div>
                   <div className="mb-3">
-                    <div className="h-10 w-32 bg-gray-600/50 rounded mb-2"></div>
+                    <div className="text-3xl font-bold text-white mb-2">42</div>
                     <div className="h-1.5 w-full bg-gray-700/50 rounded-full overflow-hidden">
                       <div className="h-full w-[60%] bg-gradient-to-r from-purple-500 to-purple-400"></div>
                     </div>
+                    <div className="text-xs text-gray-500 mt-1">+12 this week</div>
                   </div>
                   <div className="mt-auto space-y-2">
                     <div className="flex items-center gap-2">
                       <div className="h-1.5 w-1.5 bg-purple-400 rounded-full"></div>
-                      <div className="h-2 w-28 bg-gray-600/40 rounded"></div>
+                      <span className="text-xs text-gray-400">Conversion: 4.9%</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="h-1.5 w-1.5 bg-purple-400 rounded-full"></div>
-                      <div className="h-2 w-22 bg-gray-600/40 rounded"></div>
+                      <span className="text-xs text-gray-400">Avg response: 2.3h</span>
                     </div>
                   </div>
                 </div>
@@ -175,31 +177,31 @@ export default function HomePage() {
                 {/* Automation Rules Card */}
                 <div className="bg-gray-800/60 rounded-lg p-5 border border-gray-700/30 flex flex-col">
                   <div className="flex items-center justify-between mb-4">
-                    <div className="h-3 w-32 bg-gray-600/60 rounded"></div>
+                    <span className="text-gray-400 text-xs font-medium">Active Rules</span>
                     <div className="h-5 w-5 bg-green-500/50 rounded flex items-center justify-center">
-                      <div className="h-2 w-2 bg-green-400 rounded-full"></div>
+                      <ShieldCheckIcon className="h-3 w-3 text-green-400" />
                     </div>
                   </div>
                   <div className="flex-1 space-y-2.5">
                     <div className="flex items-center gap-3 p-2.5 bg-gray-700/40 rounded-lg border border-gray-600/30">
                       <div className="h-2.5 w-2.5 bg-green-500 rounded-full flex-shrink-0"></div>
                       <div className="flex-1">
-                        <div className="h-2.5 w-full bg-gray-600/50 rounded mb-1.5"></div>
-                        <div className="h-2 w-3/4 bg-gray-600/30 rounded"></div>
+                        <div className="text-xs font-medium text-gray-200 mb-1">Story Reply Rule</div>
+                        <div className="text-xs text-gray-500">Triggers: 12 today</div>
                       </div>
                     </div>
                     <div className="flex items-center gap-3 p-2.5 bg-gray-700/40 rounded-lg border border-gray-600/30">
                       <div className="h-2.5 w-2.5 bg-green-500 rounded-full flex-shrink-0"></div>
                       <div className="flex-1">
-                        <div className="h-2.5 w-full bg-gray-600/50 rounded mb-1.5"></div>
-                        <div className="h-2 w-4/5 bg-gray-600/30 rounded"></div>
+                        <div className="text-xs font-medium text-gray-200 mb-1">DM Follow-up</div>
+                        <div className="text-xs text-gray-500">Triggers: 8 today</div>
                       </div>
                     </div>
                     <div className="flex items-center gap-3 p-2.5 bg-gray-700/40 rounded-lg border border-gray-600/30">
                       <div className="h-2.5 w-2.5 bg-green-500 rounded-full flex-shrink-0"></div>
                       <div className="flex-1">
-                        <div className="h-2.5 w-full bg-gray-600/50 rounded mb-1.5"></div>
-                        <div className="h-2 w-2/3 bg-gray-600/30 rounded"></div>
+                        <div className="text-xs font-medium text-gray-200 mb-1">Comment Response</div>
+                        <div className="text-xs text-gray-500">Triggers: 5 today</div>
                       </div>
                     </div>
                   </div>
