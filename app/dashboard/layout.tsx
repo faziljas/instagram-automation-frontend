@@ -30,7 +30,8 @@ const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
   { name: 'Accounts', href: '/dashboard/accounts', icon: UserGroupIcon },
   { name: 'Automations', href: '/dashboard/automations', icon: SparklesIcon },
-  { name: 'Rules', href: '/dashboard/rules', icon: BoltIcon },
+  // Rules view has been merged into Automations; keep backend APIs but hide this tab.
+  // { name: 'Rules', href: '/dashboard/rules', icon: BoltIcon },
   { name: 'Analytics', href: '/dashboard/analytics', icon: ChartBarIcon },
   { name: 'Subscription', href: '/dashboard/subscription', icon: CreditCardIcon },
   { name: 'Settings', href: '/dashboard/settings', icon: Cog6ToothIcon },

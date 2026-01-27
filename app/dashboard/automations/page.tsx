@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useFetch } from '@/hooks/useFetch';
 import { TableSkeleton } from '@/components/Skeleton';
-// import { PlusIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import { mutate } from 'swr';
 import AutomationSetupModal from '@/components/AutomationSetupModal';
 import AutomationDrawer from '@/components/AutomationDrawer';
@@ -876,23 +875,27 @@ export default function AutomationsPage() {
                           : mediaItem.media_url || mediaItem.thumbnail_url;
                         
                         return (
-                          <tr
-                            key={mediaItem.id}
-                            className={`transition-colors duration-150 ${
-                              !rule && hasReachedRulesLimit
-                                ? 'opacity-60 cursor-not-allowed'
-                                : 'hover:bg-blue-50/50 cursor-pointer'
-                            }`}
-                            onClick={() => {
-                              // Only allow creating new rules if limit not reached, or if editing existing rule
-                              if (!rule && hasReachedRulesLimit) {
-                                alert(`You've reached your automation rules limit (${currentRulesCount}/${rulesLimit}). Upgrade to Pro to create more automation rules.`);
-                                return;
-                              }
-                              handleSetupAutomation(mediaItem);
-                            }}
-                          >
-                            <td className="px-6 py-4 whitespace-nowrap">
+                      <tr
+                        key={mediaItem.id}
+                        className="transition-colors duration-150 hover:bg-blue-50/50"
+                      >
+                            <td
+                              className={`px-6 py-4 whitespace-nowrap ${
+                                !rule && hasReachedRulesLimit
+                                  ? 'opacity-60 cursor-not-allowed'
+                                  : 'cursor-pointer'
+                              }`}
+                              onClick={() => {
+                                // Only allow creating new rules if limit not reached, or if editing existing rule
+                                if (!rule && hasReachedRulesLimit) {
+                                  alert(
+                                    `You've reached your automation rules limit (${currentRulesCount}/${rulesLimit}). Upgrade to Pro to create more automation rules.`,
+                                  );
+                                  return;
+                                }
+                                handleSetupAutomation(mediaItem);
+                              }}
+                            >
                               <div className="flex items-center">
                                 <div className="flex-shrink-0 h-14 w-14">
                                   {imageUrl ? (
@@ -963,6 +966,69 @@ export default function AutomationsPage() {
                                     minute: '2-digit',
                                   })
                                 : rule ? '-' : 'Not configured'}
+                            </td>
+                            {/* Actions: Edit & Delete */}
+                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                              {rule ? (
+                                <div className="flex items-center justify-end space-x-3">
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      // Reuse drawer flow for editing
+                                      handleSetupAutomation(mediaItem);
+                                    }}
+                                    className="text-blue-600 hover:text-blue-800 font-bold hover:scale-105 transition-all duration-200"
+                                  >
+                                    Edit
+                                  </button>
+                                  <button
+                                    onClick={async (e) => {
+                                      e.stopPropagation();
+                                      if (
+                                        !window.confirm(
+                                          'Are you sure you want to delete this automation rule?',
+                                        )
+                                      ) {
+                                        return;
+                                      }
+                                      try {
+                                        await del(`/automation/rules/${rule.id}`);
+
+                                        // Remove rule from local automationRules state
+                                        setAutomationRules((prev) => {
+                                          const next = { ...prev };
+                                          const rulesForMedia = (next[mediaItem.id] || []).filter(
+                                            (r) => r.id !== rule.id,
+                                          );
+                                          if (rulesForMedia.length > 0) {
+                                            next[mediaItem.id] = rulesForMedia;
+                                          } else {
+                                            delete next[mediaItem.id];
+                                          }
+                                          return next;
+                                        });
+
+                                        // Refresh analytics + limits (rules count)
+                                        void mutate('/automation/rules');
+                                        void mutate('/users/subscription');
+                                      } catch (error: any) {
+                                        console.error('Failed to delete automation rule:', error);
+                                        alert(
+                                          error?.message ||
+                                            'Failed to delete automation rule. Please try again.',
+                                        );
+                                      }
+                                    }}
+                                    className="text-red-600 hover:text-red-800 font-bold hover:scale-105 transition-all duration-200"
+                                  >
+                                    Delete
+                                  </button>
+                                </div>
+                              ) : (
+                                <div className="text-right text-xs text-gray-400 pr-2">
+                                  {/* No actions when there is no rule yet */}
+                                </div>
+                              )}
                             </td>
                           </tr>
                         );
