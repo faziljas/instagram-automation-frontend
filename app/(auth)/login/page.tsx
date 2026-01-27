@@ -535,8 +535,8 @@ function LoginPageContent() {
 
         {/* Static Notification (for Welcome/Login) */}
         {(viewState === 'welcome' || viewState === 'login') && (
-          <div className="relative z-10 flex items-center justify-end h-full px-12">
-            <div className="max-w-xs animate-float mr-8">
+          <div className="relative z-10 flex items-center justify-center h-full px-12">
+            <div className="max-w-xs animate-float">
               <div className="bg-white rounded-2xl shadow-2xl p-4 border border-gray-200">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-semibold text-sm">
