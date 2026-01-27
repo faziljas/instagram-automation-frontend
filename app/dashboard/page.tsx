@@ -194,6 +194,25 @@ export default function DashboardPage() {
     void loadStats();
   }, []);
 
+  // Top posts: keep static for now until there is a dedicated table
+  const topPosts = [
+    {
+      id: '1',
+      caption: '“The DM engine that replies to every comment so you don’t have to.”',
+      dms: 240,
+    },
+    {
+      id: '2',
+      caption: '“Drop ‘PRICE’ below and I’ll send you the full breakdown + case study.”',
+      dms: 185,
+    },
+    {
+      id: '3',
+      caption: '“We turned 1 post into 327 conversations. Want the template?”',
+      dms: 132,
+    },
+  ];
+
   return (
     <div className="max-w-7xl mx-auto">
       {/* Hero Banner - More Vibrant */}
