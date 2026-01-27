@@ -9,6 +9,7 @@ import AutomationDrawer from '@/components/AutomationDrawer';
 import MessagesView from '@/components/MessagesView';
 import { get, post, put, del } from '@/utils/api';
 import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/components/Toast';
 
 interface InstagramAccountResponse {
   id: number;
@@ -85,6 +86,7 @@ const PLAN_LIMITS: Record<string, { accounts: number; rules: number; dms: number
 
 export default function AutomationsPage() {
   const { session } = useAuth();
+  const toast = useToast();
   const { data: accounts, isLoading: accountsLoading, mutate: refreshAccounts } = useFetch<InstagramAccountResponse[]>('/users/me/accounts');
   
   // Refresh accounts when page becomes visible (in case a new account was connected)
@@ -637,26 +639,16 @@ export default function AutomationsPage() {
           </button>
           <button
             onClick={() => {
-              if (!hasProPlan) {
-                setShowUpgradeModal(true);
-              } else {
-                setSelectedTab('live');
-              }
+              // IG Live is in private beta – show info toast and keep tab inactive
+              toast.info('IG Live Automation is currently in private beta. Check back soon!', 4000);
             }}
-            disabled={!hasProPlan}
-            className={`py-4 px-1 border-b-3 font-bold text-sm relative transition-all duration-200 ${
-              selectedTab === 'live'
-                ? 'border-blue-500 text-blue-600'
-                : !hasProPlan
-                ? 'border-transparent text-gray-400 cursor-not-allowed'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
-            title={!hasProPlan ? 'Upgrade to Pro to unlock IG Live automation' : ''}
+            className={`py-4 px-1 border-b-3 font-bold text-sm relative transition-all duration-200 border-transparent text-gray-400 cursor-not-allowed`}
+            title="IG Live Automation is currently in private beta. Check back soon!"
           >
             IG Live
-            {!hasProPlan && (
-              <span className="ml-1 text-xs bg-purple-100 text-purple-800 px-1.5 py-0.5 rounded-full">PRO</span>
-            )}
+            <span className="ml-1 text-xs bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded-full">
+              SOON
+            </span>
           </button>
         </nav>
       </div>
