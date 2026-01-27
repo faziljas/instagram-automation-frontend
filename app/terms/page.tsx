@@ -170,16 +170,6 @@ export default function TermsPage() {
             </p>
           </section>
         </div>
-
-        {/* Footer Navigation */}
-        <div className="mt-12 pt-8 border-t border-gray-200">
-          <Link 
-            href="/" 
-            className="text-blue-600 hover:text-blue-800 font-medium"
-          >
-            ← Back to Home
-          </Link>
-        </div>
       </div>
     </div>
   );
