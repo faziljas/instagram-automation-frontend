@@ -275,7 +275,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden">
+    <div className="fixed inset-0 z-50 overflow-hidden max-w-full overflow-x-hidden">
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
@@ -283,11 +283,11 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
       />
 
       {/* Drawer */}
-      <div className="fixed right-0 top-0 h-full w-full max-w-7xl shadow-xl">
-        <div className="flex h-full bg-white">
+      <div className="fixed right-0 top-0 h-full w-full max-w-full md:max-w-7xl shadow-xl">
+        <div className="flex flex-col md:flex-row h-full bg-white">
           {/* Left Side: Settings Form */}
-          <div className="flex-1 overflow-y-auto border-r border-gray-200">
-            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-100 bg-white px-6 py-4">
+          <div className="flex-1 overflow-y-auto border-r-0 md:border-r border-gray-200 max-w-full overflow-x-hidden">
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-100 bg-white px-4 md:px-6 py-4">
               <h2 className="text-lg font-semibold text-gray-900">
                 Automation Builder
               </h2>
@@ -299,7 +299,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
               </button>
             </div>
 
-            <div className="px-6 py-6 space-y-6">
+            <div className="px-4 md:px-6 py-4 md:py-6 space-y-6 max-w-full overflow-x-hidden">
               {/* DM Flow Type (Simple vs Lead Capture) */}
               <div className="mb-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
@@ -339,7 +339,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                   </label>
                   <div className="relative group">
                     <InformationCircleIcon className="h-5 w-5 text-blue-500 hover:text-blue-600 cursor-help transition-colors" />
-                    <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-72 p-3 bg-gray-900 text-white text-xs rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none whitespace-normal">
+                    <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-64 md:w-72 max-w-[calc(100vw-2rem)] p-3 bg-gray-900 text-white text-xs rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none whitespace-normal">
                       <p className="text-center leading-relaxed">
                         If no keywords are added, replies will be sent for all comments. Add keywords to trigger only on matching comments.
                       </p>
@@ -427,7 +427,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                       </label>
                       <div className="relative group">
                         <InformationCircleIcon className="h-5 w-5 text-blue-500 hover:text-blue-600 cursor-help transition-colors" />
-                        <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-72 p-3 bg-gray-900 text-white text-xs rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none whitespace-normal">
+                        <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-64 md:w-72 max-w-[calc(100vw-2rem)] p-3 bg-gray-900 text-white text-xs rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none whitespace-normal">
                           <p className="text-center leading-relaxed">
                             Enable this to automatically reply to public comments on your post. Replies will be sent as public comments visible to everyone.
                           </p>
@@ -478,7 +478,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                         const replies = activeTab === 'simple' ? config.simpleCommentReplies : config.leadCommentReplies;
                         const reply = replies[index] || '';
                         return (
-                          <div key={index} className="flex gap-3">
+                          <div key={index} className="flex flex-col sm:flex-row gap-3">
                           <textarea
                             value={reply}
                             onChange={(e) => {
@@ -721,7 +721,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                           : (config.leadDmMessages.length ? config.leadDmMessages : ['']);
                         const message = messages[index] || '';
                         return (
-                          <div key={index} className="flex gap-3">
+                          <div key={index} className="flex flex-col sm:flex-row gap-3">
                           <textarea
                             value={message}
                             onChange={(e) => {
@@ -815,7 +815,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                     <div className="space-y-3">
                        {config.buttons.map((button, index) => (
                           <div key={index} className="flex gap-3 items-start">
-                            <div className="grid grid-cols-2 gap-3 flex-1">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-1">
                               <input
                                 type="text"
                                 value={button.text}
@@ -897,7 +897,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
               </div>
 
               {/* Save Button */}
-              <div className="sticky bottom-0 bg-white flex justify-end gap-3 pt-6 pb-6 border-t border-gray-200 mt-6">
+              <div className="sticky bottom-0 bg-white flex flex-col sm:flex-row justify-end gap-3 pt-4 md:pt-6 pb-4 md:pb-6 px-4 md:px-0 border-t border-gray-200 mt-6">
                 <button
                   onClick={onClose}
                   className="px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-700 rounded-lg transition-colors"
@@ -916,13 +916,13 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
           </div>
 
           {/* Right Side: Live Preview */}
-          <div className="flex-1 overflow-y-auto bg-gray-50">
-            <div className="sticky top-0 z-10 bg-gray-50 px-6 py-4 border-b border-gray-200">
+          <div className="flex-1 overflow-y-auto bg-gray-50 max-w-full overflow-x-hidden hidden md:block">
+            <div className="sticky top-0 z-10 bg-gray-50 px-4 md:px-6 py-4 border-b border-gray-200">
               <h3 className="text-lg font-semibold text-gray-900">
                 Live Preview
               </h3>
             </div>
-            <div className="p-6">
+            <div className="p-4 md:p-6">
               <MobilePreview
                 media={media}
                 config={config}

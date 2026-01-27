@@ -11,6 +11,11 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://instagramauto.com';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 5,
+  },
   title: {
     default: 'LogicDM',
   },
