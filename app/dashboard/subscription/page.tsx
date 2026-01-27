@@ -410,8 +410,8 @@ export default function SubscriptionPage() {
       <div className="relative overflow-hidden bg-gradient-to-br from-green-500 via-emerald-500 to-teal-500 rounded-2xl mb-8 shadow-xl">
         <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent"></div>
         <div className="relative py-10 px-8">
-          <h1 className="text-4xl font-bold text-white mb-2">Subscription & Billing</h1>
-          <p className="text-lg text-white/90">Manage your subscription and view usage details</p>
+          <h1 className="text-4xl font-bold text-white mb-2">Usage Details</h1>
+          <p className="text-lg text-white/90">View how you&apos;re using LogicDM each month</p>
         </div>
       </div>
 
@@ -590,60 +590,7 @@ export default function SubscriptionPage() {
         </div>
       )}
 
-      {/* Cancel Subscription */}
-      {displayPlan !== 'free' && subscriptionData.status !== 'cancelled' && (
-        <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl p-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-3">Cancel Subscription</h2>
-          <p className="text-sm font-medium text-gray-600 mb-6">
-            If you cancel your subscription, you will continue to have full access to Pro features until the end of your current billing cycle. You will not be charged again.
-          </p>
-          <button
-            onClick={() => setShowCancelModal(true)}
-            className="inline-flex items-center px-6 py-3 border-2 border-red-300 rounded-xl shadow-md text-sm font-bold text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200 hover:scale-105"
-          >
-            <XCircleIcon className="h-5 w-5 mr-2" />
-            Cancel Subscription
-          </button>
-        </div>
-      )}
-
-      {/* Cancel Confirmation Modal */}
-      {showCancelModal && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="flex items-center justify-center min-h-screen px-4">
-            <div
-              className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-              onClick={() => setShowCancelModal(false)}
-            />
-            <div className="relative bg-white rounded-2xl px-6 pt-6 pb-6 text-center shadow-2xl sm:p-8 max-w-md border-2 border-gray-200">
-              <div className="mx-auto flex items-center justify-center h-14 w-14 rounded-full bg-gradient-to-br from-red-100 to-rose-100 mb-4">
-                <ExclamationTriangleIcon className="h-7 w-7 text-red-600" />
-              </div>
-              <div className="mt-3">
-                <h3 className="text-xl font-bold text-gray-900">Cancel Subscription</h3>
-                <p className="mt-2 text-sm font-medium text-gray-600">
-                  Are you sure you want to cancel your subscription? You will continue to have full access to Pro features until the end of your current billing cycle. You will not be charged again.
-                </p>
-              </div>
-              <div className="mt-6 flex justify-center space-x-4">
-                <button
-                  onClick={() => setShowCancelModal(false)}
-                  className="px-6 py-3 text-sm font-bold text-gray-700 bg-white border-2 border-gray-300 rounded-xl hover:bg-gray-50 transition-all duration-200"
-                >
-                  Keep Subscription
-                </button>
-                <button
-                  onClick={handleCancelSubscription}
-                  disabled={cancelLoading}
-                  className="px-6 py-3 text-sm font-bold text-white bg-gradient-to-r from-red-600 to-rose-600 rounded-xl hover:from-red-700 hover:to-rose-700 disabled:opacity-50 transition-all duration-200 hover:scale-105"
-                >
-                  {cancelLoading ? 'Canceling...' : 'Yes, Cancel'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Cancel Subscription UI removed - billing management handled in Settings/Billing tab */}
     </div>
   );
 }

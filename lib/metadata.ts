@@ -102,8 +102,8 @@ export const pageMetadata = {
   }),
 
   subscription: generateMetadata({
-    title: 'Subscription & Billing',
-    description: 'Manage your subscription plan and billing information.',
+    title: 'Usage Details',
+    description: 'View your current plan limits and usage statistics.',
     path: '/dashboard/subscription',
     noIndex: true,
   }),
