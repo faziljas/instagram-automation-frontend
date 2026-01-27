@@ -523,7 +523,7 @@ export default function SubscriptionPage() {
                   limits.rules === -1 ? 0 : getUsagePercentage(subscriptionData.usage.rules, limits.rules)
                 )}`}
                 style={{
-                  width: `${limits.rules === -1 ? 50 : getUsagePercentage(subscriptionData.usage.rules, limits.rules)}%`,
+                  width: `${limits.rules === -1 ? (subscriptionData.usage.rules === 0 ? 0 : 50) : getUsagePercentage(subscriptionData.usage.rules, limits.rules)}%`,
                 }}
               />
             </div>
