@@ -1,6 +1,6 @@
 'use client';
 
-import { FaCommentAlt } from 'react-icons/fa';
+import { BsChatFill } from 'react-icons/bs';
 
 interface LogoProps {
   className?: string;
@@ -34,12 +34,12 @@ export default function Logo({ className = '', size = 'md', variant = 'light' }:
         <span className={textColor}>Log</span>
         <span className="relative inline-block">
           i
-          {/* Round speech bubble (FaCommentAlt) – absolute over the "i" dot, tail down */}
-          <FaCommentAlt
+          {/* Round speech bubble (BsChatFill) – absolute over the "i" dot, tail pointing down towards stem */}
+          <BsChatFill
             className={`absolute left-1/2 ${iconSizeClasses[size]} ${bubbleColorClass} pointer-events-none z-[2]`}
             style={{
               top: '-0.6em',
-              transform: 'translateX(-50%) rotate(-10deg)',
+              transform: 'translateX(-50%) rotate(12deg)',
             }}
           />
           {/* Mask the original "i" dot */}
