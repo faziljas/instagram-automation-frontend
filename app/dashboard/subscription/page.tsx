@@ -32,7 +32,7 @@ interface SubscriptionResponse {
 const PLAN_LIMITS: Record<string, { accounts: number; rules: number; dms: number }> = {
   free: { accounts: 1, rules: -1, dms: 1000 }, // High Volume pricing: unlimited rules, 1000 DMs
   basic: { accounts: 3, rules: 10, dms: 500 },
-  pro: { accounts: 10, rules: 50, dms: 5000 },
+  pro: { accounts: 3, rules: -1, dms: -1 }, // High Volume pricing: 3 accounts, unlimited rules, unlimited DMs
   enterprise: { accounts: -1, rules: -1, dms: -1 }, // unlimited
 };
 
@@ -40,7 +40,7 @@ const PLAN_LIMITS: Record<string, { accounts: number; rules: number; dms: number
 const PLAN_FEATURES: Record<string, string[]> = {
   free: ['1 Instagram Account', 'Unlimited Automation Rules', '1,000 Auto-replies / mo', 'Basic Support'],
   basic: ['3 Instagram Accounts', '10 Automation Rules', '500 DMs/month', 'Email Support'],
-  pro: ['10 Instagram Accounts', '50 Automation Rules', '5000 DMs/month', 'Priority Support'],
+  pro: ['3 Instagram Accounts', 'Unlimited Automation Rules', 'Unlimited Auto-replies', "Remove 'Sent by LogicDM' Branding", 'Priority Support'],
   enterprise: ['Unlimited Accounts', 'Unlimited Rules', 'Unlimited DMs', '24/7 Premium Support'],
 };
 
@@ -451,11 +451,13 @@ export default function SubscriptionPage() {
               <span
                 className={`text-4xl font-bold capitalize ${getPlanColor(displayPlan)}`}
               >
-                {displayPlan}
+                {displayPlan === 'pro' && subscriptionData.status === 'active' ? 'Pro - Active' : displayPlan}
               </span>
               <span
                 className={`px-4 py-2 inline-flex text-sm font-bold rounded-xl shadow-sm ${
-                  subscriptionData.status === 'active' 
+                  displayPlan === 'pro' && subscriptionData.status === 'active'
+                    ? 'bg-gradient-to-r from-yellow-400 via-amber-500 to-orange-500 text-white border border-amber-600 shadow-lg'
+                    : subscriptionData.status === 'active' 
                     ? 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border border-green-300' 
                     : subscriptionData.status === 'cancelled' && subscriptionData.cancellation_end_date
                     ? 'bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border border-blue-300'
@@ -463,7 +465,7 @@ export default function SubscriptionPage() {
                 }`}
               >
                 {subscriptionData.status === 'active' 
-                  ? 'Active' 
+                  ? displayPlan === 'pro' ? 'Active' : 'Active'
                   : subscriptionData.status === 'cancelled' && subscriptionData.cancellation_end_date
                   ? 'Cancelled (Active until cycle ends)'
                   : subscriptionData.status}
@@ -524,20 +526,32 @@ export default function SubscriptionPage() {
           <div>
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-gray-700">DMs Sent This Month</span>
-              <span className="text-sm text-gray-600">
-                {subscriptionData.usage.dms_sent_this_month} / {limits.dms === -1 ? '∞' : limits.dms}
-              </span>
+              {limits.dms === -1 ? (
+                <span className="text-sm font-semibold text-green-600 flex items-center">
+                  {subscriptionData.usage.dms_sent_this_month} <span className="ml-1">(∞ Unlimited)</span>
+                </span>
+              ) : (
+                <span className="text-sm text-gray-600">
+                  {subscriptionData.usage.dms_sent_this_month} / {limits.dms}
+                </span>
+              )}
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div
-                className={`h-2 rounded-full transition-all ${getUsageColor(
-                  limits.dms === -1 ? 0 : getUsagePercentage(subscriptionData.usage.dms_sent_this_month, limits.dms)
-                )}`}
-                style={{
-                  width: `${limits.dms === -1 ? 50 : getUsagePercentage(subscriptionData.usage.dms_sent_this_month, limits.dms)}%`,
-                }}
-              />
-            </div>
+            {limits.dms === -1 ? (
+              <div className="mt-2 text-xs text-green-600 font-medium flex items-center">
+                <span className="text-lg mr-1">∞</span> Unlimited auto-replies
+              </div>
+            ) : (
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div
+                  className={`h-2 rounded-full transition-all ${getUsageColor(
+                    getUsagePercentage(subscriptionData.usage.dms_sent_this_month, limits.dms)
+                  )}`}
+                  style={{
+                    width: `${getUsagePercentage(subscriptionData.usage.dms_sent_this_month, limits.dms)}%`,
+                  }}
+                />
+              </div>
+            )}
           </div>
 
           {/* Rules Created Usage */}

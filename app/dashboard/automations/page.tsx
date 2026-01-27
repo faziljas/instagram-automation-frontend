@@ -1396,9 +1396,10 @@ export default function AutomationsPage() {
                   <li className="flex items-center"><span className="mr-2">✅</span> Stories automation</li>
                   <li className="flex items-center"><span className="mr-2">✅</span> DMs automation</li>
                   <li className="flex items-center"><span className="mr-2">✅</span> IG Live automation</li>
-                  <li className="flex items-center"><span className="mr-2">✅</span> 10 Instagram accounts</li>
-                  <li className="flex items-center"><span className="mr-2">✅</span> 50 automation rules</li>
-                  <li className="flex items-center"><span className="mr-2">✅</span> 5,000 DMs/month</li>
+                  <li className="flex items-center"><span className="mr-2">✅</span> 3 Instagram accounts</li>
+                  <li className="flex items-center"><span className="mr-2">✅</span> Unlimited automation rules</li>
+                  <li className="flex items-center"><span className="mr-2">✅</span> Unlimited auto-replies</li>
+                  <li className="flex items-center"><span className="mr-2">✅</span> Remove &apos;Sent by LogicDM&apos; branding</li>
                   <li className="flex items-center"><span className="mr-2">✅</span> Priority support</li>
                 </ul>
               </div>
