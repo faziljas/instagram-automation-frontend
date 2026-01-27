@@ -6,6 +6,13 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 text-sm">
           <Link
+            href="/pricing"
+            className="hover:text-white transition-colors duration-200"
+          >
+            Pricing
+          </Link>
+          <span className="hidden sm:inline text-gray-600">•</span>
+          <Link
             href="/privacy"
             className="hover:text-white transition-colors duration-200"
           >
