@@ -849,29 +849,29 @@ export default function AutomationsPage() {
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
                       <tr>
-                        <th className="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
-                          Automation
+                        <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                          <div className="w-full text-center">Automation</div>
                         </th>
                         <th
-                          className="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider"
+                          className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider"
                           title="Increases when users click &quot;Follow Me&quot; / &quot;I&#39;m following&quot; in DMs"
                         >
-                          NEW FOLLOWERS
+                          <div className="w-full text-center">NEW FOLLOWERS</div>
                         </th>
-                        <th className="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
-                          RUNS
+                        <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                          <div className="w-full text-center">RUNS</div>
                         </th>
-                        <th className="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
-                          CLICKS
+                        <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                          <div className="w-full text-center">CLICKS</div>
                         </th>
-                        <th className="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
-                          STATUS
+                        <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                          <div className="w-full text-center">STATUS</div>
                         </th>
-                        <th className="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
-                          LAST MODIFIED
+                        <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                          <div className="w-full text-center">LAST MODIFIED</div>
                         </th>
-                        <th className="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
-                          Action
+                        <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                          <div className="w-full text-center">Action</div>
                         </th>
                       </tr>
                     </thead>
