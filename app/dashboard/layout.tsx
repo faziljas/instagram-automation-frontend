@@ -8,6 +8,7 @@ import { useFetch } from '@/hooks/useFetch';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import UserProfileMenu from '@/components/UserProfileMenu';
 import Logo from '@/components/Logo';
+import { ToastProvider } from '@/components/Toast';
 import {
   Bars3Icon,
   XMarkIcon,
@@ -54,7 +55,8 @@ export default function DashboardLayout({
   const isProOrEnterprise = subscriptionData?.plan_tier === 'pro' || subscriptionData?.plan_tier === 'enterprise';
 
   return (
-    <ProtectedRoute>
+    <ToastProvider>
+      <ProtectedRoute>
       <div className="min-h-screen dashboard-main-bg">
         {/* Mobile sidebar overlay */}
         {sidebarOpen && (
@@ -207,6 +209,7 @@ export default function DashboardLayout({
           <main className="py-6 px-4 sm:px-6 lg:px-8">{children}</main>
         </div>
       </div>
-    </ProtectedRoute>
+      </ProtectedRoute>
+    </ToastProvider>
   );
 }
