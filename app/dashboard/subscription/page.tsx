@@ -526,32 +526,20 @@ export default function SubscriptionPage() {
           <div>
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-gray-700">DMs Sent This Month</span>
-              {limits.dms === -1 ? (
-                <span className="text-sm font-semibold text-green-600 flex items-center">
-                  {subscriptionData.usage.dms_sent_this_month} <span className="ml-1">(∞ Unlimited)</span>
-                </span>
-              ) : (
-                <span className="text-sm text-gray-600">
-                  {subscriptionData.usage.dms_sent_this_month} / {limits.dms}
-                </span>
-              )}
+              <span className="text-sm text-gray-600">
+                {subscriptionData.usage.dms_sent_this_month} / {limits.dms === -1 ? '∞' : limits.dms}
+              </span>
             </div>
-            {limits.dms === -1 ? (
-              <div className="mt-2 text-xs text-green-600 font-medium flex items-center">
-                <span className="text-lg mr-1">∞</span> Unlimited auto-replies
-              </div>
-            ) : (
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div
-                  className={`h-2 rounded-full transition-all ${getUsageColor(
-                    getUsagePercentage(subscriptionData.usage.dms_sent_this_month, limits.dms)
-                  )}`}
-                  style={{
-                    width: `${getUsagePercentage(subscriptionData.usage.dms_sent_this_month, limits.dms)}%`,
-                  }}
-                />
-              </div>
-            )}
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div
+                className={`h-2 rounded-full transition-all ${getUsageColor(
+                  limits.dms === -1 ? 0 : getUsagePercentage(subscriptionData.usage.dms_sent_this_month, limits.dms)
+                )}`}
+                style={{
+                  width: `${limits.dms === -1 ? 50 : getUsagePercentage(subscriptionData.usage.dms_sent_this_month, limits.dms)}%`,
+                }}
+              />
+            </div>
           </div>
 
           {/* Rules Created Usage */}
