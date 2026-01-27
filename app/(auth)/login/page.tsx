@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { HiShieldCheck } from 'react-icons/hi';
+import { FaInstagram, FaBolt, FaRocket } from 'react-icons/fa';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { z } from 'zod';
@@ -551,39 +552,58 @@ function LoginPageContent() {
           </div>
         )}
 
-        {/* Scrolling Marquee (for Signup) */}
+        {/* How LogicDM Works Timeline (for Signup) */}
         {viewState === 'signup' && (
-          <div className="relative z-10 h-full overflow-hidden flex items-center justify-center px-12">
-            <div className="scrolling-marquee w-full max-w-sm">
-              <div className="scrolling-marquee-content">
-                {/* Feature Cards - Duplicated for seamless loop */}
-                {[...Array(2)].map((_, loopIndex) => (
-                  <div key={loopIndex} className="space-y-4">
-                    <div className="backdrop-blur-md bg-white/10 p-6 rounded-2xl border border-white/20">
-                      <p className="text-2xl mb-2">🚀</p>
-                      <p className="text-white font-semibold">Auto-replied to 500 comments</p>
-                    </div>
-                    <div className="backdrop-blur-md bg-white/10 p-6 rounded-2xl border border-white/20">
-                      <p className="text-2xl mb-2">💬</p>
-                      <p className="text-white font-semibold mb-1">@SarahFashion</p>
-                      <p className="text-white/80 text-sm">LogicDM saved me 10 hours this week!</p>
-                    </div>
-                    <div className="backdrop-blur-md bg-white/10 p-6 rounded-2xl border border-white/20">
-                      <p className="text-2xl mb-2">🔒</p>
-                      <p className="text-white font-semibold">100% Meta Approved & Safe</p>
-                    </div>
-                    <div className="backdrop-blur-md bg-white/10 p-6 rounded-2xl border border-white/20">
-                      <p className="text-2xl mb-2">📈</p>
-                      <p className="text-white font-semibold mb-1">Alex Rivera</p>
-                      <p className="text-white/80 text-sm">Engagement increased by 300%</p>
-                    </div>
-                    <div className="backdrop-blur-md bg-white/10 p-6 rounded-2xl border border-white/20">
-                      <p className="text-2xl mb-2">💬</p>
-                      <p className="text-white font-semibold mb-1">Sam Lo</p>
-                      <p className="text-white/80 text-sm">Best automation tool I've used!</p>
+          <div className="relative z-10 flex flex-col items-center justify-center h-full px-12">
+            <div className="max-w-md w-full space-y-8">
+              {/* Headline */}
+              <h2 className="text-3xl font-bold text-white text-center">
+                Launch your first automation in 60 seconds.
+              </h2>
+
+              {/* Timeline Steps */}
+              <div className="relative">
+                {/* Vertical Timeline Line */}
+                <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-white/20"></div>
+
+                {/* Step 1: Connect */}
+                <div className="relative flex items-start gap-6 mb-8 animate-fade-in" style={{ animationDelay: '0s' }}>
+                  <div className="flex-shrink-0 w-16 h-16 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center shadow-lg border-2 border-white/20">
+                    <FaInstagram className="w-8 h-8 text-white" />
+                  </div>
+                  <div className="flex-1 pt-2">
+                    <div className="backdrop-blur-md bg-white/10 p-5 rounded-xl border border-white/20 shadow-lg">
+                      <h3 className="text-lg font-semibold text-white mb-1">Connect your Account</h3>
+                      <p className="text-sm text-white/80">Securely link your Creator or Business profile via the Official Meta API.</p>
                     </div>
                   </div>
-                ))}
+                </div>
+
+                {/* Step 2: Trigger */}
+                <div className="relative flex items-start gap-6 mb-8 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+                  <div className="flex-shrink-0 w-16 h-16 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/20">
+                    <FaBolt className="w-8 h-8 text-white" />
+                  </div>
+                  <div className="flex-1 pt-2">
+                    <div className="backdrop-blur-md bg-white/10 p-5 rounded-xl border border-white/20 shadow-lg">
+                      <h3 className="text-lg font-semibold text-white mb-1">Set a Keyword</h3>
+                      <p className="text-sm text-white/80">Choose a trigger word like 'Price' or 'Link' for your posts.</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Step 3: Profit */}
+                <div className="relative flex items-start gap-6 animate-fade-in" style={{ animationDelay: '0.4s' }}>
+                  <div className="flex-shrink-0 w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center shadow-lg border-2 border-white/20">
+                    <FaRocket className="w-8 h-8 text-white" />
+                  </div>
+                  <div className="flex-1 pt-2">
+                    <div className="backdrop-blur-md bg-white/10 p-5 rounded-xl border border-white/20 shadow-lg">
+                      <h3 className="text-lg font-semibold text-white mb-1">Watch it Work</h3>
+                      <p className="text-sm text-white/80">LogicDM instantly replies and sends the DM while you sleep.</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
