@@ -2,9 +2,9 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: {
-    absolute: 'LogicDM Subscription',
+    absolute: 'LogicDM Usage Details',
   },
-  description: 'Manage your subscription plan and billing information.',
+  description: 'View your current plan limits and usage statistics.',
   robots: {
     index: false,
     follow: false,
