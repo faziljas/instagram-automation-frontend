@@ -103,34 +103,74 @@ export default function HomePage() {
 
           {/* Dashboard Mockup Preview */}
           <div className="w-full max-w-5xl mx-auto aspect-video bg-gray-900 rounded-xl shadow-2xl shadow-purple-500/20 border border-gray-200/50 overflow-hidden transform hover:scale-[1.01] transition-transform duration-300">
-            <div className="h-full bg-gradient-to-br from-gray-800 to-gray-900 p-8 flex flex-col">
+            <div className="h-full bg-gradient-to-br from-gray-800 to-gray-900 p-6 flex flex-col">
               {/* Mock Dashboard Header */}
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-700/50">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-blue-600 rounded-lg"></div>
-                  <div className="h-4 w-32 bg-gray-700 rounded"></div>
+                  <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                    <span className="text-white text-xs font-bold">LD</span>
+                  </div>
+                  <div className="h-4 w-24 bg-gray-700/80 rounded"></div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="h-8 w-8 bg-gray-700 rounded-full"></div>
-                  <div className="h-8 w-8 bg-gray-700 rounded-full"></div>
+                  <div className="h-8 w-8 bg-gray-700/80 rounded-full"></div>
                 </div>
               </div>
+              
               {/* Mock Dashboard Content */}
               <div className="flex-1 grid grid-cols-3 gap-4">
-                <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
-                  <div className="h-3 w-20 bg-gray-700 rounded mb-3"></div>
-                  <div className="h-8 w-full bg-gray-700 rounded mb-2"></div>
-                  <div className="h-8 w-3/4 bg-gray-700 rounded"></div>
+                {/* Stats Card 1 */}
+                <div className="bg-gray-800/60 rounded-lg p-5 border border-gray-700/30">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="h-3 w-16 bg-gray-600/60 rounded"></div>
+                    <div className="h-4 w-4 bg-blue-500/40 rounded"></div>
+                  </div>
+                  <div className="h-8 w-20 bg-gray-600/40 rounded mb-2"></div>
+                  <div className="h-2 w-full bg-gray-700/40 rounded-full overflow-hidden">
+                    <div className="h-full w-3/4 bg-blue-500/60"></div>
+                  </div>
+                  <div className="mt-3 space-y-1.5">
+                    <div className="h-2 w-full bg-gray-700/30 rounded"></div>
+                    <div className="h-2 w-4/5 bg-gray-700/30 rounded"></div>
+                  </div>
                 </div>
-                <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
-                  <div className="h-3 w-24 bg-gray-700 rounded mb-3"></div>
-                  <div className="h-8 w-full bg-gray-700 rounded mb-2"></div>
-                  <div className="h-8 w-2/3 bg-gray-700 rounded"></div>
+                
+                {/* Stats Card 2 */}
+                <div className="bg-gray-800/60 rounded-lg p-5 border border-gray-700/30">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="h-3 w-20 bg-gray-600/60 rounded"></div>
+                    <div className="h-4 w-4 bg-purple-500/40 rounded"></div>
+                  </div>
+                  <div className="h-8 w-24 bg-gray-600/40 rounded mb-2"></div>
+                  <div className="h-2 w-full bg-gray-700/40 rounded-full overflow-hidden">
+                    <div className="h-full w-2/3 bg-purple-500/60"></div>
+                  </div>
+                  <div className="mt-3 space-y-1.5">
+                    <div className="h-2 w-full bg-gray-700/30 rounded"></div>
+                    <div className="h-2 w-3/4 bg-gray-700/30 rounded"></div>
+                  </div>
                 </div>
-                <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
-                  <div className="h-3 w-16 bg-gray-700 rounded mb-3"></div>
-                  <div className="h-8 w-full bg-gray-700 rounded mb-2"></div>
-                  <div className="h-8 w-4/5 bg-gray-700 rounded"></div>
+                
+                {/* Automation Rules Card */}
+                <div className="bg-gray-800/60 rounded-lg p-5 border border-gray-700/30">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="h-3 w-28 bg-gray-600/60 rounded"></div>
+                    <div className="h-4 w-4 bg-green-500/40 rounded"></div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 p-2 bg-gray-700/30 rounded">
+                      <div className="h-2 w-2 bg-green-500/60 rounded-full"></div>
+                      <div className="h-2 w-20 bg-gray-600/40 rounded"></div>
+                    </div>
+                    <div className="flex items-center gap-2 p-2 bg-gray-700/30 rounded">
+                      <div className="h-2 w-2 bg-green-500/60 rounded-full"></div>
+                      <div className="h-2 w-24 bg-gray-600/40 rounded"></div>
+                    </div>
+                    <div className="flex items-center gap-2 p-2 bg-gray-700/30 rounded">
+                      <div className="h-2 w-2 bg-green-500/60 rounded-full"></div>
+                      <div className="h-2 w-18 bg-gray-600/40 rounded"></div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

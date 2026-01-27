@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import Footer from '@/components/Footer';
+import ConditionalFooter from '@/components/ConditionalFooter';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -76,8 +76,9 @@ export default function RootLayout({
             <div className="flex-1">
               {children}
             </div>
+            {/* Footer is conditionally rendered - home page has its own footer */}
             <div className="auth-pages-footer">
-              <Footer />
+              <ConditionalFooter />
             </div>
           </AuthProvider>
         </ErrorBoundary>
