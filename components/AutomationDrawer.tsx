@@ -110,6 +110,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
   const [isSaving, setIsSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<'simple' | 'lead'>('simple');
   const [currentKeyword, setCurrentKeyword] = useState('');
+  const [showPreviewMobile, setShowPreviewMobile] = useState(false);
 
   useEffect(() => {
     if (initialConfig) {
@@ -291,12 +292,25 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
               <h2 className="text-lg font-semibold text-gray-900">
                 Automation Builder
               </h2>
-              <button
-                onClick={onClose}
-                className="rounded-lg p-2 text-gray-400 hover:text-gray-500 transition-colors"
-              >
-                <XMarkIcon className="h-6 w-6" />
-              </button>
+              <div className="flex items-center gap-2">
+                {/* Mobile Preview Toggle */}
+                <button
+                  onClick={() => setShowPreviewMobile(!showPreviewMobile)}
+                  className="md:hidden rounded-lg p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+                  title="Toggle Preview"
+                >
+                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                </button>
+                <button
+                  onClick={onClose}
+                  className="rounded-lg p-2 text-gray-400 hover:text-gray-500 transition-colors"
+                >
+                  <XMarkIcon className="h-6 w-6" />
+                </button>
+              </div>
             </div>
 
             <div className="px-4 md:px-6 py-4 md:py-6 space-y-6 max-w-full overflow-x-hidden">
@@ -915,7 +929,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
             </div>
           </div>
 
-          {/* Right Side: Live Preview */}
+          {/* Right Side: Live Preview - Desktop */}
           <div className="flex-1 overflow-y-auto bg-gray-50 max-w-full overflow-x-hidden hidden md:block">
             <div className="sticky top-0 z-10 bg-gray-50 px-4 md:px-6 py-4 border-b border-gray-200">
               <h3 className="text-lg font-semibold text-gray-900">
@@ -931,6 +945,31 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
               />
             </div>
           </div>
+
+          {/* Mobile Preview - Toggleable */}
+          {showPreviewMobile && (
+            <div className="md:hidden border-t border-gray-200 bg-gray-50 max-w-full overflow-x-hidden">
+              <div className="sticky top-0 z-10 bg-gray-50 px-4 py-3 border-b border-gray-200 flex items-center justify-between">
+                <h3 className="text-base font-semibold text-gray-900">
+                  Live Preview
+                </h3>
+                <button
+                  onClick={() => setShowPreviewMobile(false)}
+                  className="rounded-lg p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <XMarkIcon className="h-5 w-5" />
+                </button>
+              </div>
+              <div className="p-4 max-h-[60vh] overflow-y-auto">
+                <MobilePreview
+                  media={media}
+                  config={config}
+                  mode={activeTab}
+                  accountUsername={accountUsername}
+                />
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
