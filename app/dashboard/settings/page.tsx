@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { z } from 'zod';
 import { useFetch } from '@/hooks/useFetch';
-import { usePut, useDelete } from '@/hooks/useApi';
+import { usePut, useDelete, usePost } from '@/hooks/useApi';
 import { useAuth } from '@/hooks/useAuth';
 import { User } from '@/types';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
@@ -44,6 +44,211 @@ interface SubscriptionSummary {
   };
 }
 
+interface BillingSettingsProps {
+  isLoading: boolean;
+  subscription: SubscriptionSummary | undefined;
+  onUpgrade: () => void;
+  onManageSubscription: () => void;
+  onCancelPlan: () => void;
+  portalLoading: boolean;
+  cancelLoading: boolean;
+}
+
+const BillingSettings: React.FC<BillingSettingsProps> = ({
+  isLoading,
+  subscription,
+  onUpgrade,
+  onManageSubscription,
+  onCancelPlan,
+  portalLoading,
+  cancelLoading,
+}) => {
+  if (isLoading) {
+    return (
+      <div className="py-8">
+        <div className="inline-flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-6 py-4 shadow-sm">
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-blue-500" />
+          <span className="text-sm text-gray-600">Loading billing details…</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!subscription) {
+    return (
+      <div className="space-y-4">
+        <h2 className="text-xl font-semibold text-gray-900">Billing</h2>
+        <p className="text-sm text-red-600">Unable to load subscription details right now.</p>
+      </div>
+    );
+  }
+
+  // Derived subscription state for the billing UI
+  const isPro = subscription.plan_tier === 'pro' || subscription.plan_tier === 'enterprise';
+  const planName = isPro ? 'Pro' : 'Free';
+
+  // Try to use the server-provided end date for the current billing period if available
+  const currentPeriodEnd = subscription.cancellation_end_date
+    ? new Date(subscription.cancellation_end_date)
+    : null;
+
+  // Fallback invoice date (one month before currentPeriodEnd, or today)
+  const invoiceDate = (() => {
+    const base = currentPeriodEnd ? new Date(currentPeriodEnd) : new Date();
+    base.setMonth(base.getMonth() - 1);
+    return base.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  })();
+
+  const renewalText = currentPeriodEnd
+    ? `Your plan renews on ${currentPeriodEnd.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      })}.`
+    : 'Your plan renews each billing period.';
+
+  if (!isPro) {
+    // Free plan layout
+    return (
+      <div className="space-y-8 font-inter">
+        <div>
+          <h2 className="text-xl font-semibold text-gray-900">Billing</h2>
+          <p className="mt-1 text-sm text-gray-500">
+            Upgrade to Pro to unlock higher limits and advanced automation.
+          </p>
+        </div>
+
+        <section className="bg-gray-50/50 border border-gray-200 rounded-xl p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h3 className="text-base font-semibold text-gray-900">You are on the Free Plan</h3>
+            <p className="mt-1 text-sm text-gray-600">
+              Enjoy core automation features with generous free limits. Upgrade anytime to get more.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onUpgrade}
+            className="inline-flex items-center justify-center rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-black"
+          >
+            Upgrade
+          </button>
+        </section>
+      </div>
+    );
+  }
+
+  // Pro (or higher) layout
+  return (
+    <div className="space-y-8 font-inter">
+      {/* Current Plan */}
+      <section className="bg-gray-50/50 border border-gray-200 rounded-xl p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h2 className="text-base font-semibold text-gray-900">Pro Plan</h2>
+          <p className="mt-1 text-sm text-gray-600">{renewalText}</p>
+        </div>
+        <button
+          type="button"
+          onClick={onManageSubscription}
+          disabled={portalLoading}
+          className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 disabled:opacity-60"
+        >
+          {portalLoading ? 'Opening…' : 'Manage Subscription'}
+        </button>
+      </section>
+
+      {/* Payment Method */}
+      <section className="space-y-3">
+        <h3 className="text-sm font-semibold text-gray-900">Payment Method</h3>
+        <div className="flex flex-col items-start justify-between gap-4 rounded-xl border border-gray-100 bg-white px-6 py-5 sm:flex-row sm:items-center">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-emerald-600 text-xs font-semibold text-white">
+              S
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-900">Link by Stripe</p>
+              <p className="text-xs text-gray-500">Your payment details are securely managed via Stripe.</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onManageSubscription}
+            disabled={portalLoading}
+            className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 disabled:opacity-60"
+          >
+            {portalLoading ? 'Opening…' : 'Update'}
+          </button>
+        </div>
+      </section>
+
+      {/* Invoices */}
+      <section className="space-y-3">
+        <h3 className="text-sm font-semibold text-gray-900">Invoices</h3>
+        <div className="overflow-hidden rounded-xl border border-gray-100 bg-white">
+          <table className="min-w-full divide-y divide-gray-100">
+            <thead className="bg-gray-50/50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Date
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Amount
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100 text-sm">
+              <tr>
+                <td className="px-6 py-3 text-gray-900">{invoiceDate}</td>
+                <td className="px-6 py-3 text-gray-900">$9.00</td>
+                <td className="px-6 py-3">
+                  <span className="inline-flex items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-700 border border-green-100">
+                    Paid
+                  </span>
+                </td>
+                <td className="px-6 py-3 text-right">
+                  <button
+                    type="button"
+                    onClick={onManageSubscription}
+                    disabled={portalLoading}
+                    className="text-sm font-medium text-gray-700 hover:text-gray-900 underline disabled:opacity-60"
+                  >
+                    View
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* Cancellation */}
+      <section className="space-y-3 border-t border-gray-100 pt-5">
+        <h3 className="text-sm font-semibold text-gray-900">Cancellation</h3>
+        <p className="text-sm text-gray-500">
+          You can cancel your plan at any time. Your access will continue until the end of the billing period.
+        </p>
+        <button
+          type="button"
+          onClick={onCancelPlan}
+          disabled={cancelLoading}
+          className="inline-flex items-center justify-center rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-100 disabled:opacity-60"
+        >
+          {cancelLoading ? 'Canceling…' : 'Cancel Plan'}
+        </button>
+      </section>
+    </div>
+  );
+};
+
 export default function SettingsPage() {
   const router = useRouter();
   const { updateUser, logout } = useAuth();
@@ -55,6 +260,8 @@ export default function SettingsPage() {
   const { execute: updateProfile, loading: profileLoading, error: profileError } = usePut();
   const { execute: updatePassword, loading: passwordLoading, error: passwordError } = usePut();
   const { execute: deleteAccount, loading: deleteLoading } = useDelete();
+  const { execute: createPortalSession, loading: portalLoading } = usePost();
+  const { execute: cancelSubscription, loading: cancelLoading } = usePost();
 
   const [profileData, setProfileData] = useState<ProfileFormData>({
     firstName: '',
@@ -249,6 +456,39 @@ export default function SettingsPage() {
     }
     if (typeof window !== 'undefined' && user) {
       window.localStorage.removeItem(`logicdm_avatar_${user.id}`);
+    }
+  };
+
+  const handleUpgradeClick = () => {
+    router.push('/dashboard/subscription');
+  };
+
+  const handleOpenStripePortal = async () => {
+    try {
+      const response = await createPortalSession('/api/stripe/create-portal-session', {});
+      if (response?.portal_url) {
+        window.location.href = response.portal_url;
+      } else {
+        console.error('No portal_url returned from Stripe portal session API', response);
+        alert('Unable to open billing portal. Please try again or manage billing from the Subscription page.');
+      }
+    } catch (error) {
+      console.error('Failed to create Stripe billing portal session:', error);
+      alert('Unable to open billing portal right now. Please try again in a moment.');
+    }
+  };
+
+  const handleCancelSubscription = async () => {
+    try {
+      await cancelSubscription('/users/subscription/cancel', {});
+      alert(
+        'Your subscription has been canceled. You will retain access to Pro features until the end of your current billing period.'
+      );
+      // Refresh subscription data so the Billing tab stays in sync
+      mutate('/users/subscription');
+    } catch (error) {
+      console.error('Failed to cancel subscription from Settings:', error);
+      alert('Unable to cancel your subscription right now. Please try again or contact support.');
     }
   };
 
@@ -512,159 +752,16 @@ export default function SettingsPage() {
   );
 
   const renderBillingContent = () => {
-    if (isSubscriptionLoading) {
-      return (
-        <div className="py-8">
-          <div className="inline-flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-6 py-4 shadow-sm">
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-blue-500" />
-            <span className="text-sm text-gray-600">Loading billing details…</span>
-          </div>
-        </div>
-      );
-    }
-
-    if (!subscription) {
-      return (
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-gray-900">Billing</h2>
-          <p className="text-sm text-red-600">Unable to load subscription details right now.</p>
-        </div>
-      );
-    }
-
-    const plan = subscription.plan_tier || 'free';
-    const effectivePlan = subscription.effective_plan_tier || plan;
-    const isFree = plan === 'free';
-    const planLabel = `${plan.charAt(0).toUpperCase()}${plan.slice(1)} plan`;
-
-    let renewalText: string;
-    if (subscription.status === 'cancelled' && subscription.cancellation_end_date) {
-      const endDate = new Date(subscription.cancellation_end_date).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-      });
-      renewalText = `Your ${effectivePlan} access will end on ${endDate}.`;
-    } else if (isFree) {
-      renewalText = 'You are currently on the Free plan.';
-    } else {
-      renewalText = 'Your subscription will auto renew each billing period.';
-    }
-
     return (
-      <div className="space-y-10">
-        <div>
-          <h2 className="text-xl font-semibold text-gray-900">Billing</h2>
-          <p className="mt-1 text-sm text-gray-500">
-            Review your current plan, payment method, and past invoices.
-          </p>
-        </div>
-
-        {/* Current plan */}
-        <section className="rounded-xl border border-gray-200 bg-gray-50 px-6 py-5">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h3 className="text-sm font-semibold text-gray-900">
-                {planLabel}
-              </h3>
-              <p className="mt-1 text-sm text-gray-600">{renewalText}</p>
-            </div>
-            {!isFree && (
-              <button
-                type="button"
-                className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
-              >
-                Adjust plan
-              </button>
-            )}
-          </div>
-        </section>
-
-        {/* Payment method */}
-      <section className="space-y-4">
-        <h3 className="text-sm font-semibold text-gray-900">Payment</h3>
-        <div className="flex flex-col items-start justify-between gap-4 rounded-xl border border-gray-200 bg-white px-6 py-5 sm:flex-row sm:items-center">
-          <div className="flex items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-emerald-600 text-white text-xs font-semibold">
-              $
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-900">Link by Stripe</p>
-              <p className="text-xs text-gray-500">Securely managed by Stripe.</p>
-            </div>
-          </div>
-          <button
-            type="button"
-            className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
-          >
-            Update
-          </button>
-        </div>
-      </section>
-
-        {/* Invoices */}
-      <section className="space-y-4">
-        <h3 className="text-sm font-semibold text-gray-900">Invoices</h3>
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                  Date
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                  Total
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wide text-gray-500">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200 text-sm">
-              <tr>
-                <td className="px-6 py-3 text-gray-900">Feb 25, 2025</td>
-                <td className="px-6 py-3 text-gray-900">SGD 324.99</td>
-                <td className="px-6 py-3 text-gray-900">Paid</td>
-                <td className="px-6 py-3 text-right">
-                  <button type="button" className="text-sm font-medium text-gray-700 underline">
-                    View
-                  </button>
-                </td>
-              </tr>
-              <tr>
-                <td className="px-6 py-3 text-gray-900">Dec 4, 2024</td>
-                <td className="px-6 py-3 text-gray-900">$21.80</td>
-                <td className="px-6 py-3 text-gray-900">Paid</td>
-                <td className="px-6 py-3 text-right">
-                  <button type="button" className="text-sm font-medium text-gray-700 underline">
-                    View
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-        {/* Cancellation */}
-        <section className="space-y-3 border-t border-gray-100 pt-5">
-          <h3 className="text-sm font-semibold text-gray-900">Cancellation</h3>
-          <p className="text-sm text-gray-500">
-            You can cancel your plan at any time. Your access will continue until the end of the billing period.
-          </p>
-          {!isFree && (
-            <button
-              type="button"
-              className="inline-flex items-center justify-center rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-100"
-            >
-              Cancel plan
-            </button>
-          )}
-        </section>
-      </div>
+      <BillingSettings
+        isLoading={isSubscriptionLoading}
+        subscription={subscription}
+        onUpgrade={handleUpgradeClick}
+        onManageSubscription={handleOpenStripePortal}
+        onCancelPlan={handleCancelSubscription}
+        portalLoading={portalLoading}
+        cancelLoading={cancelLoading}
+      />
     );
   };
 
