@@ -347,22 +347,23 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
   }, [accountId, selectedConversation, session, refreshStats, refreshConversations, refreshMessages]);
 
   return (
-    <div className="h-[calc(100vh-200px)] flex flex-col bg-white rounded-lg shadow-lg overflow-hidden">
+    <div className="min-h-[calc(100vh-200px)] md:h-[calc(100vh-200px)] flex flex-col bg-white rounded-lg shadow-lg overflow-hidden w-full max-w-full">
       {/* Header with Stats */}
-      <div className="border-b border-gray-200 bg-white p-4">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">Messages</h2>
-            <p className="text-sm text-gray-600">View and reply to Instagram DM conversations</p>
+      <div className="border-b border-gray-200 bg-white p-4 md:p-4">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-4">
+          <div className="w-full md:w-auto">
+            <h2 className="text-xl md:text-2xl font-bold text-gray-900">Messages</h2>
+            <p className="text-xs md:text-sm text-gray-600">View and reply to Instagram DM conversations</p>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 flex-shrink-0">
             <button
               onClick={handleSync}
               disabled={isSyncing}
-              className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="px-3 md:px-4 py-2 bg-blue-600 text-white text-xs md:text-sm font-medium rounded-md hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed whitespace-nowrap"
               title="Sync conversations from Instagram"
             >
-              {isSyncing ? 'Syncing...' : 'Sync Conversations'}
+              {isSyncing ? 'Syncing...' : <span className="hidden sm:inline">Sync Conversations</span>}
+              {isSyncing ? '' : <span className="sm:hidden">Sync</span>}
             </button>
             <button
               onClick={handleRefresh}
@@ -375,8 +376,8 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-white border border-gray-200 rounded-lg p-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
+          <div className="bg-white border border-gray-200 rounded-lg p-3 md:p-4">
             <div className="flex items-center">
               <ChatBubbleLeftRightIcon className="h-8 w-8 text-blue-600 mr-3" />
               <div>
@@ -416,18 +417,18 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-col md:flex-row flex-1 overflow-hidden min-h-0">
         {/* Left Panel - Conversation List */}
-        <div className="w-80 border-r border-gray-200 flex flex-col bg-gray-50">
+        <div className="w-full md:w-80 border-r-0 md:border-r border-gray-200 flex flex-col bg-gray-50 min-h-0">
           {/* Search Bar */}
-          <div className="p-4 border-b border-gray-200 bg-white">
+          <div className="p-3 md:p-4 border-b border-gray-200 bg-white">
             <div className="relative">
               <input
                 type="text"
                 placeholder="Search conversations..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <svg
                 className="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
@@ -441,7 +442,7 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
           </div>
 
           {/* Conversations List */}
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto min-h-0 pb-4 md:pb-0">
             {(() => {
               // CRITICAL DEBUG: Log everything at render time
               const rawConversations = conversationsData?.conversations || [];
@@ -485,24 +486,24 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
                         <div
                           key={conv.id || `conv-${conv.user_id}`}
                           onClick={() => setSelectedConversation(conv.username || conv.user_id)}
-                          className={`p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors ${
+                          className={`p-3 md:p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors ${
                             selectedConversation === (conv.username || conv.user_id) ? 'bg-blue-50 border-l-4 border-l-blue-500' : 'bg-white'
                           }`}
                         >
-                          <div className="flex items-center space-x-3">
+                          <div className="flex items-center space-x-2 md:space-x-3">
                             <div className="flex-shrink-0">
-                              <div className="h-12 w-12 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold">
+                              <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold text-sm md:text-base">
                                 {(conv.username || '?').charAt(0).toUpperCase()}
                               </div>
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-gray-900 truncate">{conv.username || 'Unknown'}</p>
+                              <p className="text-xs md:text-sm font-medium text-gray-900 truncate">{conv.username || 'Unknown'}</p>
                               <p className="text-xs text-gray-500 truncate">
                                 {conv.last_message_is_from_bot ? 'You: ' : ''}
                                 {conv.last_message || '[No messages]'}
                               </p>
                               {conv.last_message_at && (
-                                <p className="text-xs text-gray-400 mt-1">
+                                <p className="text-xs text-gray-400 mt-0.5 md:mt-1">
                                   {new Date(conv.last_message_at).toLocaleTimeString('en-US', {
                                     hour: 'numeric',
                                     minute: '2-digit',
@@ -573,18 +574,20 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
         </div>
 
         {/* Right Panel - Chat Window */}
-        <div className="flex-1 flex flex-col bg-white">
-          {!selectedConversation ? (
-            <div className="flex-1 flex items-center justify-center text-gray-400">
-              <div className="text-center">
-                <ChatBubbleLeftRightIcon className="h-16 w-16 mx-auto mb-4" />
-                <p className="text-lg">Select a conversation to view messages</p>
-              </div>
-            </div>
-          ) : (
+        {selectedConversation && (
+          <div className="fixed inset-0 z-50 md:relative md:z-auto md:inset-auto flex-1 flex flex-col bg-white min-h-0 md:flex">
+            {/* Mobile back button */}
+            <button
+              onClick={() => setSelectedConversation(null)}
+              className="md:hidden absolute top-4 left-4 z-10 p-2 bg-white rounded-full shadow-md text-gray-600 hover:text-gray-900"
+            >
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
             <>
               {/* Chat Header */}
-              <div className="border-b border-gray-200 p-4 bg-white">
+              <div className="border-b border-gray-200 p-3 md:p-4 bg-white pt-12 md:pt-3">
                 <div className="flex items-center space-x-3">
                   <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold">
                     {selectedConvDetails?.username.charAt(0).toUpperCase() || '?'}
@@ -599,7 +602,7 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
               </div>
 
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+              <div className="flex-1 overflow-y-auto p-3 md:p-4 space-y-4 bg-gray-50 min-h-0">
                 {messagesLoading ? (
                   <div className="flex justify-center items-center h-32">
                     <Spinner />
@@ -644,7 +647,7 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
               </div>
 
               {/* Message Input */}
-              <div className="border-t border-gray-200 p-4 bg-white">
+              <div className="border-t border-gray-200 p-3 md:p-4 bg-white">
                 <form
                   onSubmit={async (e) => {
                     e.preventDefault();
@@ -688,12 +691,12 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
                       value={messageText}
                       onChange={(e) => setMessageText(e.target.value)}
                       disabled={isSending}
-                      className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                      className="flex-1 px-3 md:px-4 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
                     />
                     <button
                       type="submit"
                       disabled={!messageText.trim() || isSending}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                      className="px-3 md:px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
                     >
                       {isSending ? 'Sending...' : 'Send'}
                     </button>
@@ -701,8 +704,16 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
                 </form>
               </div>
             </>
-          )}
-        </div>
+          </div>
+        )}
+        {!selectedConversation && (
+          <div className="hidden md:flex md:flex-1 items-center justify-center text-gray-400">
+            <div className="text-center">
+              <ChatBubbleLeftRightIcon className="h-16 w-16 mx-auto mb-4" />
+              <p className="text-lg">Select a conversation to view messages</p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

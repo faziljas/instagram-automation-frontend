@@ -190,8 +190,9 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
       {/* Invoices */}
       <section className="space-y-3">
         <h3 className="text-sm font-semibold text-gray-900">Invoices</h3>
-        <div className="overflow-hidden rounded-xl border border-gray-100 bg-white">
-          <table className="min-w-full divide-y divide-gray-100">
+        <div className="overflow-hidden rounded-xl border border-gray-100 bg-white w-full">
+          <div className="overflow-x-auto w-full">
+            <table className="min-w-full divide-y divide-gray-100">
             <thead className="bg-gray-50/50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
@@ -230,6 +231,7 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
               </tr>
             </tbody>
           </table>
+          </div>
         </div>
       </section>
 
