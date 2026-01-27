@@ -28,7 +28,7 @@ interface SubscriptionResponse {
 
 // Plan limits
 const PLAN_LIMITS: Record<string, { accounts: number; rules: number; dms: number }> = {
-  free: { accounts: 1, rules: 3, dms: 50 },
+  free: { accounts: 1, rules: -1, dms: 1000 }, // High Volume pricing: unlimited rules, 1000 DMs
   basic: { accounts: 3, rules: 10, dms: 500 },
   pro: { accounts: 10, rules: 50, dms: 5000 },
   enterprise: { accounts: -1, rules: -1, dms: -1 }, // unlimited
@@ -36,7 +36,7 @@ const PLAN_LIMITS: Record<string, { accounts: number; rules: number; dms: number
 
 // Plan features
 const PLAN_FEATURES: Record<string, string[]> = {
-  free: ['1 Instagram Account', '3 Automation Rules', '50 DMs/month', 'Basic Support'],
+  free: ['1 Instagram Account', 'Unlimited Automation Rules', '1,000 Auto-replies / mo', 'Basic Support'],
   basic: ['3 Instagram Accounts', '10 Automation Rules', '500 DMs/month', 'Email Support'],
   pro: ['10 Instagram Accounts', '50 Automation Rules', '5000 DMs/month', 'Priority Support'],
   enterprise: ['Unlimited Accounts', 'Unlimited Rules', 'Unlimited DMs', '24/7 Premium Support'],

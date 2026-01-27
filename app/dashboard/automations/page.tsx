@@ -78,7 +78,7 @@ interface MediaAnalytics {
 
 // Plan limits configuration
 const PLAN_LIMITS: Record<string, { accounts: number; rules: number; dms: number }> = {
-  free: { accounts: 1, rules: 3, dms: 50 },
+  free: { accounts: 1, rules: -1, dms: 1000 }, // High Volume pricing: unlimited rules, 1000 DMs
   basic: { accounts: 3, rules: 10, dms: 500 },
   pro: { accounts: 10, rules: 50, dms: 5000 },
   enterprise: { accounts: -1, rules: -1, dms: -1 }, // unlimited
@@ -122,9 +122,10 @@ export default function AutomationsPage() {
   // Check if user has reached automation rules limit
   // Safely handle undefined subscriptionData
   const planTier = subscriptionData?.plan_tier || 'free';
-  const rulesLimit = PLAN_LIMITS[planTier]?.rules ?? 3;
+  const rulesLimit = PLAN_LIMITS[planTier]?.rules ?? -1;
   const currentRulesCount = subscriptionData?.usage?.rules ?? 0;
-  const hasReachedRulesLimit = subscriptionData ? (currentRulesCount >= rulesLimit) : false;
+  // -1 means unlimited, so never reached
+  const hasReachedRulesLimit = subscriptionData ? (rulesLimit !== -1 && currentRulesCount >= rulesLimit) : false;
 
   // Fetch automation rules for stats
   useEffect(() => {
