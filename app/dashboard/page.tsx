@@ -1,7 +1,5 @@
 'use client';
 
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { useFetch } from '@/hooks/useFetch';
 import { GridStatsSkeleton } from '@/components/Skeleton';
@@ -10,8 +8,7 @@ import {
   BoltIcon,
   PaperAirplaneIcon,
   CreditCardIcon,
-  PlusIcon,
-  ExclamationTriangleIcon,
+  ClockIcon,
 } from '@heroicons/react/24/outline';
 
 interface DashboardUser {
@@ -55,25 +52,70 @@ const PLAN_LIMITS: Record<string, { accounts: number; rules: number; dms: number
 };
 
 export default function DashboardPage() {
-  const router = useRouter();
   const { user } = useAuth();
   const { data, isLoading } = useFetch<DashboardResponse>('/users/me/dashboard');
   const { data: subscriptionData } = useFetch<SubscriptionResponse>('/users/subscription');
-  
+
   // Check if account and rule limits are reached
   const plan = subscriptionData?.plan_tier || 'free';
   const limits = PLAN_LIMITS[plan] || PLAN_LIMITS.free;
-  const accountsUsed = subscriptionData?.usage?.accounts || 0;
-  const rulesUsed = subscriptionData?.usage?.rules || 0;
-  const isAccountLimitReached = limits.accounts !== -1 && accountsUsed >= limits.accounts;
-  const isRuleLimitReached = limits.rules !== -1 && rulesUsed >= limits.rules;
 
-  const handleConnectAccount = () => {
-    // Dashboard "Connect Account" button ALWAYS redirects to connect page
-    // This shows the full "Log in with Instagram" onboarding screen every time
-    console.log('🔄 Redirecting to connect page from Dashboard');
-    router.push('/dashboard/accounts/connect');
-  };
+  // Basic usage stats
+  const totalDMs = data?.stats?.total_dms_sent || 0;
+  const dmsToday = data?.stats?.dms_sent_today || 0;
+  const activeRules = data?.stats?.active_rules_count || 0;
+
+  // Time saved: each DM = 2 minutes
+  const timeSavedMinutes = totalDMs * 2;
+  const timeSavedHours = Math.round(timeSavedMinutes / 60);
+
+  // Mocked analytics data for premium "Command Center" feel
+  const engagementData = [72, 55, 90, 40, 68, 80, 60]; // last 7 days activity levels
+
+  const recentActivity = [
+    {
+      username: '@growth_hub',
+      label: 'Price',
+      timeAgo: 'Sent 2 mins ago',
+      status: 'Success',
+    },
+    {
+      username: '@creator_labs',
+      label: 'Offer',
+      timeAgo: 'Sent 8 mins ago',
+      status: 'Success',
+    },
+    {
+      username: '@brand_studio',
+      label: 'Waitlist',
+      timeAgo: 'Sent 15 mins ago',
+      status: 'Success',
+    },
+    {
+      username: '@launchpad',
+      label: 'Demo',
+      timeAgo: 'Sent 22 mins ago',
+      status: 'Success',
+    },
+  ];
+
+  const topPosts = [
+    {
+      id: '1',
+      caption: '“The DM engine that replies to every comment so you don’t have to.”',
+      dms: 240,
+    },
+    {
+      id: '2',
+      caption: '“Drop ‘PRICE’ below and I’ll send you the full breakdown + case study.”',
+      dms: 185,
+    },
+    {
+      id: '3',
+      caption: '“We turned 1 post into 327 conversations. Want the template?”',
+      dms: 132,
+    },
+  ];
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -95,199 +137,243 @@ export default function DashboardPage() {
           <GridStatsSkeleton />
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {/* Connected Accounts Card */}
-          <div className="group relative bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl border-2 border-blue-200 shadow-lg p-6 hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer">
-            <div className="absolute top-0 right-0 w-20 h-20 bg-blue-400/20 rounded-full blur-2xl"></div>
-            <div className="relative flex items-center">
-              <div className="flex-shrink-0 bg-blue-500 rounded-xl p-3 shadow-md">
-                <UserGroupIcon className="h-8 w-8 text-white" />
+        <div className="grid gap-6 mb-10">
+          {/* Row 1: Core Metrics */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Total DMs Sent */}
+            <div className="bg-white border border-gray-100 rounded-xl shadow-sm p-5 flex flex-col justify-between">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center">
+                    <PaperAirplaneIcon className="h-5 w-5 text-blue-500" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                      Total DMs Sent
+                    </p>
+                    <p className="mt-1 text-2xl font-semibold text-gray-900">
+                      {totalDMs.toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+                <span className="inline-flex items-center rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700">
+                  +12%
+                </span>
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-semibold text-blue-700">Connected Accounts</p>
-                <p className="text-3xl font-bold text-blue-900">
-                  {data?.stats?.accounts_count || 0}
-                </p>
+              <p className="mt-3 text-xs text-gray-500">
+                Your automation has handled every DM without you needing to touch the inbox.
+              </p>
+            </div>
+
+            {/* Leads Captured */}
+            <div className="bg-white border border-gray-100 rounded-xl shadow-sm p-5 flex flex-col justify-between">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="h-10 w-10 rounded-full bg-emerald-50 flex items-center justify-center">
+                    <UserGroupIcon className="h-5 w-5 text-emerald-500" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                      Leads Captured
+                    </p>
+                    <p className="mt-1 text-2xl font-semibold text-gray-900">
+                      85
+                    </p>
+                  </div>
+                </div>
+                <span className="inline-flex items-center rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700">
+                  +5
+                </span>
+              </div>
+              <p className="mt-3 text-xs text-gray-500">
+                People who replied or clicked through from your automation flows.
+              </p>
+            </div>
+
+            {/* Active Automations */}
+            <div className="bg-white border border-gray-100 rounded-xl shadow-sm p-5 flex flex-col justify-between">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="h-10 w-10 rounded-full bg-indigo-50 flex items-center justify-center">
+                    <BoltIcon className="h-5 w-5 text-indigo-500" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                      Active Automations
+                    </p>
+                    <p className="mt-1 text-2xl font-semibold text-gray-900">
+                      {activeRules || 0} Active
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <p className="mt-3 text-xs text-gray-500">
+                Rules currently watching your posts, stories, and inbox.
+              </p>
+            </div>
+
+            {/* Time Saved */}
+            <div className="bg-white border border-gray-100 rounded-xl shadow-sm p-5 flex flex-col justify-between">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="h-10 w-10 rounded-full bg-amber-50 flex items-center justify-center">
+                    <ClockIcon className="h-5 w-5 text-amber-500" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                      Time Saved
+                    </p>
+                    <p className="mt-1 text-2xl font-semibold text-gray-900">
+                      {timeSavedHours} Hours
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <p className="mt-3 text-xs text-gray-500">
+                Based on ~2 minutes saved per DM your bot sends.
+              </p>
+            </div>
+          </div>
+
+          {/* Row 2: Engagement Overview + Live Feed */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Engagement Overview (2/3 width) */}
+            <div className="lg:col-span-2 bg-white border border-gray-100 rounded-xl shadow-sm p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                    Engagement Overview
+                  </p>
+                  <h3 className="mt-1 text-lg font-semibold text-gray-900">
+                    Automation Activity (Last 7 Days)
+                  </h3>
+                </div>
+                <span className="text-xs text-gray-400">DMs / day</span>
+              </div>
+
+              <div className="mt-4 h-40 flex items-end space-x-2">
+                {engagementData.map((value, index) => (
+                  <div
+                    key={index}
+                    className="flex-1 flex flex-col items-center space-y-2"
+                  >
+                    <div className="w-full bg-gray-50 rounded-lg h-32 flex items-end overflow-hidden">
+                      <div
+                        className="w-full bg-gradient-to-t from-blue-500 to-indigo-400 rounded-lg"
+                        style={{ height: `${value}%` }}
+                      />
+                    </div>
+                    <span className="text-[10px] uppercase tracking-wide text-gray-400">
+                      {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][index]}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Live Activity Feed (1/3 width) */}
+            <div className="bg-white border border-gray-100 rounded-xl shadow-sm p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                    Live Activity Feed
+                  </p>
+                  <h3 className="mt-1 text-lg font-semibold text-gray-900">
+                    Recent Actions
+                  </h3>
+                </div>
+                <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 shadow-[0_0_0_4px_rgba(16,185,129,0.15)]" />
+              </div>
+
+              <div className="space-y-3">
+                {recentActivity.map((item) => (
+                  <div
+                    key={`${item.username}-${item.timeAgo}`}
+                    className="flex items-start space-x-3 rounded-lg border border-gray-50 px-3 py-2.5"
+                  >
+                    <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center text-xs font-semibold text-gray-700">
+                      {item.username.replace('@', '').slice(0, 2).toUpperCase()}
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm text-gray-900">
+                        <span className="font-semibold">{item.username}</span>{' '}
+                        triggered{' '}
+                        <span className="font-semibold">&quot;{item.label}&quot;</span>
+                      </p>
+                      <p className="mt-0.5 text-xs text-gray-500">
+                        {item.timeAgo}
+                      </p>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                      <span className="text-[11px] font-medium text-emerald-600">
+                        {item.status}
+                      </span>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
 
-          {/* Active Rules Card */}
-          <div className="group relative bg-gradient-to-br from-yellow-50 to-amber-100 rounded-2xl border-2 border-yellow-200 shadow-lg p-6 hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer">
-            <div className="absolute top-0 right-0 w-20 h-20 bg-yellow-400/20 rounded-full blur-2xl"></div>
-            <div className="relative flex items-center">
-              <div className="flex-shrink-0 bg-yellow-500 rounded-xl p-3 shadow-md">
-                <BoltIcon className="h-8 w-8 text-white" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-semibold text-yellow-700">Active Rules</p>
-                <p className="text-3xl font-bold text-yellow-900">
-                  {data?.stats?.active_rules_count || 0}
+          {/* Row 3: Top Performing Posts */}
+          <div className="bg-white border border-gray-100 rounded-xl shadow-sm p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Content Performance
                 </p>
+                <h3 className="mt-1 text-lg font-semibold text-gray-900">
+                  Top Performing Posts
+                </h3>
               </div>
+              <span className="text-xs text-gray-400">
+                Ranked by DMs triggered
+              </span>
             </div>
-          </div>
 
-          {/* DMs Today Card */}
-          <div className="group relative bg-gradient-to-br from-green-50 to-emerald-100 rounded-2xl border-2 border-green-200 shadow-lg p-6 hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer">
-            <div className="absolute top-0 right-0 w-20 h-20 bg-green-400/20 rounded-full blur-2xl"></div>
-            <div className="relative flex items-center">
-              <div className="flex-shrink-0 bg-green-500 rounded-xl p-3 shadow-md">
-                <PaperAirplaneIcon className="h-8 w-8 text-white" />
+            <div className="mt-2 divide-y divide-gray-100">
+              <div className="grid grid-cols-12 gap-4 py-2 text-xs font-medium text-gray-500">
+                <span className="col-span-5">Post</span>
+                <span className="col-span-5">Caption</span>
+                <span className="col-span-2 text-right">DMs</span>
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-semibold text-green-700">DMs Today</p>
-                <p className="text-3xl font-bold text-green-900">
-                  {data?.stats?.dms_sent_today || 0}
-                </p>
-                <p className="text-xs font-medium text-green-600 mt-1">
-                  {`${data?.stats?.total_dms_sent || 0} total`}
-                </p>
-              </div>
-            </div>
-          </div>
 
-          {/* Current Plan Card */}
-          <div className="group relative bg-gradient-to-br from-purple-50 to-pink-100 rounded-2xl border-2 border-purple-200 shadow-lg p-6 hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer">
-            <div className="absolute top-0 right-0 w-20 h-20 bg-purple-400/20 rounded-full blur-2xl"></div>
-            <div className="relative flex items-center">
-              <div className="flex-shrink-0 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl p-3 shadow-md">
-                <CreditCardIcon className="h-8 w-8 text-white" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-semibold text-purple-700">Current Plan</p>
-                <p className="text-3xl font-bold text-purple-900 capitalize">
-                  {data?.user?.plan_tier || 'Free'}
-                </p>
-              </div>
+              {topPosts.map((post) => (
+                <div
+                  key={post.id}
+                  className="grid grid-cols-12 gap-4 py-3 items-center"
+                >
+                  {/* Thumbnail placeholder */}
+                  <div className="col-span-5 flex items-center space-x-3">
+                    <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-500" />
+                    <div className="text-xs text-gray-500">
+                      <p className="font-medium text-gray-900">
+                        IG Reel · Auto DM
+                      </p>
+                      <p>Tap-through &amp; comment triggers enabled</p>
+                    </div>
+                  </div>
+
+                  {/* Caption */}
+                  <div className="col-span-5">
+                    <p className="text-sm text-gray-700 line-clamp-2">
+                      {post.caption}
+                    </p>
+                  </div>
+
+                  {/* DMs */}
+                  <div className="col-span-2 text-right">
+                    <span className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
+                      {post.dms.toLocaleString()} DMs
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       )}
-
-      <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl p-8 hover:shadow-2xl transition-all duration-300">
-        <h2 className="text-2xl font-bold text-gray-900 mb-8 flex items-center">
-          <span className="w-1 h-8 bg-gradient-to-b from-blue-500 to-purple-500 rounded-full mr-3"></span>
-          Quick Actions
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Connect Account Feature Card */}
-          {isAccountLimitReached ? (
-            <div className="relative group">
-              <div className="bg-gradient-to-br from-gray-50 to-gray-100 border-2 border-gray-300 rounded-2xl p-6 cursor-not-allowed opacity-60">
-                <div className="bg-gray-300 text-gray-500 rounded-2xl p-4 w-fit mb-4 shadow-inner">
-                  <PlusIcon className="h-7 w-7" />
-                </div>
-                <h3 className="font-bold text-gray-600 mb-1 text-lg">Connect Account</h3>
-                <p className="text-sm text-gray-500">Account limit reached</p>
-              </div>
-              <div className="absolute bottom-full left-0 mb-2 hidden group-hover:block z-10 w-full">
-                <div className="bg-gray-900 text-white text-xs rounded-lg py-2 px-3 shadow-xl">
-                  Account limit reached ({accountsUsed}/{limits.accounts})
-                  <br />
-                  Upgrade to connect more accounts
-                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <button
-              onClick={handleConnectAccount}
-              className="group relative overflow-hidden bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-300 rounded-2xl p-6 hover:border-blue-400 hover:shadow-2xl hover:scale-105 transition-all duration-300 w-full text-left"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-400/0 to-blue-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            <div className="relative">
-              <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-2xl p-4 w-fit mb-4 shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
-                <PlusIcon className="h-7 w-7" />
-              </div>
-              <h3 className="font-bold text-gray-900 mb-1 text-lg group-hover:text-blue-700 transition-colors">Connect Account</h3>
-              <p className="text-sm text-gray-600 font-medium">Add Instagram account</p>
-            </div>
-            </button>
-          )}
-
-          {/* Create Rule Feature Card */}
-          {isRuleLimitReached ? (
-            <div className="relative group">
-              <div className="bg-gradient-to-br from-gray-50 to-gray-100 border-2 border-gray-300 rounded-2xl p-6 cursor-not-allowed opacity-60">
-                <div className="bg-gray-300 text-gray-500 rounded-2xl p-4 w-fit mb-4 shadow-inner">
-                  <BoltIcon className="h-7 w-7" />
-                </div>
-                <h3 className="font-bold text-gray-600 mb-1 text-lg">Create Rule</h3>
-                <p className="text-sm text-gray-500">Rule limit reached</p>
-              </div>
-              <div className="absolute bottom-full left-0 mb-2 hidden group-hover:block z-10 w-full">
-                <div className="bg-gray-900 text-white text-xs rounded-lg py-2 px-3 shadow-xl">
-                  Rule limit reached ({rulesUsed}/{limits.rules})
-                  <br />
-                  Upgrade to create more rules
-                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
-                </div>
-              </div>
-            </div>
-          ) : (
-          <Link
-            href="/dashboard/rules/create"
-            className="group relative overflow-hidden bg-gradient-to-br from-yellow-50 to-amber-100 border-2 border-yellow-300 rounded-2xl p-6 hover:border-yellow-400 hover:shadow-2xl hover:scale-105 transition-all duration-300 block"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/0 to-yellow-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            <div className="relative">
-              <div className="bg-gradient-to-br from-yellow-500 to-amber-500 text-white rounded-2xl p-4 w-fit mb-4 shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
-                <BoltIcon className="h-7 w-7" />
-              </div>
-              <h3 className="font-bold text-gray-900 mb-1 text-lg group-hover:text-yellow-700 transition-colors">Create Rule</h3>
-              <p className="text-sm text-gray-600 font-medium">Set up automation</p>
-            </div>
-          </Link>
-          )}
-
-          <Link
-            href="/dashboard/subscription"
-            className="group relative overflow-hidden bg-gradient-to-br from-purple-50 to-pink-100 border-2 border-purple-300 rounded-2xl p-6 hover:border-purple-400 hover:shadow-2xl hover:scale-105 transition-all duration-300 block"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-400/0 to-purple-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            <div className="relative">
-              <div className="bg-gradient-to-br from-purple-500 to-pink-500 text-white rounded-2xl p-4 w-fit mb-4 shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
-                <CreditCardIcon className="h-7 w-7" />
-              </div>
-              <h3 className="font-bold text-gray-900 mb-1 text-lg group-hover:text-purple-700 transition-colors">Upgrade Plan</h3>
-              <p className="text-sm text-gray-600 font-medium">View pricing options</p>
-            </div>
-          </Link>
-        </div>
-        
-        {/* Warning Messages */}
-        {(isAccountLimitReached || isRuleLimitReached) && (
-          <div className="mt-8 space-y-3">
-            {isAccountLimitReached && (
-              <div className="bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 rounded-xl p-4 flex items-center shadow-md">
-                <div className="bg-amber-500 rounded-lg p-2 mr-3">
-                  <ExclamationTriangleIcon className="h-5 w-5 text-white" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-amber-800">
-                    Account limit reached ({accountsUsed}/{limits.accounts})
-                  </p>
-                  <p className="text-xs text-amber-700">Upgrade to connect more accounts</p>
-                </div>
-              </div>
-            )}
-            {isRuleLimitReached && (
-              <div className="bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 rounded-xl p-4 flex items-center shadow-md">
-                <div className="bg-amber-500 rounded-lg p-2 mr-3">
-                  <ExclamationTriangleIcon className="h-5 w-5 text-white" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-amber-800">
-                    Rule limit reached ({rulesUsed}/{limits.rules})
-                  </p>
-                  <p className="text-xs text-amber-700">Upgrade to create more rules</p>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
     </div>
   );
 }
