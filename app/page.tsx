@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
+import Logo from '@/components/Logo';
 import { 
   ArrowRightIcon,
   ChatBubbleLeftRightIcon,
@@ -45,7 +46,9 @@ export default function HomePage() {
       <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <div className="text-2xl font-bold text-gray-900">LogicDM</div>
+            <Link href="/">
+              <Logo size="md" variant="dark" />
+            </Link>
             <div className="flex items-center gap-6">
               <Link
                 href="/pricing"
