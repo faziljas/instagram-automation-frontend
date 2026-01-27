@@ -56,6 +56,7 @@ export default function SettingsPage() {
   const [profileSuccess, setProfileSuccess] = useState(false);
   const [passwordSuccess, setPasswordSuccess] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [activeTab, setActiveTab] = useState<'general' | 'security' | 'notifications' | 'billing'>('general');
 
   // Pre-fill profile form with user data
   useEffect(() => {
@@ -184,74 +185,98 @@ export default function SettingsPage() {
 
   if (isLoading) {
     return (
-      <div className="max-w-3xl mx-auto">
-        <div className="text-center py-12">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          <p className="mt-4 text-gray-600">Loading settings...</p>
+      <div className="max-w-6xl mx-auto py-16">
+        <div className="flex justify-center">
+          <div className="inline-flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-6 py-4 shadow-sm">
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-blue-500" />
+            <span className="text-sm text-gray-600">Loading your settings…</span>
+          </div>
         </div>
       </div>
     );
   }
 
-  return (
-    <div className="max-w-3xl mx-auto">
-      {/* Hero Banner */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-gray-600 via-gray-700 to-gray-800 rounded-2xl mb-8 shadow-xl">
-        <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent"></div>
-        <div className="relative py-10 px-8">
-          <h1 className="text-4xl font-bold text-white mb-2">Settings</h1>
-          <p className="text-lg text-white/90">Manage your account settings and preferences</p>
-        </div>
+  const renderGeneralContent = () => (
+    <div className="space-y-10">
+      <div>
+        <h2 className="text-xl font-semibold text-gray-900">General Settings</h2>
+        <p className="mt-1 text-sm text-gray-500">Manage your personal information and profile details.</p>
       </div>
 
-      {/* Profile Section */}
-      <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl p-8 mb-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Profile Information</h2>
-        <form onSubmit={handleProfileSubmit} className="space-y-4">
-          {/* First Name */}
-          <div>
-            <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
-              First Name
-            </label>
-            <input
-              id="firstName"
-              name="firstName"
-              type="text"
-              required
-              value={profileData.firstName}
-              onChange={handleProfileChange}
-              className={`mt-1 block w-full px-4 py-3 border-2 ${
-                profileErrors.firstName ? 'border-red-500' : 'border-gray-300'
-              } rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium transition-all duration-200`}
-            />
-            {profileErrors.firstName && (
-              <p className="mt-1 text-sm text-red-600">{profileErrors.firstName}</p>
-            )}
+      <section className="space-y-8">
+        {/* Avatar row */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-gray-100 pb-6">
+          <div className="flex items-center gap-4">
+            <div className="h-16 w-16 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white text-xl font-semibold shadow-md">
+              {profileData.firstName
+                ? profileData.firstName.charAt(0).toUpperCase()
+                : profileData.email.charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-900">Profile picture</p>
+              <p className="text-xs text-gray-500">This avatar is used across your account and automations.</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+            >
+              Upload New
+            </button>
+            <button
+              type="button"
+              className="text-sm font-medium text-red-600 hover:text-red-700"
+            >
+              Remove
+            </button>
+          </div>
+        </div>
+
+        {/* Profile form */}
+        <form onSubmit={handleProfileSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <div>
+              <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
+                First Name
+              </label>
+              <input
+                id="firstName"
+                name="firstName"
+                type="text"
+                required
+                value={profileData.firstName}
+                onChange={handleProfileChange}
+                className={`mt-1 block w-full rounded-lg border-none bg-white px-3 py-2 text-sm text-gray-900 shadow-sm ring-1 ${
+                  profileErrors.firstName ? 'ring-red-500 focus:ring-red-500' : 'ring-gray-200 focus:ring-blue-500'
+                } focus:outline-none focus:ring-2`}
+              />
+              {profileErrors.firstName && (
+                <p className="mt-1 text-xs text-red-600">{profileErrors.firstName}</p>
+              )}
+            </div>
+            <div>
+              <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
+                Last Name
+              </label>
+              <input
+                id="lastName"
+                name="lastName"
+                type="text"
+                required
+                value={profileData.lastName}
+                onChange={handleProfileChange}
+                className={`mt-1 block w-full rounded-lg border-none bg-white px-3 py-2 text-sm text-gray-900 shadow-sm ring-1 ${
+                  profileErrors.lastName ? 'ring-red-500 focus:ring-red-500' : 'ring-gray-200 focus:ring-blue-500'
+                } focus:outline-none focus:ring-2`}
+              />
+              {profileErrors.lastName && (
+                <p className="mt-1 text-xs text-red-600">{profileErrors.lastName}</p>
+              )}
+            </div>
           </div>
 
-          {/* Last Name */}
-          <div>
-            <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
-              Last Name
-            </label>
-            <input
-              id="lastName"
-              name="lastName"
-              type="text"
-              required
-              value={profileData.lastName}
-              onChange={handleProfileChange}
-              className={`mt-1 block w-full px-4 py-3 border-2 ${
-                profileErrors.lastName ? 'border-red-500' : 'border-gray-300'
-              } rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium transition-all duration-200`}
-            />
-            {profileErrors.lastName && (
-              <p className="mt-1 text-sm text-red-600">{profileErrors.lastName}</p>
-            )}
-          </div>
-
-          {/* Email */}
-          <div>
+          <div className="max-w-md">
             <label htmlFor="email" className="block text-sm font-medium text-gray-700">
               Email Address
             </label>
@@ -262,47 +287,49 @@ export default function SettingsPage() {
               required
               value={profileData.email}
               onChange={handleProfileChange}
-              className={`mt-1 block w-full px-4 py-3 border-2 ${
-                profileErrors.email ? 'border-red-500' : 'border-gray-300'
-              } rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium transition-all duration-200`}
+              className={`mt-1 block w-full rounded-lg border-none bg-white px-3 py-2 text-sm text-gray-900 shadow-sm ring-1 ${
+                profileErrors.email ? 'ring-red-500 focus:ring-red-500' : 'ring-gray-200 focus:ring-blue-500'
+              } focus:outline-none focus:ring-2`}
             />
             {profileErrors.email && (
-              <p className="mt-1 text-sm text-red-600">{profileErrors.email}</p>
+              <p className="mt-1 text-xs text-red-600">{profileErrors.email}</p>
             )}
           </div>
 
-          {/* Error Message */}
           {profileError && (
-            <div className="rounded-xl bg-gradient-to-r from-red-50 to-rose-50 border-2 border-red-200 p-5 shadow-md">
-              <p className="text-sm font-bold text-red-800">{profileError.message}</p>
+            <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {profileError.message}
             </div>
           )}
-
-          {/* Success Message */}
           {profileSuccess && (
-            <div className="rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 p-5 shadow-md">
-              <p className="text-sm font-bold text-green-800">Profile updated successfully!</p>
+            <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+              Profile updated successfully.
             </div>
           )}
 
-          {/* Save Button */}
           <div className="flex justify-end">
             <button
               type="submit"
               disabled={profileLoading}
-              className="px-6 py-3 border border-transparent rounded-xl shadow-lg text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105"
+              className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 disabled:opacity-60"
             >
-              {profileLoading ? 'Saving...' : 'Save Changes'}
+              {profileLoading ? 'Saving…' : 'Save Profile'}
             </button>
           </div>
         </form>
+      </section>
+    </div>
+  );
+
+  const renderSecurityContent = () => (
+    <div className="space-y-8">
+      <div>
+        <h2 className="text-xl font-semibold text-gray-900">Security</h2>
+        <p className="mt-1 text-sm text-gray-500">Update your password to keep your account secure.</p>
       </div>
 
-      {/* Password Section */}
-      <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl p-8 mb-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Change Password</h2>
-        <form onSubmit={handlePasswordSubmit} className="space-y-4">
-          {/* Old Password */}
+      <section>
+        <form onSubmit={handlePasswordSubmit} className="space-y-6 max-w-lg">
           <div>
             <label htmlFor="oldPassword" className="block text-sm font-medium text-gray-700">
               Current Password
@@ -314,16 +341,15 @@ export default function SettingsPage() {
               required
               value={passwordData.oldPassword}
               onChange={handlePasswordChange}
-              className={`mt-1 block w-full px-4 py-3 border-2 ${
-                passwordErrors.oldPassword ? 'border-red-500' : 'border-gray-300'
-              } rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium transition-all duration-200`}
+              className={`mt-1 block w-full rounded-lg border-none bg-white px-3 py-2 text-sm text-gray-900 shadow-sm ring-1 ${
+                passwordErrors.oldPassword ? 'ring-red-500 focus:ring-red-500' : 'ring-gray-200 focus:ring-blue-500'
+              } focus:outline-none focus:ring-2`}
             />
             {passwordErrors.oldPassword && (
-              <p className="mt-1 text-sm text-red-600">{passwordErrors.oldPassword}</p>
+              <p className="mt-1 text-xs text-red-600">{passwordErrors.oldPassword}</p>
             )}
           </div>
 
-          {/* New Password */}
           <div>
             <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700">
               New Password
@@ -335,16 +361,15 @@ export default function SettingsPage() {
               required
               value={passwordData.newPassword}
               onChange={handlePasswordChange}
-              className={`mt-1 block w-full px-4 py-3 border-2 ${
-                passwordErrors.newPassword ? 'border-red-500' : 'border-gray-300'
-              } rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium transition-all duration-200`}
+              className={`mt-1 block w-full rounded-lg border-none bg-white px-3 py-2 text-sm text-gray-900 shadow-sm ring-1 ${
+                passwordErrors.newPassword ? 'ring-red-500 focus:ring-red-500' : 'ring-gray-200 focus:ring-blue-500'
+              } focus:outline-none focus:ring-2`}
             />
             {passwordErrors.newPassword && (
-              <p className="mt-1 text-sm text-red-600">{passwordErrors.newPassword}</p>
+              <p className="mt-1 text-xs text-red-600">{passwordErrors.newPassword}</p>
             )}
           </div>
 
-          {/* Confirm Password */}
           <div>
             <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
               Confirm New Password
@@ -356,54 +381,148 @@ export default function SettingsPage() {
               required
               value={passwordData.confirmPassword}
               onChange={handlePasswordChange}
-              className={`mt-1 block w-full px-4 py-3 border-2 ${
-                passwordErrors.confirmPassword ? 'border-red-500' : 'border-gray-300'
-              } rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium transition-all duration-200`}
+              className={`mt-1 block w-full rounded-lg border-none bg-white px-3 py-2 text-sm text-gray-900 shadow-sm ring-1 ${
+                passwordErrors.confirmPassword ? 'ring-red-500 focus:ring-red-500' : 'ring-gray-200 focus:ring-blue-500'
+              } focus:outline-none focus:ring-2`}
             />
             {passwordErrors.confirmPassword && (
-              <p className="mt-1 text-sm text-red-600">{passwordErrors.confirmPassword}</p>
+              <p className="mt-1 text-xs text-red-600">{passwordErrors.confirmPassword}</p>
             )}
           </div>
 
-          {/* Error Message */}
           {passwordError && (
-            <div className="rounded-xl bg-gradient-to-r from-red-50 to-rose-50 border-2 border-red-200 p-5 shadow-md">
-              <p className="text-sm font-bold text-red-800">{passwordError.message}</p>
+            <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {passwordError.message}
             </div>
           )}
-
-          {/* Success Message */}
           {passwordSuccess && (
-            <div className="rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 p-5 shadow-md">
-              <p className="text-sm font-bold text-green-800">Password changed successfully!</p>
+            <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+              Password changed successfully.
             </div>
           )}
 
-          {/* Change Button */}
           <div className="flex justify-end">
             <button
               type="submit"
               disabled={passwordLoading}
-              className="px-6 py-3 border border-transparent rounded-xl shadow-lg text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105"
+              className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 disabled:opacity-60"
             >
-              {passwordLoading ? 'Changing...' : 'Change Password'}
+              {passwordLoading ? 'Updating…' : 'Update Password'}
             </button>
           </div>
         </form>
+      </section>
+    </div>
+  );
+
+  const renderNotificationsContent = () => (
+    <div className="space-y-4">
+      <h2 className="text-xl font-semibold text-gray-900">Notifications</h2>
+      <p className="text-sm text-gray-500">
+        Notification preferences will be configurable soon. For now, you&apos;ll receive important product and billing
+        updates by email.
+      </p>
+    </div>
+  );
+
+  const renderContent = () => {
+    if (activeTab === 'general') return renderGeneralContent();
+    if (activeTab === 'security') return renderSecurityContent();
+    if (activeTab === 'notifications') return renderNotificationsContent();
+    if (activeTab === 'billing') {
+      router.push('/dashboard/subscription');
+      return (
+        <div className="space-y-2">
+          <h2 className="text-xl font-semibold text-gray-900">Billing</h2>
+          <p className="text-sm text-gray-500">Redirecting you to the billing dashboard…</p>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  return (
+    <div className="max-w-6xl mx-auto py-10">
+      <div className="mb-8">
+        <h1 className="text-3xl font-semibold text-gray-900">Account Settings</h1>
+        <p className="mt-1 text-sm text-gray-500">
+          Fine-tune your profile, security, and preferences in one place.
+        </p>
+      </div>
+
+      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white/80 shadow-lg">
+        <div className="flex flex-col md:flex-row">
+          {/* Left navigation */}
+          <aside className="w-full border-b border-gray-100 bg-gray-50/80 p-4 md:w-64 md:border-b-0 md:border-r">
+            <nav className="space-y-1">
+              <button
+                type="button"
+                onClick={() => setActiveTab('general')}
+                className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium ${
+                  activeTab === 'general'
+                    ? 'bg-gray-900 text-white'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                <span>General</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('security')}
+                className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium ${
+                  activeTab === 'security'
+                    ? 'bg-gray-900 text-white'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                <span>Security</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('notifications')}
+                className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium ${
+                  activeTab === 'notifications'
+                    ? 'bg-gray-900 text-white'
+                    : 'text-gray-500 hover:bg-gray-100'
+                }`}
+              >
+                <span>Notifications</span>
+                <span className="rounded-full bg-gray-200 px-2 py-0.5 text-[10px] font-semibold text-gray-600">
+                  SOON
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('billing')}
+                className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100"
+              >
+                <span>Billing</span>
+                <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-blue-700">
+                  Manage
+                </span>
+              </button>
+            </nav>
+          </aside>
+
+          {/* Right content */}
+          <section className="flex-1 p-6 md:p-8">{renderContent()}</section>
+        </div>
       </div>
 
       {/* Danger Zone */}
-      <div className="bg-white rounded-2xl border-2 border-red-300 shadow-xl p-8">
-        <h2 className="text-xl font-bold text-red-900 mb-3">Danger Zone</h2>
-        <p className="text-sm font-medium text-gray-700 mb-6">
-          Once you delete your account, there is no going back. Please be certain.
+      <div className="mt-8 rounded-2xl border border-red-100 bg-red-50 p-6">
+        <h2 className="text-lg font-semibold text-red-800">Danger Zone</h2>
+        <p className="mt-2 text-sm text-red-700">
+          Deleting your account is permanent and will remove all of your data. This action cannot be undone.
         </p>
-        <button
-          onClick={() => setShowDeleteModal(true)}
-          className="px-6 py-3 border-2 border-red-300 rounded-xl shadow-md text-sm font-bold text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200 hover:scale-105"
-        >
-          Delete Account
-        </button>
+        <div className="mt-4">
+          <button
+            onClick={() => setShowDeleteModal(true)}
+            className="inline-flex items-center justify-center rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700"
+          >
+            Delete Account
+          </button>
+        </div>
       </div>
 
       {/* Delete Confirmation Modal */}
