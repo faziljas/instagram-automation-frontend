@@ -533,11 +533,11 @@ export default function AutomationsPage() {
   }, [accounts, selectedAccount]);
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-7xl mx-auto w-full overflow-x-hidden">
       {/* Hero Banner */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-purple-500 via-pink-500 to-rose-600 rounded-2xl mb-8 shadow-xl">
+      <div className="relative overflow-hidden bg-gradient-to-br from-purple-500 via-pink-500 to-rose-600 rounded-2xl mb-8 shadow-xl w-full">
         <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent"></div>
-        <div className="relative py-10 px-8">
+        <div className="relative py-6 md:py-10 px-4 md:px-8">
           <h1 className="text-4xl font-bold text-white mb-2">Automations</h1>
           <p className="text-lg text-white/90">Jump right in and automate your Instagram</p>
         </div>
@@ -781,8 +781,8 @@ export default function AutomationsPage() {
           </div>
         ) : viewMode === 'table' ? (
           // Table View with Analytics
-          <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl overflow-hidden">
-            <div className="px-6 py-4 border-b-2 border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
+          <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl overflow-hidden w-full">
+            <div className="px-4 md:px-6 py-4 border-b-2 border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
               <h3 className="text-xl font-bold text-gray-900">AUTOMATIONS</h3>
             </div>
             {isLoadingMedia || isLoadingAnalytics ? (
@@ -837,7 +837,7 @@ export default function AutomationsPage() {
               const sortedMediaWithRules = [...itemsWithRules, ...itemsWithoutRules];
               
               return (
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto w-full">
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
                       <tr>

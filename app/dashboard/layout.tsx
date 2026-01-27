@@ -57,7 +57,7 @@ export default function DashboardLayout({
   return (
     <ToastProvider>
       <ProtectedRoute>
-      <div className="min-h-screen dashboard-main-bg">
+      <div className="min-h-screen dashboard-main-bg w-full overflow-x-hidden">
         {/* Mobile sidebar overlay */}
         {sidebarOpen && (
           <div
@@ -183,9 +183,9 @@ export default function DashboardLayout({
         </div>
 
         {/* Main content area */}
-        <div className="lg:pl-64">
+        <div className="w-full lg:pl-64 overflow-x-hidden">
           {/* Top header */}
-          <header className="bg-white/80 backdrop-blur-lg border-b border-gray-200 sticky top-0 z-30 shadow-lg">
+          <header className="bg-white/80 backdrop-blur-lg border-b border-gray-200 sticky top-0 z-30 shadow-lg w-full">
             <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
               {/* Mobile menu button */}
               <button
@@ -206,7 +206,7 @@ export default function DashboardLayout({
           </header>
 
           {/* Page content */}
-          <main className="py-6 px-4 sm:px-6 lg:px-8">{children}</main>
+          <main className="py-6 px-4 sm:px-6 lg:px-8 w-full max-w-full overflow-x-hidden">{children}</main>
         </div>
       </div>
       </ProtectedRoute>

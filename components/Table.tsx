@@ -31,8 +31,9 @@ export function Table<T>({
   }
 
   return (
-    <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-      <table className="min-w-full divide-y divide-gray-200">
+    <div className="bg-white shadow overflow-hidden sm:rounded-lg w-full">
+      <div className="overflow-x-auto w-full">
+        <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr>
             {columns.map((column) => (
@@ -70,6 +71,7 @@ export function Table<T>({
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

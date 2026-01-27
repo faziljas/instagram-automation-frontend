@@ -151,11 +151,11 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-7xl mx-auto w-full overflow-x-hidden">
       {/* Hero Banner - More Vibrant */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 rounded-2xl mb-8 shadow-xl">
+      <div className="relative overflow-hidden bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 rounded-2xl mb-8 shadow-xl w-full">
         <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent"></div>
-        <div className="relative py-10 px-8">
+        <div className="relative py-6 md:py-10 px-4 md:px-8">
           <h1 className="text-4xl font-bold text-white mb-2">
             Welcome back, {user?.email?.split('@')[0]}! 👋
           </h1>

@@ -194,11 +194,11 @@ export default function AnalyticsPage() {
   const chartHeightPx = 200;
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-7xl mx-auto w-full overflow-x-hidden">
       {/* Hero Banner */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-2xl mb-8 shadow-xl">
+      <div className="relative overflow-hidden bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-2xl mb-8 shadow-xl w-full">
         <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent"></div>
-        <div className="relative py-10 px-8">
+        <div className="relative py-6 md:py-10 px-4 md:px-8">
           <h1 className="text-4xl font-bold text-white mb-2">Analytics Dashboard</h1>
           <p className="text-lg text-white/90">
             Track your automation performance and engagement metrics

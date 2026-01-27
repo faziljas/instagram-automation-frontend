@@ -118,11 +118,11 @@ export default function RulesPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-7xl mx-auto w-full overflow-x-hidden">
       {/* Hero Banner */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-yellow-500 via-amber-500 to-orange-500 rounded-2xl mb-8 shadow-xl">
+      <div className="relative overflow-hidden bg-gradient-to-br from-yellow-500 via-amber-500 to-orange-500 rounded-2xl mb-8 shadow-xl w-full">
         <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent"></div>
-        <div className="relative py-10 px-8">
+        <div className="relative py-6 md:py-10 px-4 md:px-8">
           <h1 className="text-4xl font-bold text-white mb-2">Automation Rules</h1>
           <p className="text-lg text-white/90">Manage your Instagram automation rules</p>
         </div>
@@ -166,8 +166,9 @@ export default function RulesPage() {
 
       {/* Rules Table */}
       {!isLoading && rules && rules.length > 0 && (
-        <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
+        <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl overflow-hidden w-full">
+          <div className="overflow-x-auto w-full">
+            <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
               <tr>
                 <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
@@ -292,6 +293,7 @@ export default function RulesPage() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
     </div>
