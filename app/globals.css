@@ -39,3 +39,33 @@
 .animate-float {
   animation: float 3s ease-in-out infinite;
 }
+
+/* Scrolling marquee animation */
+.scrolling-marquee {
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
+}
+
+.scrolling-marquee-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  animation: scroll-up 25s linear infinite;
+  will-change: transform;
+}
+
+.scrolling-marquee-content:hover {
+  animation-play-state: paused;
+}
+
+@keyframes scroll-up {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
