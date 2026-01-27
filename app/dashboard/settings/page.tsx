@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { z } from 'zod';
 import { useFetch } from '@/hooks/useFetch';
@@ -57,6 +57,8 @@ export default function SettingsPage() {
   const [passwordSuccess, setPasswordSuccess] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [activeTab, setActiveTab] = useState<'general' | 'security' | 'notifications' | 'billing'>('general');
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Pre-fill profile form with user data
   useEffect(() => {
@@ -183,6 +185,43 @@ export default function SettingsPage() {
     }
   };
 
+  const handleAvatarUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleAvatarFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const isValidImage =
+      file.type === 'image/png' ||
+      file.type === 'image/jpeg' ||
+      file.type === 'image/jpg';
+
+    if (!isValidImage) {
+      // For now we silently ignore invalid types; can add toast later
+      e.target.value = '';
+      return;
+    }
+
+    if (avatarPreview) {
+      URL.revokeObjectURL(avatarPreview);
+    }
+
+    const previewUrl = URL.createObjectURL(file);
+    setAvatarPreview(previewUrl);
+  };
+
+  const handleAvatarRemove = () => {
+    if (avatarPreview) {
+      URL.revokeObjectURL(avatarPreview);
+    }
+    setAvatarPreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="max-w-6xl mx-auto py-16">
@@ -207,11 +246,19 @@ export default function SettingsPage() {
         {/* Avatar row */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-gray-100 pb-6">
           <div className="flex items-center gap-4">
-            <div className="h-16 w-16 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white text-xl font-semibold shadow-md">
-              {profileData.firstName
-                ? profileData.firstName.charAt(0).toUpperCase()
-                : profileData.email.charAt(0).toUpperCase()}
-            </div>
+            {avatarPreview ? (
+              <img
+                src={avatarPreview}
+                alt="Profile avatar"
+                className="h-16 w-16 rounded-full object-cover shadow-md"
+              />
+            ) : (
+              <div className="h-16 w-16 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white text-xl font-semibold shadow-md">
+                {profileData.firstName
+                  ? profileData.firstName.charAt(0).toUpperCase()
+                  : profileData.email.charAt(0).toUpperCase()}
+              </div>
+            )}
             <div>
               <p className="text-sm font-medium text-gray-900">Profile picture</p>
               <p className="text-xs text-gray-500">This avatar is used across your account and automations.</p>
@@ -220,16 +267,25 @@ export default function SettingsPage() {
           <div className="flex items-center gap-3">
             <button
               type="button"
+              onClick={handleAvatarUploadClick}
               className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
             >
               Upload New
             </button>
             <button
               type="button"
+              onClick={handleAvatarRemove}
               className="text-sm font-medium text-red-600 hover:text-red-700"
             >
               Remove
             </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/jpg"
+              className="hidden"
+              onChange={handleAvatarFileChange}
+            />
           </div>
         </div>
 
@@ -425,19 +481,119 @@ export default function SettingsPage() {
     </div>
   );
 
+  const renderBillingContent = () => (
+    <div className="space-y-10">
+      <div>
+        <h2 className="text-xl font-semibold text-gray-900">Billing</h2>
+        <p className="mt-1 text-sm text-gray-500">
+          Review your current plan, payment method, and past invoices.
+        </p>
+      </div>
+
+      {/* Current plan */}
+      <section className="rounded-xl border border-gray-200 bg-gray-50 px-6 py-5">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h3 className="text-sm font-semibold text-gray-900">Pro plan</h3>
+            <p className="mt-1 text-sm text-gray-600">Annual • Renews automatically each year.</p>
+          </div>
+          <button
+            type="button"
+            className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+          >
+            Adjust plan
+          </button>
+        </div>
+      </section>
+
+      {/* Payment method */}
+      <section className="space-y-4">
+        <h3 className="text-sm font-semibold text-gray-900">Payment</h3>
+        <div className="flex flex-col items-start justify-between gap-4 rounded-xl border border-gray-200 bg-white px-6 py-5 sm:flex-row sm:items-center">
+          <div className="flex items-center gap-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-emerald-600 text-white text-xs font-semibold">
+              $
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-900">Link by Stripe</p>
+              <p className="text-xs text-gray-500">Securely managed by Stripe.</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+          >
+            Update
+          </button>
+        </div>
+      </section>
+
+      {/* Invoices */}
+      <section className="space-y-4">
+        <h3 className="text-sm font-semibold text-gray-900">Invoices</h3>
+        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Date
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Total
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200 text-sm">
+              <tr>
+                <td className="px-6 py-3 text-gray-900">Feb 25, 2025</td>
+                <td className="px-6 py-3 text-gray-900">SGD 324.99</td>
+                <td className="px-6 py-3 text-gray-900">Paid</td>
+                <td className="px-6 py-3 text-right">
+                  <button type="button" className="text-sm font-medium text-gray-700 underline">
+                    View
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td className="px-6 py-3 text-gray-900">Dec 4, 2024</td>
+                <td className="px-6 py-3 text-gray-900">$21.80</td>
+                <td className="px-6 py-3 text-gray-900">Paid</td>
+                <td className="px-6 py-3 text-right">
+                  <button type="button" className="text-sm font-medium text-gray-700 underline">
+                    View
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* Cancellation */}
+      <section className="space-y-3 border-t border-gray-100 pt-5">
+        <h3 className="text-sm font-semibold text-gray-900">Cancellation</h3>
+        <p className="text-sm text-gray-500">You can cancel your plan at any time. Your access will continue until the end of the billing period.</p>
+        <button
+          type="button"
+          className="inline-flex items-center justify-center rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-100"
+        >
+          Cancel plan
+        </button>
+      </section>
+    </div>
+  );
+
   const renderContent = () => {
     if (activeTab === 'general') return renderGeneralContent();
     if (activeTab === 'security') return renderSecurityContent();
     if (activeTab === 'notifications') return renderNotificationsContent();
-    if (activeTab === 'billing') {
-      router.push('/dashboard/subscription');
-      return (
-        <div className="space-y-2">
-          <h2 className="text-xl font-semibold text-gray-900">Billing</h2>
-          <p className="text-sm text-gray-500">Redirecting you to the billing dashboard…</p>
-        </div>
-      );
-    }
+    if (activeTab === 'billing') return renderBillingContent();
     return null;
   };
 
