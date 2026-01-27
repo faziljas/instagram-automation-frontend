@@ -469,6 +469,7 @@ export default function AccountsPage() {
           </table>
           </div>
         </div>
+        </div>
       )}
     </div>
   );
