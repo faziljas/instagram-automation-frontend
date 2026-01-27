@@ -34,7 +34,7 @@ const navigation = [
   // Rules view has been merged into Automations; keep backend APIs but hide this tab.
   // { name: 'Rules', href: '/dashboard/rules', icon: BoltIcon },
   { name: 'Analytics', href: '/dashboard/analytics', icon: ChartBarIcon },
-  { name: 'Usage Details', href: '/dashboard/subscription', icon: CreditCardIcon },
+  { name: 'Usage Details', href: '/dashboard/subscription', icon: BoltIcon },
   // Settings page is accessible from the user menu; hide sidebar entry to avoid duplication.
   // { name: 'Settings', href: '/dashboard/settings', icon: Cog6ToothIcon },
 ];

@@ -141,6 +141,9 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
     );
   }
 
+  const isCancelled =
+    subscription.status === 'cancelled' && subscription.cancellation_end_date;
+
   // Pro (or higher) layout
   return (
     <div className="space-y-8 font-inter">
@@ -236,14 +239,36 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
         <p className="text-sm text-gray-500">
           You can cancel your plan at any time. Your access will continue until the end of the billing period.
         </p>
-        <button
-          type="button"
-          onClick={onCancelPlan}
-          disabled={cancelLoading}
-          className="inline-flex items-center justify-center rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-100 disabled:opacity-60"
-        >
-          {cancelLoading ? 'Canceling…' : 'Cancel Plan'}
-        </button>
+
+        {!isCancelled && (
+          <button
+            type="button"
+            onClick={onCancelPlan}
+            disabled={cancelLoading}
+            className="inline-flex items-center justify-center rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-100 disabled:opacity-60"
+          >
+            {cancelLoading ? 'Canceling…' : 'Cancel Plan'}
+          </button>
+        )}
+
+        {isCancelled && currentPeriodEnd && (
+          <div className="mt-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+            <p className="font-semibold mb-1">Subscription Cancelled</p>
+            <p>Your subscription has been successfully canceled.</p>
+            <p>
+              You will continue to have full access to <span className="font-semibold">Pro</span> features until{' '}
+              <span className="font-semibold">
+                {currentPeriodEnd.toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}
+              </span>
+              .
+            </p>
+            <p>You will not be charged again.</p>
+          </div>
+        )}
       </section>
     </div>
   );
