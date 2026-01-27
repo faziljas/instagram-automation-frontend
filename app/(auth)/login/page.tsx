@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { HiShieldCheck } from 'react-icons/hi';
-import { FaInstagram, FaBolt, FaRocket } from 'react-icons/fa';
+import { FaInstagram, FaBolt, FaRocket, FaEnvelope, FaChartLine } from 'react-icons/fa';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { z } from 'zod';
@@ -528,23 +528,78 @@ function LoginPageContent() {
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-purple-900/20 to-slate-900" />
 
-        {/* Static Notification (for Welcome/Login) */}
+        {/* Staggered Notification Cards (for Welcome/Login) */}
         {(viewState === 'welcome' || viewState === 'login') && (
-          <div className="relative z-10 flex items-center justify-center h-full px-12">
-            <div className="max-w-xs animate-float">
-              <div className="bg-white rounded-2xl shadow-2xl p-4 border border-gray-200">
+          <div className="relative z-10 flex items-center justify-center h-full px-12 overflow-y-auto py-12">
+            <div className="max-w-sm w-full space-y-6">
+              {/* Card 1: The Trigger */}
+              <div className="bg-white rounded-2xl shadow-2xl p-4 border border-gray-200 -ml-4 animate-fade-in" style={{ animationDelay: '0s' }}>
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-semibold text-sm">
-                    IG
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-white">
+                    <FaInstagram className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-gray-900">Instagram</p>
+                    <p className="text-sm font-semibold text-gray-900">@sarah_design commented:</p>
                     <p className="text-xs text-gray-500">Just now</p>
                   </div>
                 </div>
                 <div className="bg-gray-50 rounded-xl p-3">
                   <p className="text-sm text-gray-800">
-                    Here is the link you asked for! 🚀
+                    Link please! I need this guide 😍
+                  </p>
+                </div>
+              </div>
+
+              {/* Card 2: The Automation */}
+              <div className="bg-white rounded-2xl shadow-2xl p-4 border border-gray-200 ml-4 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-white">
+                    <FaBolt className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">LogicDM Auto-Reply:</p>
+                    <p className="text-xs text-gray-500">2 seconds ago</p>
+                  </div>
+                </div>
+                <div className="bg-gray-50 rounded-xl p-3">
+                  <p className="text-sm text-gray-800">
+                    Sent! Check your DMs for the free guide ⚡
+                  </p>
+                </div>
+              </div>
+
+              {/* Card 3: The Lead */}
+              <div className="bg-white rounded-2xl shadow-2xl p-4 border border-gray-200 -ml-4 animate-fade-in" style={{ animationDelay: '0.4s' }}>
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white">
+                    <FaEnvelope className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">New Lead Captured:</p>
+                    <p className="text-xs text-gray-500">1 minute ago</p>
+                  </div>
+                </div>
+                <div className="bg-gray-50 rounded-xl p-3">
+                  <p className="text-sm text-gray-800">
+                    sarah@design.studio (Added to Contacts)
+                  </p>
+                </div>
+              </div>
+
+              {/* Card 4: The Growth */}
+              <div className="bg-white rounded-2xl shadow-2xl p-4 border border-gray-200 ml-4 animate-fade-in" style={{ animationDelay: '0.6s' }}>
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center text-white">
+                    <FaChartLine className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">Weekly Report:</p>
+                    <p className="text-xs text-gray-500">Today</p>
+                  </div>
+                </div>
+                <div className="bg-gray-50 rounded-xl p-3">
+                  <p className="text-sm text-gray-800">
+                    Engagement up +127% this week 🚀
                   </p>
                 </div>
               </div>
