@@ -538,8 +538,8 @@ export default function AutomationsPage() {
       <div className="relative overflow-hidden bg-gradient-to-br from-purple-500 via-pink-500 to-rose-600 rounded-2xl mb-8 shadow-xl w-full">
         <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent"></div>
         <div className="relative py-6 md:py-10 px-4 md:px-8">
-          <h1 className="text-4xl font-bold text-white mb-2">Automations</h1>
-          <p className="text-lg text-white/90">Jump right in and automate your Instagram</p>
+          <h1 className="text-2xl md:text-4xl font-bold text-white mb-2">Automations</h1>
+          <p className="text-sm md:text-lg text-white/90">Jump right in and automate your Instagram</p>
         </div>
       </div>
 
@@ -557,7 +557,7 @@ export default function AutomationsPage() {
             id="account-select"
             value={selectedAccount || ''}
             onChange={(e) => setSelectedAccount(Number(e.target.value))}
-            className="block w-64 px-4 py-3 border-2 border-gray-300 rounded-xl shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white font-medium transition-all duration-200 hover:border-blue-400"
+            className="block w-full max-w-xs md:w-64 px-4 py-3 border-2 border-gray-300 rounded-xl shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white font-medium transition-all duration-200 hover:border-blue-400"
           >
             {accounts.map((account) => (
               <option key={account.id} value={account.id}>
@@ -579,11 +579,11 @@ export default function AutomationsPage() {
       )}
 
       {/* Content Type Tabs */}
-      <div className="mb-6 border-b-2 border-gray-200">
-        <nav className="-mb-px flex space-x-8">
+      <div className="mb-6 border-b-2 border-gray-200 overflow-x-auto">
+        <nav className="-mb-px flex space-x-4 md:space-x-8 min-w-max md:min-w-0">
           <button
             onClick={() => setSelectedTab('posts')}
-            className={`py-4 px-1 border-b-3 font-bold text-sm transition-all duration-200 ${
+            className={`py-3 md:py-4 px-2 md:px-1 border-b-3 font-bold text-xs md:text-sm transition-all duration-200 whitespace-nowrap ${
               selectedTab === 'posts'
                 ? 'border-blue-500 text-blue-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -600,7 +600,7 @@ export default function AutomationsPage() {
               }
             }}
             disabled={!hasProPlan}
-            className={`py-4 px-1 border-b-3 font-bold text-sm relative transition-all duration-200 ${
+            className={`py-3 md:py-4 px-2 md:px-1 border-b-3 font-bold text-xs md:text-sm relative transition-all duration-200 whitespace-nowrap ${
               selectedTab === 'stories'
                 ? 'border-blue-500 text-blue-600'
                 : !hasProPlan
@@ -623,7 +623,7 @@ export default function AutomationsPage() {
               }
             }}
             disabled={!hasProPlan}
-            className={`py-4 px-1 border-b-3 font-bold text-sm relative transition-all duration-200 ${
+            className={`py-3 md:py-4 px-2 md:px-1 border-b-3 font-bold text-xs md:text-sm relative transition-all duration-200 whitespace-nowrap ${
               selectedTab === 'dms'
                 ? 'border-blue-500 text-blue-600'
                 : !hasProPlan
@@ -642,7 +642,7 @@ export default function AutomationsPage() {
               // IG Live is in private beta – show info toast and keep tab inactive
               toast.info('IG Live Automation is currently in private beta. Check back soon!', 4000);
             }}
-            className={`py-4 px-1 border-b-3 font-bold text-sm relative transition-all duration-200 border-transparent text-gray-400 cursor-not-allowed`}
+            className={`py-3 md:py-4 px-2 md:px-1 border-b-3 font-bold text-xs md:text-sm relative transition-all duration-200 border-transparent text-gray-400 cursor-not-allowed whitespace-nowrap`}
             title="IG Live Automation is currently in private beta. Check back soon!"
           >
             IG Live
@@ -661,7 +661,7 @@ export default function AutomationsPage() {
             <div className="flex items-center space-x-2">
               <button
                 onClick={() => setViewMode('table')}
-                className={`px-5 py-2.5 text-sm font-bold rounded-xl transition-all duration-200 ${
+                className={`px-3 md:px-5 py-2 md:py-2.5 text-xs md:text-sm font-bold rounded-xl transition-all duration-200 whitespace-nowrap ${
                   viewMode === 'table'
                     ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
                     : 'bg-white text-gray-700 border-2 border-gray-300 hover:bg-gray-50 hover:border-blue-400 shadow-md'
@@ -671,7 +671,7 @@ export default function AutomationsPage() {
               </button>
               <button
                 onClick={() => setViewMode('grid')}
-                className={`px-5 py-2.5 text-sm font-bold rounded-xl transition-all duration-200 ${
+                className={`px-3 md:px-5 py-2 md:py-2.5 text-xs md:text-sm font-bold rounded-xl transition-all duration-200 whitespace-nowrap ${
                   viewMode === 'grid'
                     ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
                     : 'bg-white text-gray-700 border-2 border-gray-300 hover:bg-gray-50 hover:border-blue-400 shadow-md'
@@ -710,22 +710,22 @@ export default function AutomationsPage() {
             if (filteredAnalytics.length === 0) return null;
             
             return (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl border-2 border-blue-200 shadow-lg p-6 hover:shadow-xl hover:scale-105 transition-all duration-300">
-                  <div className="text-sm font-semibold text-blue-700 mb-1">DMs Sent</div>
-                  <div className="text-3xl font-bold text-blue-900">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6">
+                <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl border-2 border-blue-200 shadow-lg p-4 md:p-6 hover:shadow-xl hover:scale-105 transition-all duration-300">
+                  <div className="text-xs md:text-sm font-semibold text-blue-700 mb-1">DMs Sent</div>
+                  <div className="text-2xl md:text-3xl font-bold text-blue-900">
                     {filteredAnalytics.reduce((sum, m) => sum + m.dms_sent, 0)}
                   </div>
                 </div>
-                <div className="bg-gradient-to-br from-green-50 to-emerald-100 rounded-2xl border-2 border-green-200 shadow-lg p-6 hover:shadow-xl hover:scale-105 transition-all duration-300">
-                  <div className="text-sm font-semibold text-green-700 mb-1">Leads Generated</div>
-                  <div className="text-3xl font-bold text-green-900">
+                <div className="bg-gradient-to-br from-green-50 to-emerald-100 rounded-2xl border-2 border-green-200 shadow-lg p-4 md:p-6 hover:shadow-xl hover:scale-105 transition-all duration-300">
+                  <div className="text-xs md:text-sm font-semibold text-green-700 mb-1">Leads Generated</div>
+                  <div className="text-2xl md:text-3xl font-bold text-green-900">
                     {filteredAnalytics.reduce((sum, m) => sum + m.leads_collected, 0)}
                   </div>
                 </div>
-                <div className="bg-gradient-to-br from-purple-50 to-pink-100 rounded-2xl border-2 border-purple-200 shadow-lg p-6 hover:shadow-xl hover:scale-105 transition-all duration-300" title="Increases when users click &quot;Follow Me&quot; or &quot;I&#39;m following&quot; in your DM flow">
-                  <div className="text-sm font-semibold text-purple-700 mb-1">Followers Gained via AutoDM</div>
-                  <div className="text-3xl font-bold text-purple-900">
+                <div className="bg-gradient-to-br from-purple-50 to-pink-100 rounded-2xl border-2 border-purple-200 shadow-lg p-4 md:p-6 hover:shadow-xl hover:scale-105 transition-all duration-300" title="Increases when users click &quot;Follow Me&quot; or &quot;I&#39;m following&quot; in your DM flow">
+                  <div className="text-xs md:text-sm font-semibold text-purple-700 mb-1">Followers Gained via AutoDM</div>
+                  <div className="text-2xl md:text-3xl font-bold text-purple-900">
                     {filteredAnalytics.reduce((sum, m) => sum + (m.follow_button_clicks || 0) + (m.im_following_clicks || 0), 0)}
                   </div>
                   <div className="text-xs font-medium text-purple-600 mt-2">Follow / I&apos;m following button clicks</div>
@@ -782,8 +782,8 @@ export default function AutomationsPage() {
         ) : viewMode === 'table' ? (
           // Table View with Analytics
           <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl overflow-hidden w-full">
-            <div className="px-4 md:px-6 py-4 border-b-2 border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
-              <h3 className="text-xl font-bold text-gray-900">AUTOMATIONS</h3>
+            <div className="px-4 md:px-6 py-3 md:py-4 border-b-2 border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
+              <h3 className="text-base md:text-xl font-bold text-gray-900">AUTOMATIONS</h3>
             </div>
             {isLoadingMedia || isLoadingAnalytics ? (
               <div className="p-6 text-center">
