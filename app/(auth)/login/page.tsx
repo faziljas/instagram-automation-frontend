@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import Logo from '@/components/Logo';
@@ -126,11 +127,24 @@ function LoginPageContent() {
   }
 
   return (
-    <div className="min-h-screen w-full flex">
+    <div className="min-h-screen w-full flex flex-col lg:flex-row">
       {/* Left Column - Form Area */}
       <div className="w-full lg:w-[45%] bg-white flex flex-col justify-center px-8 lg:px-24 relative">
-        {/* Logo */}
-        <div className="absolute top-8 left-8 lg:left-24">
+        {/* Top Navigation */}
+        <div className="absolute top-8 left-8 lg:left-24 right-8 lg:right-24 flex items-center justify-between z-10">
+          <Link href="/" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
+            Home
+          </Link>
+          <Link
+            href="/register"
+            className="px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+          >
+            Get Started
+          </Link>
+        </div>
+
+        {/* Logo - Moved below navigation */}
+        <div className="absolute top-20 left-8 lg:left-24 lg:top-24">
           <Logo size="md" variant="dark" />
         </div>
 
@@ -247,7 +261,7 @@ function LoginPageContent() {
             <button
               type="submit"
               disabled={isLoading || isGoogleLoading}
-              className="w-full h-10 bg-slate-900 hover:bg-slate-800 text-white rounded-md font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              className="w-full h-10 bg-gradient-to-r from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700 text-white rounded-md font-medium text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-sm"
             >
               {isLoading ? (
                 <>
@@ -260,12 +274,32 @@ function LoginPageContent() {
             </button>
           </form>
 
+          {/* Social Proof */}
+          <div className="mt-8 text-center">
+            <p className="text-xs text-gray-500 mb-3">Trusted by 100+ Creators</p>
+            <div className="flex items-center justify-center gap-2">
+              {/* Avatar faces */}
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-400 to-pink-500 flex items-center justify-center text-white text-xs font-semibold">
+                A
+              </div>
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center text-white text-xs font-semibold -ml-2">
+                B
+              </div>
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-green-400 to-teal-500 flex items-center justify-center text-white text-xs font-semibold -ml-2">
+                C
+              </div>
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-white text-xs font-semibold -ml-2">
+                D
+              </div>
+            </div>
+          </div>
+
           {/* Footer */}
           <div className="mt-6 text-center text-sm text-gray-600">
             Don't have an account?{' '}
-            <a href="/register" className="font-medium text-blue-600 hover:text-blue-500">
+            <Link href="/register" className="font-medium text-blue-600 hover:text-blue-500">
               Sign up
-            </a>
+            </Link>
           </div>
         </div>
       </div>
@@ -286,16 +320,76 @@ function LoginPageContent() {
           />
         </div>
 
+        {/* Gradient Blob - Orange/Purple */}
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-br from-orange-500/30 via-pink-500/30 to-purple-600/30 rounded-full blur-3xl opacity-60 animate-pulse" />
+
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-purple-900/20 to-slate-900" />
 
-        {/* Quote Card */}
-        <div className="relative z-10 flex items-center justify-center h-full px-12">
-          <div className="backdrop-blur-md bg-white/10 p-8 rounded-2xl border border-white/20 max-w-md">
-            <p className="text-2xl font-semibold text-white leading-relaxed mb-4">
-              "Automating my DMs saved me 20 hours a week."
-            </p>
-            <p className="text-lg text-white/80">— Creator Name</p>
+        {/* Content */}
+        <div className="relative z-10 flex flex-col items-center justify-center h-full px-12">
+          {/* Feature Highlights */}
+          <div className="max-w-md space-y-8">
+            {/* Headline */}
+            <h2 className="text-4xl font-bold text-white leading-tight">
+              Turn Comments into Customers.
+            </h2>
+
+            {/* Feature List */}
+            <div className="space-y-4">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-green-500 flex items-center justify-center mt-0.5">
+                  <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <p className="text-lg text-white/90 leading-relaxed">
+                  Automate replies 24/7 without lifting a finger.
+                </p>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-green-500 flex items-center justify-center mt-0.5">
+                  <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <p className="text-lg text-white/90 leading-relaxed">
+                  Capture leads directly from your Instagram comments.
+                </p>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-green-500 flex items-center justify-center mt-0.5">
+                  <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <p className="text-lg text-white/90 leading-relaxed">
+                  Safe, secure, and approved by Meta.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Mock Notification Card */}
+          <div className="absolute bottom-20 right-12 max-w-xs animate-float">
+            <div className="bg-white rounded-2xl shadow-2xl p-4 border border-gray-200">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-semibold text-sm">
+                  IG
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-gray-900">Instagram</p>
+                  <p className="text-xs text-gray-500">Just now</p>
+                </div>
+              </div>
+              <div className="bg-gray-50 rounded-xl p-3">
+                <p className="text-sm text-gray-800">
+                  Here is the link you asked for! 🚀
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
