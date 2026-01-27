@@ -24,6 +24,7 @@ interface SubscriptionResponse {
   effective_plan_tier: string;  // Effective plan tier for display (shows Pro limits if still within paid Pro cycle)
   status: string;
   stripe_subscription_id: string | null;
+  cancellation_end_date: string | null;  // When Pro access ends after cancellation (ISO format)
   usage: SubscriptionUsageData;
 }
 
@@ -314,13 +315,29 @@ export default function SubscriptionPage() {
 
   const handleCancelSubscription = async () => {
     try {
-      await cancelSubscription('/users/subscription/cancel', {});
+      const response = await cancelSubscription('/users/subscription/cancel', {});
       setShowCancelModal(false);
+      
+      // Show success message with cancellation end date
+      if (response?.cancellation_end_date) {
+        const endDate = new Date(response.cancellation_end_date);
+        const formattedEndDate = endDate.toLocaleDateString('en-US', { 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        });
+        setSuccessMessage(
+          `Your subscription has been successfully canceled. You will continue to have full access to Pro features until ${formattedEndDate}. You will not be charged again.`
+        );
+      } else {
+        setSuccessMessage('Your subscription has been successfully canceled.');
+      }
+      
       // Refresh subscription data
-      window.location.reload();
+      await refetchSubscription(undefined, { revalidate: true });
     } catch (error) {
       console.error('Failed to cancel subscription:', error);
-      alert(error instanceof Error ? error.message : 'Failed to cancel subscription');
+      setErrorMessage(error instanceof Error ? error.message : 'Failed to cancel subscription');
     }
   };
 
@@ -378,10 +395,14 @@ export default function SubscriptionPage() {
 
   // Use effective_plan_tier for display limits (shows Pro limits if still within paid Pro cycle)
   // Use plan_tier for actual plan features and status
+  // If cancelled but still within cycle, show Pro in UI
   const plan = subscriptionData.plan_tier;
   const effectivePlan = subscriptionData.effective_plan_tier || subscriptionData.plan_tier;
+  const displayPlan = (subscriptionData.status === 'cancelled' && subscriptionData.cancellation_end_date) 
+    ? effectivePlan  // Show Pro if cancelled but still within cycle
+    : plan;
   const limits = PLAN_LIMITS[effectivePlan] || PLAN_LIMITS.free;
-  const features = PLAN_FEATURES[plan] || PLAN_FEATURES.free;
+  const features = PLAN_FEATURES[displayPlan] || PLAN_FEATURES.free;
 
   return (
     <div className="max-w-5xl mx-auto">
@@ -428,22 +449,28 @@ export default function SubscriptionPage() {
             <h2 className="text-xl font-bold text-gray-900 mb-3">Current Plan</h2>
             <div className="flex items-center space-x-4">
               <span
-                className={`text-4xl font-bold capitalize ${getPlanColor(plan)}`}
+                className={`text-4xl font-bold capitalize ${getPlanColor(displayPlan)}`}
               >
-                {plan}
+                {displayPlan}
               </span>
               <span
                 className={`px-4 py-2 inline-flex text-sm font-bold rounded-xl shadow-sm ${
                   subscriptionData.status === 'active' 
                     ? 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border border-green-300' 
-                    : getPlanBadgeColor(plan)
+                    : subscriptionData.status === 'cancelled' && subscriptionData.cancellation_end_date
+                    ? 'bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border border-blue-300'
+                    : getPlanBadgeColor(displayPlan)
                 }`}
               >
-                {subscriptionData.status === 'active' ? 'Active' : subscriptionData.status}
+                {subscriptionData.status === 'active' 
+                  ? 'Active' 
+                  : subscriptionData.status === 'cancelled' && subscriptionData.cancellation_end_date
+                  ? 'Cancelled (Active until cycle ends)'
+                  : subscriptionData.status}
               </span>
             </div>
           </div>
-          {plan === 'free' && (
+          {displayPlan === 'free' && subscriptionData.status !== 'cancelled' && (
             <button
               onClick={handleUpgrade}
               disabled={checkoutLoading}
@@ -535,12 +562,40 @@ export default function SubscriptionPage() {
         </div>
       </div>
 
+      {/* Cancellation Message */}
+      {subscriptionData.status === 'cancelled' && subscriptionData.cancellation_end_date && (
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-2xl p-6 mb-6">
+          <div className="flex items-start">
+            <div className="flex-shrink-0">
+              <CheckCircleIcon className="h-6 w-6 text-blue-600" />
+            </div>
+            <div className="ml-3">
+              <h3 className="text-lg font-bold text-blue-900 mb-2">Subscription Cancelled</h3>
+              <p className="text-sm text-blue-800">
+                Your subscription has been successfully canceled.
+                <br />
+                You will continue to have full access to <strong>Pro</strong> features until{' '}
+                <strong>
+                  {new Date(subscriptionData.cancellation_end_date).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </strong>.
+                <br />
+                You will not be charged again.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Cancel Subscription */}
-      {plan !== 'free' && subscriptionData.status !== 'cancelled' && (
+      {displayPlan !== 'free' && subscriptionData.status !== 'cancelled' && (
         <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl p-8">
           <h2 className="text-xl font-bold text-gray-900 mb-3">Cancel Subscription</h2>
           <p className="text-sm font-medium text-gray-600 mb-6">
-            If you cancel your subscription, you will be downgraded to the free plan immediately.
+            If you cancel your subscription, you will continue to have full access to Pro features until the end of your current billing cycle. You will not be charged again.
           </p>
           <button
             onClick={() => setShowCancelModal(true)}
@@ -567,7 +622,7 @@ export default function SubscriptionPage() {
               <div className="mt-3">
                 <h3 className="text-xl font-bold text-gray-900">Cancel Subscription</h3>
                 <p className="mt-2 text-sm font-medium text-gray-600">
-                  Are you sure you want to cancel your subscription? You will be downgraded to the free plan immediately.
+                  Are you sure you want to cancel your subscription? You will continue to have full access to Pro features until the end of your current billing cycle. You will not be charged again.
                 </p>
               </div>
               <div className="mt-6 flex justify-center space-x-4">
