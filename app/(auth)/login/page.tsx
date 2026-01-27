@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { HiShieldCheck } from 'react-icons/hi';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { z } from 'zod';
@@ -239,20 +240,13 @@ function LoginPageContent() {
                 </button>
               </div>
 
-              {/* Social Proof */}
-              <div className="pt-6">
-                <div className="flex items-center justify-center gap-2 mb-3">
-                  <div className="flex items-center gap-1">
-                    <span className="text-yellow-400 text-sm">⭐⭐⭐⭐⭐</span>
-                  </div>
-                  <span className="text-xs text-gray-500">Trusted by 5,000+ Creators</span>
+              {/* Tech & Security Trust Badge */}
+              <div className="pt-6 flex flex-col items-center gap-1">
+                <div className="flex items-center gap-2 text-gray-600 text-sm">
+                  <HiShieldCheck className="w-5 h-5 text-green-500" />
+                  <span className="font-medium">Built on the Official Instagram API</span>
                 </div>
-                <div className="flex items-center justify-center gap-2">
-                  <img src="https://i.pravatar.cc/150?u=1" alt="User 1" className="w-10 h-10 rounded-full border-2 border-white -ml-2" />
-                  <img src="https://i.pravatar.cc/150?u=2" alt="User 2" className="w-10 h-10 rounded-full border-2 border-white -ml-2" />
-                  <img src="https://i.pravatar.cc/150?u=3" alt="User 3" className="w-10 h-10 rounded-full border-2 border-white -ml-2" />
-                  <img src="https://i.pravatar.cc/150?u=4" alt="User 4" className="w-10 h-10 rounded-full border-2 border-white -ml-2" />
-                </div>
+                <p className="text-xs text-gray-500">100% Safe & Meta Compliant</p>
               </div>
             </div>
           )}
