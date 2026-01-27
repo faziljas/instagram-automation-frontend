@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useFetch } from '@/hooks/useFetch';
 import { GridStatsSkeleton } from '@/components/Skeleton';
@@ -11,7 +10,6 @@ import {
   CreditCardIcon,
   ClockIcon,
 } from '@heroicons/react/24/outline';
-import { getSupabaseClient, isSupabaseConfigured } from '@/lib/supabase';
 
 interface DashboardUser {
   id: number;
@@ -45,6 +43,43 @@ interface SubscriptionResponse {
   usage: SubscriptionUsageData;
 }
 
+interface AnalyticsSummary {
+  total_triggers: number;
+  total_dms_sent: number;
+  leads_collected: number;
+  link_clicks: number;
+  follow_button_clicks: number;
+  im_following_clicks: number;
+  profile_visits: number;
+  comment_replies: number;
+  top_posts: Array<{
+    media_id: string;
+    trigger_count: number;
+    leads_count: number;
+    dms_count: number;
+    permalink?: string;
+    media_url?: string;
+    media_type?: string;
+  }>;
+  daily_breakdown: Array<{
+    date: string;
+    date_label: string;
+    triggers: number;
+    dms_sent: number;
+    leads: number;
+    total: number;
+  }>;
+}
+
+interface Lead {
+  id: number;
+  email: string | null;
+  phone: string | null;
+  name: string | null;
+  captured_at: string;
+  automation_rule_id: number;
+}
+
 // Plan limits (must match backend and other pages)
 const PLAN_LIMITS: Record<string, { accounts: number; rules: number; dms: number }> = {
   free: { accounts: 1, rules: -1, dms: 1000 }, // High Volume pricing: unlimited rules, 1000 DMs
@@ -57,24 +92,49 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const { data, isLoading } = useFetch<DashboardResponse>('/users/me/dashboard');
   const { data: subscriptionData } = useFetch<SubscriptionResponse>('/users/subscription');
+  const { data: analyticsData, isLoading: isAnalyticsLoading } = useFetch<AnalyticsSummary>(
+    '/api/analytics/dashboard?days=7'
+  );
+  const { data: leadsData } = useFetch<Lead[]>('/api/leads');
 
   // Check if account and rule limits are reached
   const plan = subscriptionData?.plan_tier || 'free';
   const limits = PLAN_LIMITS[plan] || PLAN_LIMITS.free;
 
-  // Supabase-powered stats
-  const [totalDMs, setTotalDMs] = useState<number | null>(null);
-  const [activeRules, setActiveRules] = useState<number | null>(null);
-  const [leadsCaptured, setLeadsCaptured] = useState<number | null>(null);
-  const [recentActivity, setRecentActivity] = useState<
-    { id: string | number; username: string; label?: string; created_at: string }[]
-  >([]);
-  const [engagementData, setEngagementData] = useState<number[]>([]);
-  const [isSupabaseLoading, setIsSupabaseLoading] = useState<boolean>(true);
+  // Extract metrics from analytics API
+  const totalDMs = analyticsData?.total_dms_sent || 0;
+  const leadsCaptured = analyticsData?.leads_collected || 0;
+  const activeRules = data?.stats?.active_rules_count || 0;
 
   // Time saved: each DM = 2 minutes
-  const timeSavedHours =
-    totalDMs && totalDMs > 0 ? Math.ceil((totalDMs * 2) / 60) : 0;
+  const timeSavedHours = totalDMs > 0 ? Math.ceil((totalDMs * 2) / 60) : 0;
+
+  // Process daily breakdown for chart (last 7 days)
+  const dailyBreakdown = analyticsData?.daily_breakdown || [];
+  const maxDailyTotal = Math.max(...dailyBreakdown.map((d) => d.total), 1);
+  const engagementData = dailyBreakdown.map((day) =>
+    maxDailyTotal > 0 ? (day.total / maxDailyTotal) * 100 : 0
+  );
+
+  // Recent activity from leads (show when leads were captured)
+  const recentLeads = (leadsData || []).slice(0, 5);
+  const recentActivity = recentLeads.map((lead) => ({
+    id: lead.id,
+    username: lead.email?.split('@')[0] || lead.name || 'Anonymous',
+    label: 'Lead Captured',
+    created_at: lead.captured_at,
+  }));
+
+  // Top posts from analytics API
+  const topPosts = (analyticsData?.top_posts || []).slice(0, 3).map((post) => ({
+    id: post.media_id,
+    caption: post.permalink
+      ? `View on ${post.media_type === 'STORY' ? 'Story' : 'Instagram'}`
+      : `Media ${post.media_id.substring(0, 18)}...`,
+    dms: post.dms_count,
+    media_url: post.media_url,
+    media_type: post.media_type,
+  }));
 
   const formatTimeAgo = (isoDate: string) => {
     const created = new Date(isoDate);
@@ -89,129 +149,6 @@ export default function DashboardPage() {
     if (diffHours < 24) return `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`;
     return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
   };
-
-  useEffect(() => {
-    if (!isSupabaseConfigured()) {
-      setIsSupabaseLoading(false);
-      return;
-    }
-
-    const loadStats = async () => {
-      setIsSupabaseLoading(true);
-      try {
-        const supabase = getSupabaseClient();
-
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6); // include today as day 6
-
-        const [
-          totalDMsResult,
-          activeRulesResult,
-          recentLogsResult,
-          lastWeekLogsResult,
-        ] = await Promise.all([
-          supabase
-            .from('automation_logs')
-            .select('*', { count: 'exact', head: true }),
-          supabase
-            .from('automation_rules')
-            .select('*', { count: 'exact', head: true })
-            .eq('status', 'active'),
-          supabase
-            .from('automation_logs')
-            .select('id, instagram_username, label, created_at')
-            .order('created_at', { ascending: false })
-            .limit(5),
-          supabase
-            .from('automation_logs')
-            .select('id, created_at')
-            .gte('created_at', sevenDaysAgo.toISOString()),
-        ]);
-
-        if (!totalDMsResult.error) {
-          setTotalDMs(totalDMsResult.count ?? 0);
-        }
-
-        if (!activeRulesResult.error) {
-          setActiveRules(activeRulesResult.count ?? 0);
-        }
-
-        if (!recentLogsResult.error && recentLogsResult.data) {
-          const mapped = recentLogsResult.data.map((log: any) => ({
-            id: log.id,
-            username: log.instagram_username || 'Anonymous',
-            label: log.label || 'Automation',
-            created_at: log.created_at,
-          }));
-          setRecentActivity(mapped);
-
-          // Approximate leads as unique usernames in the recent logs (fallback until a leads table exists)
-          const uniqueUsernames = new Set(
-            mapped
-              .map((item) => item.username)
-              .filter((name) => name && name !== 'Anonymous'),
-          );
-          setLeadsCaptured(uniqueUsernames.size);
-        } else {
-          setLeadsCaptured(0);
-        }
-
-        if (!lastWeekLogsResult.error && lastWeekLogsResult.data) {
-          const buckets = Array(7).fill(0) as number[];
-          const now = new Date();
-
-          lastWeekLogsResult.data.forEach((log: any) => {
-            const created = new Date(log.created_at);
-            // Calculate difference in days from today (0-6)
-            const diffDays = Math.floor(
-              (now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24),
-            );
-            const indexFromEnd = 6 - diffDays; // so 6 is today, 0 is 6 days ago
-            if (indexFromEnd >= 0 && indexFromEnd < 7) {
-              buckets[indexFromEnd] += 1;
-            }
-          });
-
-          const max = Math.max(...buckets);
-          if (max === 0) {
-            setEngagementData(buckets);
-          } else {
-            // Normalize to percentage heights
-            setEngagementData(buckets.map((count) => (count / max) * 100));
-          }
-        } else {
-          setEngagementData([]);
-        }
-      } catch (error) {
-        console.error('Error loading dashboard stats from Supabase', error);
-        setEngagementData([]);
-        setLeadsCaptured(0);
-      } finally {
-        setIsSupabaseLoading(false);
-      }
-    };
-
-    void loadStats();
-  }, []);
-
-  // Top posts: keep static for now until there is a dedicated table
-  const topPosts = [
-    {
-      id: '1',
-      caption: '“The DM engine that replies to every comment so you don’t have to.”',
-      dms: 240,
-    },
-    {
-      id: '2',
-      caption: '“Drop ‘PRICE’ below and I’ll send you the full breakdown + case study.”',
-      dms: 185,
-    },
-    {
-      id: '3',
-      caption: '“We turned 1 post into 327 conversations. Want the template?”',
-      dms: 132,
-    },
-  ];
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -228,7 +165,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {isLoading || isSupabaseLoading ? (
+      {isLoading || isAnalyticsLoading ? (
         <div className="mb-8">
           <GridStatsSkeleton />
         </div>
@@ -248,15 +185,10 @@ export default function DashboardPage() {
                       Total DMs Sent
                     </p>
                     <p className="mt-1 text-2xl font-semibold text-gray-900">
-                      {totalDMs === null || totalDMs === 0
-                        ? '-'
-                        : totalDMs.toLocaleString()}
+                      {totalDMs === 0 ? '-' : totalDMs.toLocaleString()}
                     </p>
                   </div>
                 </div>
-                <span className="inline-flex items-center rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700">
-                  +12%
-                </span>
               </div>
               <p className="mt-3 text-xs text-gray-500">
                 Your automation has handled every DM without you needing to touch the inbox.
@@ -275,18 +207,18 @@ export default function DashboardPage() {
                       Leads Captured
                     </p>
                     <p className="mt-1 text-2xl font-semibold text-gray-900">
-                      {leadsCaptured ?? 0}
+                      {leadsCaptured}
                     </p>
                   </div>
                 </div>
                 <span
                   className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                    leadsCaptured && leadsCaptured > 0
+                    leadsCaptured > 0
                       ? 'border border-emerald-100 bg-emerald-50 text-emerald-700'
                       : 'border border-gray-200 bg-gray-50 text-gray-600'
                   }`}
                 >
-                  {leadsCaptured && leadsCaptured > 0 ? '+ Leads' : 'No leads yet'}
+                  {leadsCaptured > 0 ? '+ Leads' : 'No leads yet'}
                 </span>
               </div>
               <p className="mt-3 text-xs text-gray-500">
@@ -306,7 +238,7 @@ export default function DashboardPage() {
                       Active Automations
                     </p>
                     <p className="mt-1 text-2xl font-semibold text-gray-900">
-                      {activeRules ?? 0} Active
+                      {activeRules} Active
                     </p>
                   </div>
                 </div>
@@ -355,7 +287,7 @@ export default function DashboardPage() {
                 <span className="text-xs text-gray-400">DMs / day</span>
               </div>
 
-              {totalDMs === null || totalDMs === 0 ? (
+              {dailyBreakdown.length === 0 || totalDMs === 0 ? (
                 <div className="mt-6 h-40 flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-200 bg-gray-50/60 text-center">
                   <p className="text-sm font-medium text-gray-700">
                     Waiting for data...
@@ -367,24 +299,27 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 <div className="mt-4 h-40 flex items-end space-x-2">
-                  {(
-                    engagementData.length ? engagementData : [20, 40, 60, 50, 70, 80, 65]
-                  ).map((value, index) => (
-                    <div
-                      key={index}
-                      className="flex-1 flex flex-col items-center space-y-2"
-                    >
-                      <div className="w-full bg-gray-50 rounded-lg h-32 flex items-end overflow-hidden">
-                        <div
-                          className="w-full bg-gradient-to-t from-blue-500 to-indigo-400 rounded-lg"
-                          style={{ height: `${value}%` }}
-                        />
+                  {engagementData.map((value, index) => {
+                    const day = dailyBreakdown[index];
+                    const dayName = day?.date.split(' ')[0] || ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][index];
+                    return (
+                      <div
+                        key={index}
+                        className="flex-1 flex flex-col items-center space-y-2"
+                      >
+                        <div className="w-full bg-gray-50 rounded-lg h-32 flex items-end overflow-hidden">
+                          <div
+                            className="w-full bg-gradient-to-t from-blue-500 to-indigo-400 rounded-lg"
+                            style={{ height: `${Math.max(value, 2)}%` }}
+                            title={`${day?.date || ''}: ${day?.total || 0} total (${day?.triggers || 0} triggers, ${day?.dms_sent || 0} DMs, ${day?.leads || 0} leads)`}
+                          />
+                        </div>
+                        <span className="text-[10px] uppercase tracking-wide text-gray-400">
+                          {dayName}
+                        </span>
                       </div>
-                      <span className="text-[10px] uppercase tracking-wide text-gray-400">
-                        {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][index]}
-                      </span>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -475,37 +410,55 @@ export default function DashboardPage() {
                 <span className="col-span-2 text-right">DMs</span>
               </div>
 
-              {topPosts.map((post) => (
-                <div
-                  key={post.id}
-                  className="grid grid-cols-12 gap-4 py-3 items-center"
-                >
-                  {/* Thumbnail placeholder */}
-                  <div className="col-span-5 flex items-center space-x-3">
-                    <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-500" />
-                    <div className="text-xs text-gray-500">
-                      <p className="font-medium text-gray-900">
-                        IG Reel · Auto DM
+              {topPosts.length === 0 ? (
+                <div className="py-8 text-center text-sm text-gray-500">
+                  No posts have been triggered yet. Create automation rules to start tracking performance.
+                </div>
+              ) : (
+                topPosts.map((post) => (
+                  <div
+                    key={post.id}
+                    className="grid grid-cols-12 gap-4 py-3 items-center"
+                  >
+                    {/* Thumbnail */}
+                    <div className="col-span-5 flex items-center space-x-3">
+                      {post.media_url ? (
+                        <img
+                          src={post.media_url}
+                          alt="Post"
+                          className="h-10 w-10 rounded-lg object-cover"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                          }}
+                        />
+                      ) : (
+                        <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-500" />
+                      )}
+                      <div className="text-xs text-gray-500">
+                        <p className="font-medium text-gray-900">
+                          {post.media_type === 'STORY' ? 'IG Story' : 'IG Post'} · Auto DM
+                        </p>
+                        <p>Tap-through &amp; comment triggers enabled</p>
+                      </div>
+                    </div>
+
+                    {/* Caption */}
+                    <div className="col-span-5">
+                      <p className="text-sm text-gray-700 line-clamp-2">
+                        {post.caption}
                       </p>
-                      <p>Tap-through &amp; comment triggers enabled</p>
+                    </div>
+
+                    {/* DMs */}
+                    <div className="col-span-2 text-right">
+                      <span className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
+                        {post.dms.toLocaleString()} DMs
+                      </span>
                     </div>
                   </div>
-
-                  {/* Caption */}
-                  <div className="col-span-5">
-                    <p className="text-sm text-gray-700 line-clamp-2">
-                      {post.caption}
-                    </p>
-                  </div>
-
-                  {/* DMs */}
-                  <div className="col-span-2 text-right">
-                    <span className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
-                      {post.dms.toLocaleString()} DMs
-                    </span>
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         </div>
