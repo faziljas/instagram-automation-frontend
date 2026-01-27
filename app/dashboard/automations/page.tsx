@@ -114,6 +114,7 @@ export default function AutomationsPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('table'); // Default to table view
   const [mediaAnalytics, setMediaAnalytics] = useState<MediaAnalytics[]>([]);
   const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(false);
+  const [deleteConfirmRuleId, setDeleteConfirmRuleId] = useState<number | null>(null);
 
   // Check if user has Pro plan or higher
   const hasProPlan = subscriptionData?.plan_tier === 'pro' || subscriptionData?.plan_tier === 'enterprise';
@@ -851,7 +852,10 @@ export default function AutomationsPage() {
                         <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                           Automation
                         </th>
-                        <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider" title="Increases when users click &quot;Follow Me&quot; / &quot;I&#39;m following&quot; in DMs">
+                        <th
+                          className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider"
+                          title="Increases when users click &quot;Follow Me&quot; / &quot;I&#39;m following&quot; in DMs"
+                        >
                           NEW FOLLOWERS
                         </th>
                         <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
@@ -865,6 +869,9 @@ export default function AutomationsPage() {
                         </th>
                         <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                           LAST MODIFIED
+                        </th>
+                        <th className="px-6 py-4 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">
+                          Action
                         </th>
                       </tr>
                     </thead>
@@ -967,63 +974,87 @@ export default function AutomationsPage() {
                                   })
                                 : rule ? '-' : 'Not configured'}
                             </td>
-                            {/* Actions: Edit & Delete */}
+                            {/* Actions: Edit & Delete with inline Yes/No confirmation */}
                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                               {rule ? (
-                                <div className="flex items-center justify-end space-x-3">
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      // Reuse drawer flow for editing
-                                      handleSetupAutomation(mediaItem);
-                                    }}
-                                    className="text-blue-600 hover:text-blue-800 font-bold hover:scale-105 transition-all duration-200"
+                                deleteConfirmRuleId === rule.id ? (
+                                  <div
+                                    className="flex items-center justify-end space-x-3"
+                                    onClick={(e) => e.stopPropagation()}
                                   >
-                                    Edit
-                                  </button>
-                                  <button
-                                    onClick={async (e) => {
-                                      e.stopPropagation();
-                                      if (
-                                        !window.confirm(
-                                          'Are you sure you want to delete this automation rule?',
-                                        )
-                                      ) {
-                                        return;
-                                      }
-                                      try {
-                                        await del(`/automation/rules/${rule.id}`);
+                                    <span className="text-red-600 text-xs font-semibold">
+                                      Delete?
+                                    </span>
+                                    <button
+                                      onClick={async (e) => {
+                                        e.stopPropagation();
+                                        try {
+                                          await del(`/automation/rules/${rule.id}`);
 
-                                        // Remove rule from local automationRules state
-                                        setAutomationRules((prev) => {
-                                          const next = { ...prev };
-                                          const rulesForMedia = (next[mediaItem.id] || []).filter(
-                                            (r) => r.id !== rule.id,
+                                          // Remove rule from local automationRules state
+                                          setAutomationRules((prev) => {
+                                            const next = { ...prev };
+                                            const rulesForMedia = (next[mediaItem.id] || []).filter(
+                                              (r) => r.id !== rule.id,
+                                            );
+                                            if (rulesForMedia.length > 0) {
+                                              next[mediaItem.id] = rulesForMedia;
+                                            } else {
+                                              delete next[mediaItem.id];
+                                            }
+                                            return next;
+                                          });
+
+                                          // Refresh analytics + limits (rules count)
+                                          void mutate('/automation/rules');
+                                          void mutate('/users/subscription');
+                                        } catch (error: any) {
+                                          console.error('Failed to delete automation rule:', error);
+                                          alert(
+                                            error?.message ||
+                                              'Failed to delete automation rule. Please try again.',
                                           );
-                                          if (rulesForMedia.length > 0) {
-                                            next[mediaItem.id] = rulesForMedia;
-                                          } else {
-                                            delete next[mediaItem.id];
-                                          }
-                                          return next;
-                                        });
-
-                                        // Refresh analytics + limits (rules count)
-                                        void mutate('/automation/rules');
-                                        void mutate('/users/subscription');
-                                      } catch (error: any) {
-                                        console.error('Failed to delete automation rule:', error);
-                                        alert(
-                                          error?.message ||
-                                            'Failed to delete automation rule. Please try again.',
-                                        );
-                                      }
-                                    }}
-                                    className="text-red-600 hover:text-red-800 font-bold hover:scale-105 transition-all duration-200"
-                                  >
-                                    Delete
-                                  </button>
-                                </div>
+                                        } finally {
+                                          setDeleteConfirmRuleId(null);
+                                        }
+                                      }}
+                                      className="px-3 py-1.5 text-xs font-semibold text-red-600 hover:text-white hover:bg-red-600 rounded-lg border border-red-300 transition-all duration-200"
+                                    >
+                                      Yes
+                                    </button>
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setDeleteConfirmRuleId(null);
+                                      }}
+                                      className="px-3 py-1.5 text-xs font-semibold text-gray-600 hover:text-white hover:bg-gray-600 rounded-lg border border-gray-300 transition-all duration-200"
+                                    >
+                                      No
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center justify-end space-x-3">
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        // Reuse drawer flow for editing
+                                        handleSetupAutomation(mediaItem);
+                                      }}
+                                      className="text-blue-600 hover:text-blue-800 font-bold hover:scale-105 transition-all duration-200"
+                                    >
+                                      Edit
+                                    </button>
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setDeleteConfirmRuleId(rule.id);
+                                      }}
+                                      className="text-red-600 hover:text-red-800 font-bold hover:scale-105 transition-all duration-200"
+                                    >
+                                      Delete
+                                    </button>
+                                  </div>
+                                )
                               ) : (
                                 <div className="text-right text-xs text-gray-400 pr-2">
                                   {/* No actions when there is no rule yet */}
