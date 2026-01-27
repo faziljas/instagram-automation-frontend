@@ -31,10 +31,27 @@ const passwordSchema = z
 type ProfileFormData = z.infer<typeof profileSchema>;
 type PasswordFormData = z.infer<typeof passwordSchema>;
 
+interface SubscriptionSummary {
+  plan_tier: string;
+  effective_plan_tier: string;
+  status: string;
+  stripe_subscription_id: string | null;
+  cancellation_end_date: string | null;
+  usage: {
+    accounts: number;
+    rules: number;
+    dms_sent_this_month: number;
+  };
+}
+
 export default function SettingsPage() {
   const router = useRouter();
   const { updateUser, logout } = useAuth();
   const { data: user, isLoading } = useFetch<User>('/users/me');
+  const {
+    data: subscription,
+    isLoading: isSubscriptionLoading,
+  } = useFetch<SubscriptionSummary>('/users/subscription');
   const { execute: updateProfile, loading: profileLoading, error: profileError } = usePut();
   const { execute: updatePassword, loading: passwordLoading, error: passwordError } = usePut();
   const { execute: deleteAccount, loading: deleteLoading } = useDelete();
@@ -68,6 +85,15 @@ export default function SettingsPage() {
         lastName: user.lastName || '',
         email: user.email,
       });
+    }
+  }, [user]);
+
+  // Load stored avatar (local-only persistence for now)
+  useEffect(() => {
+    if (typeof window === 'undefined' || !user) return;
+    const stored = window.localStorage.getItem(`logicdm_avatar_${user.id}`);
+    if (stored) {
+      setAvatarPreview(stored);
     }
   }, [user]);
 
@@ -204,21 +230,25 @@ export default function SettingsPage() {
       return;
     }
 
-    if (avatarPreview) {
-      URL.revokeObjectURL(avatarPreview);
-    }
-
-    const previewUrl = URL.createObjectURL(file);
-    setAvatarPreview(previewUrl);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const result = typeof reader.result === 'string' ? reader.result : null;
+      if (!result) return;
+      setAvatarPreview(result);
+      if (typeof window !== 'undefined' && user) {
+        window.localStorage.setItem(`logicdm_avatar_${user.id}`, result);
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleAvatarRemove = () => {
-    if (avatarPreview) {
-      URL.revokeObjectURL(avatarPreview);
-    }
     setAvatarPreview(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
+    }
+    if (typeof window !== 'undefined' && user) {
+      window.localStorage.removeItem(`logicdm_avatar_${user.id}`);
     }
   };
 
@@ -481,32 +511,76 @@ export default function SettingsPage() {
     </div>
   );
 
-  const renderBillingContent = () => (
-    <div className="space-y-10">
-      <div>
-        <h2 className="text-xl font-semibold text-gray-900">Billing</h2>
-        <p className="mt-1 text-sm text-gray-500">
-          Review your current plan, payment method, and past invoices.
-        </p>
-      </div>
-
-      {/* Current plan */}
-      <section className="rounded-xl border border-gray-200 bg-gray-50 px-6 py-5">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h3 className="text-sm font-semibold text-gray-900">Pro plan</h3>
-            <p className="mt-1 text-sm text-gray-600">Annual • Renews automatically each year.</p>
+  const renderBillingContent = () => {
+    if (isSubscriptionLoading) {
+      return (
+        <div className="py-8">
+          <div className="inline-flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-6 py-4 shadow-sm">
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-blue-500" />
+            <span className="text-sm text-gray-600">Loading billing details…</span>
           </div>
-          <button
-            type="button"
-            className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
-          >
-            Adjust plan
-          </button>
         </div>
-      </section>
+      );
+    }
 
-      {/* Payment method */}
+    if (!subscription) {
+      return (
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold text-gray-900">Billing</h2>
+          <p className="text-sm text-red-600">Unable to load subscription details right now.</p>
+        </div>
+      );
+    }
+
+    const plan = subscription.plan_tier || 'free';
+    const effectivePlan = subscription.effective_plan_tier || plan;
+    const isFree = plan === 'free';
+    const planLabel = `${plan.charAt(0).toUpperCase()}${plan.slice(1)} plan`;
+
+    let renewalText: string;
+    if (subscription.status === 'cancelled' && subscription.cancellation_end_date) {
+      const endDate = new Date(subscription.cancellation_end_date).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      });
+      renewalText = `Your ${effectivePlan} access will end on ${endDate}.`;
+    } else if (isFree) {
+      renewalText = 'You are currently on the Free plan.';
+    } else {
+      renewalText = 'Your subscription will auto renew each billing period.';
+    }
+
+    return (
+      <div className="space-y-10">
+        <div>
+          <h2 className="text-xl font-semibold text-gray-900">Billing</h2>
+          <p className="mt-1 text-sm text-gray-500">
+            Review your current plan, payment method, and past invoices.
+          </p>
+        </div>
+
+        {/* Current plan */}
+        <section className="rounded-xl border border-gray-200 bg-gray-50 px-6 py-5">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900">
+                {planLabel}
+              </h3>
+              <p className="mt-1 text-sm text-gray-600">{renewalText}</p>
+            </div>
+            {!isFree && (
+              <button
+                type="button"
+                className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+              >
+                Adjust plan
+              </button>
+            )}
+          </div>
+        </section>
+
+        {/* Payment method */}
       <section className="space-y-4">
         <h3 className="text-sm font-semibold text-gray-900">Payment</h3>
         <div className="flex flex-col items-start justify-between gap-4 rounded-xl border border-gray-200 bg-white px-6 py-5 sm:flex-row sm:items-center">
@@ -528,7 +602,7 @@ export default function SettingsPage() {
         </div>
       </section>
 
-      {/* Invoices */}
+        {/* Invoices */}
       <section className="space-y-4">
         <h3 className="text-sm font-semibold text-gray-900">Invoices</h3>
         <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
@@ -575,19 +649,24 @@ export default function SettingsPage() {
         </div>
       </section>
 
-      {/* Cancellation */}
-      <section className="space-y-3 border-t border-gray-100 pt-5">
-        <h3 className="text-sm font-semibold text-gray-900">Cancellation</h3>
-        <p className="text-sm text-gray-500">You can cancel your plan at any time. Your access will continue until the end of the billing period.</p>
-        <button
-          type="button"
-          className="inline-flex items-center justify-center rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-100"
-        >
-          Cancel plan
-        </button>
-      </section>
-    </div>
-  );
+        {/* Cancellation */}
+        <section className="space-y-3 border-t border-gray-100 pt-5">
+          <h3 className="text-sm font-semibold text-gray-900">Cancellation</h3>
+          <p className="text-sm text-gray-500">
+            You can cancel your plan at any time. Your access will continue until the end of the billing period.
+          </p>
+          {!isFree && (
+            <button
+              type="button"
+              className="inline-flex items-center justify-center rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-100"
+            >
+              Cancel plan
+            </button>
+          )}
+        </section>
+      </div>
+    );
+  };
 
   const renderContent = () => {
     if (activeTab === 'general') return renderGeneralContent();
