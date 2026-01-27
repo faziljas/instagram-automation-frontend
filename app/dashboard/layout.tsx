@@ -34,7 +34,8 @@ const navigation = [
   // { name: 'Rules', href: '/dashboard/rules', icon: BoltIcon },
   { name: 'Analytics', href: '/dashboard/analytics', icon: ChartBarIcon },
   { name: 'Subscription', href: '/dashboard/subscription', icon: CreditCardIcon },
-  { name: 'Settings', href: '/dashboard/settings', icon: Cog6ToothIcon },
+  // Settings page is accessible from the user menu; hide sidebar entry to avoid duplication.
+  // { name: 'Settings', href: '/dashboard/settings', icon: Cog6ToothIcon },
 ];
 
 export default function DashboardLayout({
