@@ -21,6 +21,7 @@ interface SubscriptionUsageData {
 
 interface SubscriptionResponse {
   plan_tier: string;
+  effective_plan_tier: string;  // Effective plan tier for display (shows Pro limits if still within paid Pro cycle)
   status: string;
   stripe_subscription_id: string | null;
   usage: SubscriptionUsageData;
@@ -375,8 +376,11 @@ export default function SubscriptionPage() {
     );
   }
 
+  // Use effective_plan_tier for display limits (shows Pro limits if still within paid Pro cycle)
+  // Use plan_tier for actual plan features and status
   const plan = subscriptionData.plan_tier;
-  const limits = PLAN_LIMITS[plan] || PLAN_LIMITS.free;
+  const effectivePlan = subscriptionData.effective_plan_tier || subscriptionData.plan_tier;
+  const limits = PLAN_LIMITS[effectivePlan] || PLAN_LIMITS.free;
   const features = PLAN_FEATURES[plan] || PLAN_FEATURES.free;
 
   return (
