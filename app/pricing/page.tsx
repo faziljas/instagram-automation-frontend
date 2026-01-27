@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { usePost } from '@/hooks/useApi';
 import {
@@ -10,6 +11,7 @@ import {
 } from '@heroicons/react/24/solid';
 import {
   CheckIcon as CheckIconOutline,
+  ArrowLeftIcon,
 } from '@heroicons/react/24/outline';
 
 type BillingCycle = 'monthly' | 'yearly';
@@ -50,6 +52,16 @@ export default function PricingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
+        {/* Back Button */}
+        <div className="mb-8">
+          <Link
+            href="/"
+            className="inline-flex items-center text-gray-600 hover:text-gray-900 font-medium transition-colors"
+          >
+            <ArrowLeftIcon className="h-5 w-5 mr-2" />
+            Back to Home
+          </Link>
+        </div>
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">

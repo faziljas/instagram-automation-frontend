@@ -2,6 +2,7 @@
 
 import Logo from '@/components/Logo';
 import Link from 'next/link';
+import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 
 export default function TermsPage() {
   return (
@@ -17,6 +18,16 @@ export default function TermsPage() {
 
       {/* Main Content */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Back Button */}
+        <div className="mb-8">
+          <Link
+            href="/"
+            className="inline-flex items-center text-gray-600 hover:text-gray-900 font-medium transition-colors"
+          >
+            <ArrowLeftIcon className="h-5 w-5 mr-2" />
+            Back to Home
+          </Link>
+        </div>
         <div className="prose prose-slate max-w-none">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Terms of Service</h1>
           <p className="text-gray-600 mb-8">Last updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
