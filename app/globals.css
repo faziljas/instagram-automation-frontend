@@ -86,3 +86,8 @@
   animation: fade-in 0.6s ease-out forwards;
   opacity: 0;
 }
+
+/* Hide global footer on auth pages */
+body:has(.auth-page) .auth-pages-footer {
+  display: none;
+}

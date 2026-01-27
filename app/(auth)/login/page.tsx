@@ -206,17 +206,18 @@ function LoginPageContent() {
   return (
     <div className="min-h-screen w-full flex flex-col lg:flex-row">
       {/* Left Column - Form Area */}
-      <div className="w-full lg:w-[45%] bg-white flex flex-col justify-center px-8 lg:px-24 relative">
+      <div className="w-full lg:w-[45%] bg-white flex flex-col px-8 lg:px-24 relative min-h-screen">
         {/* Logo */}
         <div className="absolute top-8 left-8 lg:left-24">
           <Logo size="md" variant="dark" />
         </div>
 
         {/* Content Container */}
-        <div className="w-full max-w-md mx-auto">
-          {/* Welcome State */}
-          {viewState === 'welcome' && (
-            <div className="space-y-8">
+        <div className="w-full max-w-md mx-auto flex flex-col justify-center flex-1 py-12">
+          <div className="flex-1 flex flex-col justify-center">
+            {/* Welcome State */}
+            {viewState === 'welcome' && (
+              <div className="space-y-8">
               <div>
                 <h1 className="text-4xl font-bold tracking-tight text-gray-900 mb-4">
                   Supercharge your Instagram DMs.
@@ -503,11 +504,25 @@ function LoginPageContent() {
               </div>
             </div>
           )}
+          </div>
+
+          {/* Footer Links */}
+          <div className="mt-auto pt-8 pb-4">
+            <div className="flex items-center justify-center gap-4 text-xs text-gray-400">
+              <Link href="/privacy" className="hover:text-gray-600 transition-colors">
+                Privacy Policy
+              </Link>
+              <span className="text-gray-300">•</span>
+              <Link href="/terms" className="hover:text-gray-600 transition-colors">
+                Terms of Service
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Right Column - Visual Area */}
-      <div className="hidden lg:flex lg:w-[55%] bg-slate-900 relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-[55%] bg-slate-900 relative overflow-hidden min-h-screen">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div
