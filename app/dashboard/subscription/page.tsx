@@ -516,7 +516,7 @@ export default function SubscriptionPage() {
                   limits.accounts === -1 ? 0 : getUsagePercentage(subscriptionData.usage.accounts, limits.accounts)
                 )}`}
                 style={{
-                  width: `${limits.accounts === -1 ? 50 : getUsagePercentage(subscriptionData.usage.accounts, limits.accounts)}%`,
+                  width: `${limits.accounts === -1 ? (subscriptionData.usage.accounts === 0 ? 0 : 50) : getUsagePercentage(subscriptionData.usage.accounts, limits.accounts)}%`,
                 }}
               />
             </div>
@@ -536,7 +536,7 @@ export default function SubscriptionPage() {
                   limits.dms === -1 ? 0 : getUsagePercentage(subscriptionData.usage.dms_sent_this_month, limits.dms)
                 )}`}
                 style={{
-                  width: `${limits.dms === -1 ? 50 : getUsagePercentage(subscriptionData.usage.dms_sent_this_month, limits.dms)}%`,
+                  width: `${limits.dms === -1 ? (subscriptionData.usage.dms_sent_this_month === 0 ? 0 : 50) : getUsagePercentage(subscriptionData.usage.dms_sent_this_month, limits.dms)}%`,
                 }}
               />
             </div>
