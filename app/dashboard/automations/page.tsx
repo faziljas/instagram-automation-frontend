@@ -1427,7 +1427,6 @@ export default function AutomationsPage() {
                   <li className="flex items-center"><span className="mr-2">✅</span> <strong>Unlimited</strong> AutoDMs across Reels, Posts, Stories &amp; Lives</li>
                   <li className="flex items-center"><span className="mr-2">✅</span> Advanced AutoDM Flows (Follow-checks, Sequences)</li>
                   <li className="flex items-center"><span className="mr-2">✅</span> <strong>Unlimited</strong> Leads via Lead Magnets</li>
-                  <li className="flex items-center"><span className="mr-2">✅</span> Remove &apos;Sent by LogicDM&apos; Branding</li>
                   <li className="flex items-center"><span className="mr-2">✅</span> Priority Support via Dedicated Channel</li>
                 </ul>
               </div>

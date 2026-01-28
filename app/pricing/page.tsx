@@ -225,10 +225,6 @@ export default function PricingPage() {
                 </div>
                 <div className="flex items-start">
                   <CheckIcon className="h-6 w-6 text-green-500 mr-3 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700"><strong>Remove &apos;Sent by LogicDM&apos; Branding</strong></span>
-                </div>
-                <div className="flex items-start">
-                  <CheckIcon className="h-6 w-6 text-green-500 mr-3 flex-shrink-0 mt-0.5" />
                   <span className="text-gray-700">Priority Support via Dedicated Channel</span>
                 </div>
               </div>

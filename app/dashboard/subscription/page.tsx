@@ -40,7 +40,7 @@ const PLAN_LIMITS: Record<string, { accounts: number; rules: number; dms: number
 const PLAN_FEATURES: Record<string, string[]> = {
   free: ['1 Instagram Account', 'Unlimited Automation Rules', '1,000 Auto-replies / mo', 'Basic Support'],
   basic: ['3 Instagram Accounts', '10 Automation Rules', '500 DMs/month', 'Email Support'],
-  pro: ['Connect up to 5 Instagram Accounts', 'Unlimited AutoDMs across Reels, Posts, Stories & Lives', 'Advanced AutoDM Flows (Follow-checks, Sequences)', 'Unlimited Leads via Lead Magnets', "Remove 'Sent by LogicDM' Branding", 'Priority Support via Dedicated Channel'],
+  pro: ['Connect up to 5 Instagram Accounts', 'Unlimited AutoDMs across Reels, Posts, Stories & Lives', 'Advanced AutoDM Flows (Follow-checks, Sequences)', 'Unlimited Leads via Lead Magnets', 'Priority Support via Dedicated Channel'],
   enterprise: ['Unlimited Accounts', 'Unlimited Rules', 'Unlimited DMs', '24/7 Premium Support'],
 };
 
