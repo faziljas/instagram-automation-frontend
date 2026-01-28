@@ -140,8 +140,8 @@ export default function AnalyticsPage() {
               {item.media_type === 'STORY' ? 'View Story' : 'View on Instagram'}
             </a>
           ) : (
-            <span className="font-mono text-xs text-gray-600 truncate max-w-[180px]" title={item.media_id}>
-              {item.media_id?.substring(0, 18)}...
+            <span className="text-xs text-gray-500 truncate max-w-[180px]" title={item.media_id || 'Preview unavailable'}>
+              Preview unavailable
             </span>
           )}
         </div>
