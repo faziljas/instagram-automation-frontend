@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useFetch } from '@/hooks/useFetch';
 import { Spinner } from './Spinner';
 import {
@@ -9,7 +9,7 @@ import {
   PaperAirplaneIcon,
   ArrowPathIcon,
 } from '@heroicons/react/24/outline';
-import { post } from '@/utils/api';
+import { get, post } from '@/utils/api';
 import { useAuth } from '@/hooks/useAuth';
 
 interface Conversation {
@@ -49,7 +49,6 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
   const { session } = useAuth();
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [forceRender, setForceRender] = useState(0);
   const [messageText, setMessageText] = useState('');
   const [isSending, setIsSending] = useState(false);
 
@@ -58,22 +57,61 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
     accountId ? `/api/instagram/conversations/stats?account_id=${accountId}` : null
   );
 
-  // Fetch conversations list
-  const { data: conversationsData, isLoading: conversationsLoading, mutate: refreshConversations } = useFetch<{
-    success: boolean;
-    conversations: Conversation[];
-    count: number;
-  }>(accountId ? `/api/instagram/conversations?account_id=${accountId}&limit=50` : null);
+  // Conversations list (paginated, manual fetch for "Load more")
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [hasMoreConversations, setHasMoreConversations] = useState(false);
+  const [nextConversationsOffset, setNextConversationsOffset] = useState(0);
+  const [isLoadingConversations, setIsLoadingConversations] = useState(false);
+  const [isLoadingMoreConversations, setIsLoadingMoreConversations] = useState(false);
+
+  const fetchConversations = useCallback(async (loadMore?: boolean) => {
+    if (!accountId) return;
+    const offset = loadMore ? nextConversationsOffset : 0;
+    if (loadMore) setIsLoadingMoreConversations(true);
+    else setIsLoadingConversations(true);
+    try {
+      const data = await get<{
+        success: boolean;
+        conversations: Conversation[];
+        count: number;
+        has_more?: boolean;
+        next_offset?: number | null;
+      }>(`/api/instagram/conversations?account_id=${accountId}&limit=100&offset=${offset}`);
+      const list = data?.conversations ?? [];
+      if (loadMore) {
+        setConversations((prev) => [...prev, ...list]);
+      } else {
+        setConversations(list);
+      }
+      setHasMoreConversations(Boolean(data?.has_more));
+      setNextConversationsOffset(typeof data?.next_offset === 'number' ? data.next_offset : offset + list.length);
+    } catch (e) {
+      console.error('Fetch conversations error:', e);
+      if (!loadMore) setConversations([]);
+    } finally {
+      setIsLoadingConversations(false);
+      setIsLoadingMoreConversations(false);
+    }
+  }, [accountId, nextConversationsOffset]);
+
+  useEffect(() => {
+    if (!accountId) {
+      setConversations([]);
+      setHasMoreConversations(false);
+      setNextConversationsOffset(0);
+      return;
+    }
+    fetchConversations();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accountId]);
 
   // Get selected conversation details to extract user_id (memoized to avoid recalculation)
   const selectedConvDetails = useMemo(() => {
-    if (!conversationsData?.conversations || !selectedConversation) {
-      return null;
-    }
-    return conversationsData.conversations.find(
+    if (!conversations.length || !selectedConversation) return null;
+    return conversations.find(
       (c) => c.username === selectedConversation || c.user_id === selectedConversation
     ) || null;
-  }, [conversationsData, selectedConversation]);
+  }, [conversations, selectedConversation]);
   
   // Fetch messages for selected conversation
   // Use participant_user_id query param for more reliable lookup (especially for Unknown users)
@@ -93,34 +131,7 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
   }>(messagesUrl);
 
   // Filter conversations by search query
-  // CRITICAL: NEVER filter out "Unknown" conversations - they are valid conversations
-  // Direct access to conversations array - no filtering at this stage
-  const allConversations = (() => {
-    // Try multiple ways to access the data
-    // Type-safe data access
-    const data = conversationsData?.conversations || 
-                 (conversationsData && 'data' in conversationsData && conversationsData.data && 'conversations' in conversationsData.data 
-                   ? (conversationsData.data as { conversations?: Conversation[] }).conversations 
-                   : undefined) ||
-                 (conversationsData && 'conversations' in conversationsData 
-                   ? (conversationsData as { conversations?: Conversation[] }).conversations 
-                   : undefined);
-    
-    if (Array.isArray(data) && data.length > 0) {
-      console.log('📥 ✅ Raw conversations from API:', data.length, data);
-      return data;
-    }
-    
-    if (conversationsData) {
-      console.log('⚠️ conversationsData exists but conversations is not an array:', {
-        conversationsData,
-        type: typeof conversationsData,
-        hasConversations: 'conversations' in conversationsData,
-        conversationsValue: conversationsData.conversations
-      });
-    }
-    return [];
-  })();
+  const allConversations = conversations;
   
   // Always show ALL conversations (including "Unknown") when no search query
   // When searching, include "Unknown" conversations too - they should always be visible
@@ -145,90 +156,14 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
   // This ensures "Unknown" conversations are NEVER hidden
   // IMPORTANT: If we have ANY conversations but filtered is empty, always show allConversations
   const displayConversations = (allConversations.length > 0 && filteredConversations.length === 0)
-    ? allConversations  // ALWAYS fallback to all conversations if filter removed everything
+    ? allConversations
     : filteredConversations;
   
-  // Log to confirm Unknown conversations are included
-  if (allConversations.length > 0) {
-    const unknownCount = allConversations.filter(c => !c.username || c.username === 'Unknown').length;
-    console.log(`📊 Conversation Stats:`, {
-      total: allConversations.length,
-      unknown: unknownCount,
-      filtered: filteredConversations.length,
-      display: displayConversations.length,
-      searchQuery: searchQuery || '(none)'
-    });
-    if (unknownCount > 0) {
-      console.log(`✅ Including ${unknownCount} "Unknown" conversation(s) in display`);
-    }
-  }
-  
-  // Force re-render when conversations data changes
-  useEffect(() => {
-    if (allConversations.length > 0) {
-      console.log('🔄 Conversations available, forcing render check');
-      // Force a re-render by updating state
-      setForceRender(prev => prev + 1);
-    }
-  }, [allConversations.length]);
-  
-  // CRITICAL: Force re-render when conversationsData changes
-  useEffect(() => {
-    if (conversationsData && conversationsData.conversations && conversationsData.conversations.length > 0) {
-      console.log('🔄 conversationsData changed, forcing render');
-      setForceRender(prev => prev + 1);
-    }
-  }, [conversationsData]);
-  
-  // Debug: Log filtered results
-  useEffect(() => {
-    if (conversationsData) {
-      console.log('🔍 Filter Debug:', {
-        total: allConversations.length,
-        filtered: filteredConversations.length,
-        display: displayConversations.length,
-        searchQuery,
-        conversations: allConversations,
-        displayConversations: displayConversations,
-        rawData: conversationsData,
-        hasSuccess: conversationsData.success,
-        count: conversationsData.count
-      });
-      
-      // If we have conversations but they're not showing, log warning
-      if (allConversations.length > 0 && displayConversations.length === 0) {
-        console.error('⚠️ CRITICAL: Conversations exist but displayConversations is empty!', {
-          allConversations,
-          filteredConversations,
-          displayConversations,
-          searchQuery
-        });
-      } else if (displayConversations.length > 0) {
-        console.log('✅ Conversations will be displayed:', displayConversations.length);
-      }
-    }
-  }, [conversationsData, filteredConversations, searchQuery, allConversations, displayConversations]);
-
-  // Debug logging
-  useEffect(() => {
-    if (conversationsData) {
-      console.log('📬 Conversations data received:', conversationsData);
-      console.log('📊 Total conversations:', conversationsData.conversations?.length || 0);
-      if (conversationsData.conversations && conversationsData.conversations.length > 0) {
-        console.log('✅ Conversations found:', conversationsData.conversations);
-      } else {
-        console.log('⚠️ No conversations in response');
-      }
-    }
-  }, [conversationsData]);
-
-  const handleRefresh = () => {
+  const handleRefresh = useCallback(() => {
     refreshStats();
-    refreshConversations();
-    if (selectedConversation) {
-      refreshMessages();
-    }
-  };
+    fetchConversations();
+    if (selectedConversation) refreshMessages();
+  }, [refreshStats, fetchConversations, selectedConversation, refreshMessages]);
 
   const [isSyncing, setIsSyncing] = useState(false);
 
@@ -254,60 +189,31 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
       // Wait a moment for database to update
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      // Force refresh conversations after sync
       console.log('🔄 Refreshing conversations list...');
       refreshStats();
-      // Force revalidation by passing undefined (which triggers revalidation)
-      await refreshConversations();
-      if (selectedConversation) {
-        refreshMessages();
-      }
+      fetchConversations();
+      if (selectedConversation) refreshMessages();
     } catch (error: any) {
       console.error('❌ Error syncing conversations:', error);
       alert(error?.message || 'Failed to sync conversations. Please try again.');
     } finally {
       setIsSyncing(false);
     }
-  }, [accountId, selectedConversation, refreshStats, refreshConversations, refreshMessages, isSyncing, session]);
+  }, [accountId, selectedConversation, refreshStats, fetchConversations, refreshMessages, isSyncing, session]);
 
-  // Auto-sync on mount if no conversations found
+  const loadingAndConvosRef = useRef({ loading: false, length: 0 });
+  loadingAndConvosRef.current = { loading: isLoadingConversations, length: conversations.length };
+
+  // Auto-sync on mount if no conversations found after initial fetch
   useEffect(() => {
-    if (!accountId) return;
-    
-    // CRITICAL: Wait for session before attempting auto-sync
-    if (!session?.access_token) {
-      console.log('[MessagesView] Session not ready, skipping auto-sync check');
-      return;
-    }
-    
-    // Wait a bit for initial data to load, then check if we need to sync
-    const checkAndSync = async () => {
-      // Small delay to let initial fetch complete
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Double-check session is still available before syncing
-      if (!session?.access_token) {
-        console.warn('[MessagesView] Session lost during auto-sync check, aborting');
-        return;
-      }
-      
-      // Check if conversations data is loaded and empty
-      if (conversationsData && conversationsData.conversations && conversationsData.conversations.length === 0) {
-        console.log('📭 No conversations found, triggering auto-sync...');
-        handleSync();
-      } else if (!conversationsData && !conversationsLoading) {
-        // If data hasn't loaded yet, wait a bit more
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        if (conversationsData && conversationsData.conversations && conversationsData.conversations.length === 0) {
-          console.log('📭 No conversations found after wait, triggering auto-sync...');
-          handleSync();
-        }
-      }
-    };
-    
-    checkAndSync();
+    if (!accountId || !session?.access_token) return;
+    const t = setTimeout(() => {
+      const { loading, length } = loadingAndConvosRef.current;
+      if (!loading && length === 0) handleSync();
+    }, 2000);
+    return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [accountId, session]); // Added session as dependency
+  }, [accountId, session]);
 
   // Polling: refresh only when tab is visible, every 20s. Message sync is via webhooks + Sync button.
   useEffect(() => {
@@ -319,13 +225,9 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
     }
 
     const refresh = () => {
-      // Double-check session before refreshing
-      if (!session?.access_token) {
-        console.warn('[MessagesView] Session lost during polling refresh, skipping');
-        return;
-      }
+      if (!session?.access_token) return;
       refreshStats();
-      refreshConversations();
+      fetchConversations();
       if (selectedConversation) refreshMessages();
     };
 
@@ -344,7 +246,7 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
       document.removeEventListener('visibilitychange', handleVisibility);
       clearInterval(intervalId);
     };
-  }, [accountId, selectedConversation, session, refreshStats, refreshConversations, refreshMessages]);
+  }, [accountId, selectedConversation, session, refreshStats, fetchConversations, refreshMessages]);
 
   return (
     <div className="min-h-[calc(100vh-200px)] md:h-[calc(100vh-200px)] flex flex-col bg-white rounded-lg shadow-lg overflow-hidden w-full max-w-full">
@@ -444,24 +346,7 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
           {/* Conversations List */}
           <div className="flex-1 overflow-y-auto min-h-0 pb-4 md:pb-0">
             {(() => {
-              // CRITICAL DEBUG: Log everything at render time
-              const rawConversations = conversationsData?.conversations || [];
-              console.log('🔴 RENDER CHECK:', {
-                loading: conversationsLoading,
-                hasData: !!conversationsData,
-                rawData: conversationsData,
-                rawConversationsArray: rawConversations,
-                rawConversationsLength: rawConversations.length,
-                allCount: allConversations.length,
-                filteredCount: filteredConversations.length,
-                displayCount: displayConversations.length,
-                allConversations: allConversations,
-                displayConversations: displayConversations,
-                forceRender: forceRender
-              });
-              
-              // Direct check - if we have conversations, show them
-              if (conversationsLoading) {
+              if (isLoadingConversations) {
                 return (
                   <div className="flex justify-center items-center h-32">
                     <Spinner />
@@ -477,12 +362,9 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
                     : []); // Show empty when search query has no matches
               
               if (conversationsToRender.length > 0) {
-                console.log('✅ RENDERING CONVERSATIONS NOW (DIRECT):', conversationsToRender.length, conversationsToRender);
                 return (
                   <>
-                    {conversationsToRender.map((conv, index) => {
-                      console.log(`🎯 Rendering conversation ${index}:`, conv);
-                      return (
+                    {conversationsToRender.map((conv) => (
                         <div
                           key={conv.id || `conv-${conv.user_id}`}
                           onClick={() => setSelectedConversation(conv.username || conv.user_id)}
@@ -514,18 +396,22 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
                             </div>
                           </div>
                         </div>
-                      );
-                    })}
+                    ))}
+                    {hasMoreConversations && !searchQuery && (
+                      <div className="p-3 flex justify-center border-t border-gray-200">
+                        <button
+                          type="button"
+                          onClick={() => fetchConversations(true)}
+                          disabled={isLoadingMoreConversations}
+                          className="px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {isLoadingMoreConversations ? 'Loading…' : 'Load more'}
+                        </button>
+                      </div>
+                    )}
                   </>
                 );
               }
-              
-              // If we reach here, we have NO conversations to show
-              console.log('❌ NO CONVERSATIONS TO RENDER:', {
-                allConversations: allConversations.length,
-                displayConversations: displayConversations.length,
-                conversationsData: conversationsData
-              });
               
               if (allConversations.length > 0 && searchQuery && filteredConversations.length === 0) {
                 return (
@@ -672,10 +558,9 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
                       // Clear input
                       setMessageText('');
                       
-                      // Refresh messages and conversations
                       await refreshMessages();
-                      await refreshConversations();
-                      await refreshStats();
+                      fetchConversations();
+                      refreshStats();
                     } catch (error: any) {
                       console.error('Failed to send message:', error);
                       alert(error?.message || 'Failed to send message. Please try again.');
