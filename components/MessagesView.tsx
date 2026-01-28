@@ -113,22 +113,71 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
     ) || null;
   }, [conversations, selectedConversation]);
   
-  // Fetch messages for selected conversation
-  // Use participant_user_id query param for more reliable lookup (especially for Unknown users)
-  const messagesUrl = useMemo(() => {
-    if (!selectedConversation || !accountId) {
-      return null;
+  // Messages for selected conversation (paginated, manual fetch for "Load older")
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [hasMoreMessages, setHasMoreMessages] = useState(false);
+  const [nextMessagesOffset, setNextMessagesOffset] = useState(0);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+  const [isLoadingOlderMessages, setIsLoadingOlderMessages] = useState(false);
+  const messagesContainerRef = useRef<HTMLDivElement | null>(null);
+  const didLoadOlderRef = useRef(false);
+
+  const fetchMessages = useCallback(async (loadOlder?: boolean) => {
+    if (!selectedConversation || !accountId) return;
+    const offset = loadOlder ? nextMessagesOffset : 0;
+    if (loadOlder) {
+      didLoadOlderRef.current = true;
+      setIsLoadingOlderMessages(true);
+    } else {
+      setIsLoadingMessages(true);
     }
-    const baseUrl = `/api/instagram/conversations/${encodeURIComponent(selectedConversation)}/messages?account_id=${accountId}&limit=100`;
-    const participantParam = selectedConvDetails?.user_id ? `&participant_user_id=${selectedConvDetails.user_id}` : '';
-    return baseUrl + participantParam;
+    try {
+      let url = `/api/instagram/conversations/${encodeURIComponent(selectedConversation)}/messages?account_id=${accountId}&limit=100&offset=${offset}`;
+      if (selectedConvDetails?.user_id) url += `&participant_user_id=${selectedConvDetails.user_id}`;
+      const data = await get<{
+        success: boolean;
+        messages: Message[];
+        count: number;
+        has_more?: boolean;
+        next_offset?: number | null;
+      }>(url);
+      const list = data?.messages ?? [];
+      if (loadOlder) {
+        setMessages((prev) => [...list, ...prev]);
+      } else {
+        setMessages(list);
+      }
+      setHasMoreMessages(Boolean(data?.has_more));
+      setNextMessagesOffset(typeof data?.next_offset === 'number' ? data.next_offset : offset + list.length);
+    } catch (e) {
+      console.error('Fetch messages error:', e);
+      if (!loadOlder) setMessages([]);
+    } finally {
+      setIsLoadingMessages(false);
+      setIsLoadingOlderMessages(false);
+    }
+  }, [selectedConversation, accountId, selectedConvDetails?.user_id, nextMessagesOffset]);
+
+  useEffect(() => {
+    if (!selectedConversation || !accountId) {
+      setMessages([]);
+      setHasMoreMessages(false);
+      setNextMessagesOffset(0);
+      return;
+    }
+    fetchMessages();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedConversation, accountId, selectedConvDetails?.user_id]);
-  
-  const { data: messagesData, isLoading: messagesLoading, mutate: refreshMessages } = useFetch<{
-    success: boolean;
-    messages: Message[];
-    count: number;
-  }>(messagesUrl);
+
+  useEffect(() => {
+    if (messages.length === 0 || isLoadingMessages || isLoadingOlderMessages) return;
+    if (didLoadOlderRef.current) {
+      didLoadOlderRef.current = false;
+      return;
+    }
+    const el = messagesContainerRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [messages.length, isLoadingMessages, isLoadingOlderMessages]);
 
   // Filter conversations by search query
   const allConversations = conversations;
@@ -162,8 +211,8 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
   const handleRefresh = useCallback(() => {
     refreshStats();
     fetchConversations();
-    if (selectedConversation) refreshMessages();
-  }, [refreshStats, fetchConversations, selectedConversation, refreshMessages]);
+    if (selectedConversation) fetchMessages();
+  }, [refreshStats, fetchConversations, selectedConversation, fetchMessages]);
 
   const [isSyncing, setIsSyncing] = useState(false);
 
@@ -192,14 +241,14 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
       console.log('🔄 Refreshing conversations list...');
       refreshStats();
       fetchConversations();
-      if (selectedConversation) refreshMessages();
+      if (selectedConversation) fetchMessages();
     } catch (error: any) {
       console.error('❌ Error syncing conversations:', error);
       alert(error?.message || 'Failed to sync conversations. Please try again.');
     } finally {
       setIsSyncing(false);
     }
-  }, [accountId, selectedConversation, refreshStats, fetchConversations, refreshMessages, isSyncing, session]);
+  }, [accountId, selectedConversation, refreshStats, fetchConversations, fetchMessages, isSyncing, session]);
 
   const loadingAndConvosRef = useRef({ loading: false, length: 0 });
   loadingAndConvosRef.current = { loading: isLoadingConversations, length: conversations.length };
@@ -228,7 +277,7 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
       if (!session?.access_token) return;
       refreshStats();
       fetchConversations();
-      if (selectedConversation) refreshMessages();
+      if (selectedConversation) fetchMessages();
     };
 
     const handleVisibility = () => {
@@ -246,7 +295,7 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
       document.removeEventListener('visibilitychange', handleVisibility);
       clearInterval(intervalId);
     };
-  }, [accountId, selectedConversation, session, refreshStats, fetchConversations, refreshMessages]);
+  }, [accountId, selectedConversation, session, refreshStats, fetchConversations, fetchMessages]);
 
   return (
     <div className="min-h-[calc(100vh-200px)] md:h-[calc(100vh-200px)] flex flex-col bg-white rounded-lg shadow-lg overflow-hidden w-full max-w-full">
@@ -488,45 +537,62 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
               </div>
 
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-3 md:p-4 space-y-4 bg-gray-50 min-h-0">
-                {messagesLoading ? (
-                  <div className="flex justify-center items-center h-32">
+              <div
+                ref={messagesContainerRef}
+                className="flex-1 overflow-y-auto p-3 md:p-4 space-y-4 bg-gray-50 min-h-0 flex flex-col"
+              >
+                {hasMoreMessages && (
+                  <div className="flex justify-center py-2 flex-shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => fetchMessages(true)}
+                      disabled={isLoadingOlderMessages}
+                      className="px-3 py-1.5 text-sm font-medium rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isLoadingOlderMessages ? 'Loading…' : 'Load older messages'}
+                    </button>
+                  </div>
+                )}
+                {isLoadingMessages ? (
+                  <div className="flex justify-center items-center flex-1 min-h-[8rem]">
                     <Spinner />
                   </div>
-                ) : messagesData?.messages && messagesData.messages.length > 0 ? (
-                  messagesData.messages.map((msg) => (
-                    <div
-                      key={msg.id}
-                      className={`flex ${msg.is_from_bot ? 'justify-end' : 'justify-start'}`}
-                    >
+                ) : messages.length > 0 ? (
+                  <div className="space-y-4 flex-1">
+                    {messages.map((msg) => (
                       <div
-                        className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                          msg.is_from_bot
-                            ? 'bg-gray-200 text-gray-900'
-                            : 'bg-teal-600 text-white'
-                        }`}
+                        key={msg.id}
+                        className={`flex ${msg.is_from_bot ? 'justify-end' : 'justify-start'}`}
                       >
-                        <p className="text-sm whitespace-pre-wrap break-words">
-                          {msg.text || (msg.has_attachments ? '[Media]' : '[No text]')}
-                        </p>
-                        <p
-                          className={`text-xs mt-1 ${
-                            msg.is_from_bot ? 'text-gray-500' : 'text-teal-100'
+                        <div
+                          className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                            msg.is_from_bot
+                              ? 'bg-gray-200 text-gray-900'
+                              : 'bg-teal-600 text-white'
                           }`}
                         >
-                          {msg.created_at
-                            ? new Date(msg.created_at).toLocaleTimeString('en-US', {
-                                hour: 'numeric',
-                                minute: '2-digit',
-                                second: '2-digit',  // Show seconds for accurate timing
-                              })
-                            : ''}
-                        </p>
+                          <p className="text-sm whitespace-pre-wrap break-words">
+                            {msg.text || (msg.has_attachments ? '[Media]' : '[No text]')}
+                          </p>
+                          <p
+                            className={`text-xs mt-1 ${
+                              msg.is_from_bot ? 'text-gray-500' : 'text-teal-100'
+                            }`}
+                          >
+                            {msg.created_at
+                              ? new Date(msg.created_at).toLocaleTimeString('en-US', {
+                                  hour: 'numeric',
+                                  minute: '2-digit',
+                                  second: '2-digit',
+                                })
+                              : ''}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  ))
+                    ))}
+                  </div>
                 ) : (
-                  <div className="text-center text-gray-400 py-8">
+                  <div className="text-center text-gray-400 py-8 flex-1">
                     <p>No messages in this conversation yet</p>
                   </div>
                 )}
@@ -555,10 +621,8 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
                       
                       await post(url, { text: messageText.trim() });
                       
-                      // Clear input
                       setMessageText('');
-                      
-                      await refreshMessages();
+                      fetchMessages();
                       fetchConversations();
                       refreshStats();
                     } catch (error: any) {
