@@ -9,10 +9,7 @@ import {
   CheckIcon,
   ShieldCheckIcon,
 } from '@heroicons/react/24/solid';
-import {
-  CheckIcon as CheckIconOutline,
-  ArrowLeftIcon,
-} from '@heroicons/react/24/outline';
+import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 
 type BillingCycle = 'monthly' | 'yearly';
 
@@ -209,45 +206,30 @@ export default function PricingPage() {
               </div>
 
               {/* Features List */}
-              <div className="space-y-4">
+              <div className="space-y-2">
                 <div className="flex items-start">
                   <CheckIcon className="h-6 w-6 text-green-500 mr-3 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">
-                    <strong>3 Instagram Accounts</strong>
-                  </span>
+                  <span className="text-gray-700">Connect up to <strong>5</strong> Instagram Accounts</span>
                 </div>
                 <div className="flex items-start">
                   <CheckIcon className="h-6 w-6 text-green-500 mr-3 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700 flex items-center gap-1">
-                    <strong>Unlimited Auto-replies</strong>
-                    <span className="text-xl font-bold text-green-600">∞</span>
-                  </span>
+                  <span className="text-gray-700"><strong>Unlimited</strong> AutoDMs across Reels, Posts, Stories &amp; Lives</span>
                 </div>
                 <div className="flex items-start">
                   <CheckIcon className="h-6 w-6 text-green-500 mr-3 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">
-                    <strong>Remove &apos;Sent by LogicDM&apos; Branding</strong>
-                  </span>
+                  <span className="text-gray-700">Advanced AutoDM Flows (Follow-checks, Sequences)</span>
                 </div>
                 <div className="flex items-start">
                   <CheckIcon className="h-6 w-6 text-green-500 mr-3 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Unlimited Automation Rules</span>
+                  <span className="text-gray-700"><strong>Unlimited</strong> Leads via Lead Magnets</span>
                 </div>
                 <div className="flex items-start">
                   <CheckIcon className="h-6 w-6 text-green-500 mr-3 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Story & Live Automation</span>
+                  <span className="text-gray-700"><strong>Remove &apos;Sent by LogicDM&apos; Branding</strong></span>
                 </div>
                 <div className="flex items-start">
                   <CheckIcon className="h-6 w-6 text-green-500 mr-3 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Basic Analytics</span>
-                </div>
-                <div className="flex items-start">
-                  <CheckIcon className="h-6 w-6 text-green-500 mr-3 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Priority Email Support</span>
-                </div>
-                <div className="flex items-start">
-                  <CheckIcon className="h-6 w-6 text-green-500 mr-3 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Safe & Secure</span>
+                  <span className="text-gray-700">Priority Support via Dedicated Channel</span>
                 </div>
               </div>
             </div>

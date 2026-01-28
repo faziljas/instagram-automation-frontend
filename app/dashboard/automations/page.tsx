@@ -1393,14 +1393,12 @@ export default function AutomationsPage() {
               <div className="bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200 rounded-xl p-6 mb-8">
                 <h3 className="font-bold text-purple-900 mb-4 text-lg">Pro Plan Includes:</h3>
                 <ul className="space-y-2 text-sm text-purple-800 font-medium">
-                  <li className="flex items-center"><span className="mr-2">✅</span> Stories automation</li>
-                  <li className="flex items-center"><span className="mr-2">✅</span> DMs automation</li>
-                  <li className="flex items-center"><span className="mr-2">✅</span> IG Live automation</li>
-                  <li className="flex items-center"><span className="mr-2">✅</span> 3 Instagram accounts</li>
-                  <li className="flex items-center"><span className="mr-2">✅</span> Unlimited automation rules</li>
-                  <li className="flex items-center"><span className="mr-2">✅</span> Unlimited auto-replies</li>
-                  <li className="flex items-center"><span className="mr-2">✅</span> Remove &apos;Sent by LogicDM&apos; branding</li>
-                  <li className="flex items-center"><span className="mr-2">✅</span> Priority support</li>
+                  <li className="flex items-center"><span className="mr-2">✅</span> Connect up to <strong>5</strong> Instagram Accounts</li>
+                  <li className="flex items-center"><span className="mr-2">✅</span> <strong>Unlimited</strong> AutoDMs across Reels, Posts, Stories &amp; Lives</li>
+                  <li className="flex items-center"><span className="mr-2">✅</span> Advanced AutoDM Flows (Follow-checks, Sequences)</li>
+                  <li className="flex items-center"><span className="mr-2">✅</span> <strong>Unlimited</strong> Leads via Lead Magnets</li>
+                  <li className="flex items-center"><span className="mr-2">✅</span> Remove &apos;Sent by LogicDM&apos; Branding</li>
+                  <li className="flex items-center"><span className="mr-2">✅</span> Priority Support via Dedicated Channel</li>
                 </ul>
               </div>
               <div className="flex space-x-4">
