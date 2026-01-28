@@ -142,10 +142,10 @@ export default function AutomationsPage() {
 
       try {
         const allRules = await get<AutomationRuleResponse[]>('/automation/rules');
-        // Group rules by media_id
+        // Group rules by media_id; only include rules for the selected account
         const rulesByMedia: Record<string, AutomationRuleResponse[]> = {};
         allRules.forEach((rule: AutomationRuleResponse) => {
-          if (rule.media_id) {
+          if (rule.media_id && rule.instagram_account_id === selectedAccount) {
             if (!rulesByMedia[rule.media_id]) {
               rulesByMedia[rule.media_id] = [];
             }
@@ -1064,7 +1064,16 @@ export default function AutomationsPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {media.map((item) => {
+            {[...media]
+              .sort((a, b) => {
+                // Show media with automation rules first (same as table view)
+                const aHasRule = (automationRules[a.id]?.length ?? 0) > 0;
+                const bHasRule = (automationRules[b.id]?.length ?? 0) > 0;
+                if (aHasRule && !bHasRule) return -1;
+                if (!aHasRule && bHasRule) return 1;
+                return 0;
+              })
+              .map((item) => {
               // For video stories, prefer thumbnail_url; for images, use media_url
               // If video has no thumbnail, we'll show a placeholder
               const imageUrl = item.media_type === 'VIDEO' 
