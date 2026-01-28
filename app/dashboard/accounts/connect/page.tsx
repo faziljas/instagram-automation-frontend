@@ -44,7 +44,7 @@ export default function ConnectAccountPage() {
     
     try {
       // Instagram Business Login scopes (2025)
-      const scopes = 'instagram_business_basic,instagram_business_manage_messages,instagram_business_manage_comments,instagram_business_content_publish';
+      const scopes = 'instagram_business_basic,instagram_business_manage_messages,instagram_business_manage_comments';
       const redirectUri = `${window.location.origin}/dashboard/callback`;
       const appId = process.env.NEXT_PUBLIC_INSTAGRAM_APP_ID;
 
