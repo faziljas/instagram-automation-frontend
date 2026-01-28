@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useFetch } from '@/hooks/useFetch';
 import { Card } from '@/components/Card';
 import { Table } from '@/components/Table';
@@ -57,13 +57,24 @@ interface Lead {
   automation_rule_id: number;
 }
 
+const LEADS_PAGE_SIZES = [25, 50, 100, 500, 3000] as const;
+
 export default function AnalyticsPage() {
   const [days, setDays] = useState(7);
+  const [leadsPage, setLeadsPage] = useState(1);
+  const [leadsPageSize, setLeadsPageSize] = useState(50);
   const { data, error, isLoading, mutate } = useFetch<AnalyticsSummary>(
     `/api/analytics/dashboard?days=${days}`
   );
   const { data: leadsData } = useFetch<Lead[]>('/api/leads');
-  const recentLeads = (leadsData || []).slice(0, 5);
+  const allLeads = leadsData || [];
+  const totalLeads = allLeads.length;
+  const totalPages = Math.max(1, Math.ceil(totalLeads / leadsPageSize));
+  const recentLeads = allLeads.slice((leadsPage - 1) * leadsPageSize, leadsPage * leadsPageSize);
+
+  useEffect(() => {
+    if (totalPages > 0 && leadsPage > totalPages) setLeadsPage(totalPages);
+  }, [totalPages, leadsPage]);
 
   const stats = [
     {
@@ -339,17 +350,62 @@ export default function AnalyticsPage() {
 
       {/* Recent leads */}
       <Card className="mb-8 rounded-2xl border-2 border-gray-200 shadow-xl">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Recent Email leads</h2>
-        <ul className="space-y-2">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <h2 className="text-xl font-bold text-gray-900">Recent Email leads</h2>
+          {totalLeads > 0 && (
+            <div className="flex flex-wrap items-center gap-3">
+              <label className="text-sm text-gray-600 flex items-center gap-2">
+                Show
+                <select
+                  value={leadsPageSize}
+                  onChange={(e) => {
+                    setLeadsPageSize(Number(e.target.value));
+                    setLeadsPage(1);
+                  }}
+                  className="rounded-lg border border-gray-300 px-2 py-1 text-sm font-medium text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  {LEADS_PAGE_SIZES.map((n) => (
+                    <option key={n} value={n}>
+                      {n === 3000 && totalLeads >= 3000 ? '3000 (all)' : n}
+                    </option>
+                  ))}
+                </select>
+                per page
+              </label>
+              <span className="text-sm text-gray-500">
+                Page {leadsPage} of {totalPages} · {totalLeads.toLocaleString()} total
+              </span>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setLeadsPage((p) => Math.max(1, p - 1))}
+                  disabled={leadsPage <= 1}
+                  className="px-3 py-1.5 text-sm font-semibold rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Previous
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLeadsPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={leadsPage >= totalPages}
+                  className="px-3 py-1.5 text-sm font-semibold rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+        <ul className="space-y-2 max-h-[480px] overflow-y-auto">
           {recentLeads.length === 0 ? (
             <li className="text-sm text-gray-500">No leads yet. They appear here once captured.</li>
           ) : (
             recentLeads.map((lead) => (
               <li key={lead.id} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                <span className="text-sm font-medium text-gray-900">
+                <span className="text-sm font-medium text-gray-900 truncate mr-2">
                   {lead.email || lead.phone || lead.name || `Lead #${lead.id}`}
                 </span>
-                <span className="text-xs text-gray-400">
+                <span className="text-xs text-gray-400 flex-shrink-0">
                   {new Date(lead.captured_at).toLocaleDateString()}
                 </span>
               </li>
