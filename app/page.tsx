@@ -283,68 +283,13 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="border-t border-gray-200 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
-            {/* Product */}
-            <div>
-              <h4 className="text-sm font-semibold text-gray-900 mb-4">Product</h4>
-              <ul className="space-y-2">
-                <li>
-                  <Link href="/dashboard" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
-                    Features
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/dashboard/automations" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
-                    Automations
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            {/* Company */}
-            <div>
-              <h4 className="text-sm font-semibold text-gray-900 mb-4">Company</h4>
-              <ul className="space-y-2">
-                <li>
-                  <Link href="/about" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
-                    About
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/blog" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
-                    Blog
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/contact" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
-                    Contact
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-
-            {/* Socials */}
-            <div>
-              <h4 className="text-sm font-semibold text-gray-900 mb-4">Follow Us</h4>
-              <ul className="space-y-2">
-                <li>
-                  <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
-                    Twitter
-                  </a>
-                </li>
-                <li>
-                  <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
-                    Instagram
-                  </a>
-                </li>
-                <li>
-                  <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
-                    LinkedIn
-                  </a>
-                </li>
-              </ul>
-            </div>
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+            <Link href="/privacy" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
+              Privacy
+            </Link>
+            <Link href="/terms" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
+              Terms
+            </Link>
           </div>
           <div className="mt-8 pt-8 border-t border-gray-200 text-center">
             <p className="text-sm text-gray-500">
