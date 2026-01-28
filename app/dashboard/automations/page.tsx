@@ -107,7 +107,10 @@ export default function AutomationsPage() {
   const [selectedAccountUsername, setSelectedAccountUsername] = useState<string>('');
   const [selectedTab, setSelectedTab] = useState<'posts' | 'stories' | 'dms' | 'live'>('posts');
   const [media, setMedia] = useState<MediaItem[]>([]);
+  const [mediaNextCursor, setMediaNextCursor] = useState<string | null>(null);
+  const [mediaHasMore, setMediaHasMore] = useState(false);
   const [isLoadingMedia, setIsLoadingMedia] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<MediaItem | null>(null);
   const [showSetupModal, setShowSetupModal] = useState(false);
   const [showDrawer, setShowDrawer] = useState(false);
@@ -200,75 +203,65 @@ export default function AutomationsPage() {
   // Fetch media when account or tab is selected
   useEffect(() => {
     if (!selectedAccount) {
-      // Clear media if no account selected
       setMedia([]);
+      setMediaNextCursor(null);
+      setMediaHasMore(false);
       return;
     }
-    
-    // Clear media when switching tabs to prevent showing wrong content
+
     setMedia([]);
-    
+    setMediaNextCursor(null);
+    setMediaHasMore(false);
+
     if (selectedTab === 'posts' || selectedTab === 'stories' || selectedTab === 'live') {
       fetchMedia();
-    } else if (selectedTab === 'dms') {
-      // DMs will be handled separately by MessagesView component
-      // No need to call fetchDMs here as MessagesView handles its own fetching
     }
   }, [selectedAccount, selectedTab]);
 
-  const fetchMedia = async () => {
+  const fetchMedia = async (opts?: { after?: string | null }) => {
     if (!selectedAccount) return;
-
-    // CRITICAL: Wait for session token before making API call
     if (!session?.access_token) {
       console.warn('[AutomationsPage] No session token available, skipping fetchMedia');
       return;
     }
 
-    setIsLoadingMedia(true);
+    const loadMore = Boolean(opts?.after);
+    if (loadMore) setIsLoadingMore(true);
+    else setIsLoadingMedia(true);
+
     try {
-      // Map tab to media_type
       let mediaType = 'posts';
+      if (selectedTab === 'stories') mediaType = 'stories';
+      else if (selectedTab === 'live') mediaType = 'live';
+
+      let url = `/api/instagram/media?account_id=${selectedAccount}&media_type=${mediaType}&limit=100`;
+      if (opts?.after) url += `&after=${encodeURIComponent(opts.after)}`;
+
+      const data = await get<{ media: MediaItem[]; next_cursor?: string | null; has_more?: boolean }>(url);
+      let fetchedMedia = data.media || [];
+
       if (selectedTab === 'stories') {
-        mediaType = 'stories';
-      } else if (selectedTab === 'live') {
-        mediaType = 'live';
+        fetchedMedia = fetchedMedia.filter((item: MediaItem) => item.media_product_type === 'STORY');
+      } else if (selectedTab === 'posts') {
+        fetchedMedia = fetchedMedia.filter((item: MediaItem) => item.media_product_type !== 'STORY');
       }
 
-      const data = await get<{ media: MediaItem[] }>(
-        `/api/instagram/media?account_id=${selectedAccount}&media_type=${mediaType}&limit=25`
-      );
-      
-      console.log(`Media fetched (${mediaType}):`, data);
-      let fetchedMedia = data.media || [];
-      
-      // Additional filtering to ensure correct content type
-      if (selectedTab === 'stories') {
-        // Only show items with media_product_type === 'STORY'
-        fetchedMedia = fetchedMedia.filter((item: MediaItem) => 
-          item.media_product_type === 'STORY'
-        );
-      } else if (selectedTab === 'posts') {
-        // Exclude stories from posts/reels tab
-        fetchedMedia = fetchedMedia.filter((item: MediaItem) => 
-          item.media_product_type !== 'STORY'
-        );
-      } else if (selectedTab === 'live') {
-        // For live, we might need to filter by status or other criteria
-        // For now, just use what the backend returns
+      if (loadMore) {
+        setMedia((prev) => [...prev, ...fetchedMedia]);
+      } else {
+        setMedia(fetchedMedia);
       }
-      
-      console.log(`Filtered media for ${selectedTab}:`, fetchedMedia);
-      setMedia(fetchedMedia);
+      setMediaNextCursor(data.next_cursor ?? null);
+      setMediaHasMore(Boolean(data.has_more));
     } catch (error: any) {
       console.error('Error fetching media:', error);
-      // Don't show alert for 403 (Pro plan required) - user should see upgrade modal
       if (error?.response?.status !== 403) {
         alert(`Error: ${error?.message || 'Failed to fetch media. Please check console for details.'}`);
       }
-      setMedia([]);
+      if (!loadMore) setMedia([]);
     } finally {
       setIsLoadingMedia(false);
+      setIsLoadingMore(false);
     }
   };
 
@@ -837,6 +830,7 @@ export default function AutomationsPage() {
               const sortedMediaWithRules = [...itemsWithRules, ...itemsWithoutRules];
               
               return (
+                <>
                 <div className="overflow-x-auto w-full">
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
@@ -1059,10 +1053,24 @@ export default function AutomationsPage() {
                     </tbody>
                   </table>
                 </div>
+                {media.length > 0 && mediaHasMore && (selectedTab === 'posts' || selectedTab === 'stories' || selectedTab === 'live') && (
+                  <div className="flex justify-center py-6 border-t border-gray-200">
+                    <button
+                      type="button"
+                      onClick={() => fetchMedia({ after: mediaNextCursor ?? undefined })}
+                      disabled={isLoadingMore}
+                      className="px-6 py-2.5 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                    >
+                      {isLoadingMore ? 'Loading…' : 'Load more'}
+                    </button>
+                  </div>
+                )}
+                </>
               );
             })()}
           </div>
         ) : (
+          <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...media]
               .sort((a, b) => {
@@ -1244,6 +1252,19 @@ export default function AutomationsPage() {
               );
             })}
           </div>
+          {media.length > 0 && mediaHasMore && (selectedTab === 'posts' || selectedTab === 'stories' || selectedTab === 'live') && (
+            <div className="flex justify-center py-6">
+              <button
+                type="button"
+                onClick={() => fetchMedia({ after: mediaNextCursor ?? undefined })}
+                disabled={isLoadingMore}
+                className="px-6 py-2.5 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              >
+                {isLoadingMore ? 'Loading…' : 'Load more'}
+              </button>
+            </div>
+          )}
+          </>
         )
       ) : (
         <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl text-center py-16 px-6">
