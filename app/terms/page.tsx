@@ -164,8 +164,8 @@ export default function TermsPage() {
             </p>
             <p className="text-gray-700 leading-relaxed">
               <strong className="font-semibold text-gray-900">Email:</strong>{' '}
-              <a href="mailto:fazil.jas@gmail.com" className="text-blue-600 hover:text-blue-800 underline">
-                fazil.jas@gmail.com
+              <a href="mailto:admin@logicdm.app" className="text-blue-600 hover:text-blue-800 underline">
+                admin@logicdm.app
               </a>
             </p>
           </section>

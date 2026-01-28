@@ -81,7 +81,7 @@ export default function Error({
           <p className="mt-6 text-sm text-gray-500">
             If this problem persists, please{' '}
             <a
-              href="mailto:support@instagramauto.com"
+              href="mailto:admin@logicdm.app"
               className="text-blue-600 hover:text-blue-500 font-medium"
             >
               contact support

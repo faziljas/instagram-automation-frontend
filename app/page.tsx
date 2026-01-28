@@ -290,6 +290,9 @@ export default function HomePage() {
             <Link href="/terms" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
               Terms
             </Link>
+            <a href="mailto:admin@logicdm.app" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
+              Contact Us
+            </a>
           </div>
           <div className="mt-8 pt-8 border-t border-gray-200 text-center">
             <p className="text-sm text-gray-500">
