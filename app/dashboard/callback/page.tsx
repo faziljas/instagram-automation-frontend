@@ -110,10 +110,13 @@ export default function CallbackPage() {
 
         console.log('✅ Instagram OAuth code received, exchanging with backend...');
 
+        // Send the exact redirect_uri used in the OAuth dialog so backend matches (fixes www vs non-www mismatch)
+        const redirectUri = typeof window !== 'undefined' ? `${window.location.origin}/dashboard/callback` : undefined;
+
         // Exchange code for token via backend using API helper (handles token injection automatically)
         const response = await post<{ success: boolean; already_connected?: boolean; message?: string }>(
           '/api/instagram/exchange-code',
-          { code }
+          { code, redirect_uri: redirectUri }
         );
 
         if (response && response.success) {
