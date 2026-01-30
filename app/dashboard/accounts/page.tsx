@@ -126,19 +126,18 @@ export default function AccountsPage() {
         throw new Error('Instagram App ID not configured. Please set NEXT_PUBLIC_INSTAGRAM_APP_ID in environment variables.');
       }
 
-      // Store exact redirect_uri so callback page can send the same one to backend (avoids www vs non-www mismatch after redirects)
-      if (typeof window !== 'undefined') {
-        sessionStorage.setItem('oauth_redirect_uri', redirectUri);
-      }
+      // Encode redirect_uri in state so callback can recover it after domain redirect (logicdm.app -> www); sessionStorage is per-origin and is lost
+      const statePayload = { r: redirectUri, s: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15) };
+      const state = typeof btoa !== 'undefined'
+        ? btoa(JSON.stringify(statePayload)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+        : statePayload.s;
 
       // Build Instagram Business Login OAuth URL (shows white Instagram login screen)
-      // Add state parameter to prevent code reuse (random string)
       // Add prompt=select_account to force account selection screen (allows switching accounts)
       // Add force_reauth=true to force password login every time (breaks cache trap)
       // Add force_authentication=1 to force fresh login screen (breaks cache trap even more aggressively)
       // Add enable_fb_login=0 to force Instagram native login (not Facebook login)
-      const state = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-      const url = `https://www.instagram.com/oauth/authorize?client_id=${appId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${scopes}&state=${state}&prompt=select_account&force_reauth=true&force_authentication=1&enable_fb_login=0`;
+      const url = `https://www.instagram.com/oauth/authorize?client_id=${appId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${scopes}&state=${encodeURIComponent(state)}&prompt=select_account&force_reauth=true&force_authentication=1&enable_fb_login=0`;
 
       // Navigate to Instagram OAuth in the same tab (not popup/new tab)
       console.log('🔄 Redirecting to Instagram OAuth...');

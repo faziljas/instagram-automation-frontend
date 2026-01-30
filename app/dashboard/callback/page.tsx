@@ -110,9 +110,19 @@ export default function CallbackPage() {
 
         console.log('✅ Instagram OAuth code received, exchanging with backend...');
 
-        // Use the exact redirect_uri stored when we started OAuth (avoids mismatch when domain redirects e.g. logicdm.app -> www.logicdm.app)
+        // Recover redirect_uri from state (survives logicdm.app -> www redirect; sessionStorage is per-origin and is lost)
         let redirectUri: string | undefined;
-        if (typeof window !== 'undefined') {
+        const stateParam = searchParams.get('state');
+        if (stateParam) {
+          try {
+            const decoded = atob(stateParam.replace(/-/g, '+').replace(/_/g, '/'));
+            const parsed = JSON.parse(decoded) as { r?: string };
+            if (parsed.r && typeof parsed.r === 'string') redirectUri = parsed.r;
+          } catch {
+            // ignore invalid state
+          }
+        }
+        if (!redirectUri && typeof window !== 'undefined') {
           redirectUri = sessionStorage.getItem('oauth_redirect_uri') || undefined;
           if (redirectUri) sessionStorage.removeItem('oauth_redirect_uri');
         }
