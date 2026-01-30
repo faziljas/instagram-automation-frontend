@@ -110,11 +110,18 @@ export default function CallbackPage() {
 
         console.log('✅ Instagram OAuth code received, exchanging with backend...');
 
-        // Send the exact redirect_uri used in the OAuth dialog so backend matches (fixes www vs non-www mismatch)
-        const redirectUri =
-          typeof window !== 'undefined'
-            ? `${window.location.origin}/dashboard/callback`
-            : (process.env.NEXT_PUBLIC_FRONTEND_URL?.replace(/\/$/, '') || '') + '/dashboard/callback';
+        // Use the exact redirect_uri stored when we started OAuth (avoids mismatch when domain redirects e.g. logicdm.app -> www.logicdm.app)
+        let redirectUri: string | undefined;
+        if (typeof window !== 'undefined') {
+          redirectUri = sessionStorage.getItem('oauth_redirect_uri') || undefined;
+          if (redirectUri) sessionStorage.removeItem('oauth_redirect_uri');
+        }
+        if (!redirectUri) {
+          redirectUri =
+            typeof window !== 'undefined'
+              ? `${window.location.origin}/dashboard/callback`
+              : (process.env.NEXT_PUBLIC_FRONTEND_URL?.replace(/\/$/, '') || '') + '/dashboard/callback';
+        }
 
         // Exchange code for token via backend using API helper (handles token injection automatically)
         const response = await post<{ success: boolean; already_connected?: boolean; message?: string }>(

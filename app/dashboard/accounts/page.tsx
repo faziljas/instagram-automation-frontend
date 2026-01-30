@@ -126,6 +126,11 @@ export default function AccountsPage() {
         throw new Error('Instagram App ID not configured. Please set NEXT_PUBLIC_INSTAGRAM_APP_ID in environment variables.');
       }
 
+      // Store exact redirect_uri so callback page can send the same one to backend (avoids www vs non-www mismatch after redirects)
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('oauth_redirect_uri', redirectUri);
+      }
+
       // Build Instagram Business Login OAuth URL (shows white Instagram login screen)
       // Add state parameter to prevent code reuse (random string)
       // Add prompt=select_account to force account selection screen (allows switching accounts)
