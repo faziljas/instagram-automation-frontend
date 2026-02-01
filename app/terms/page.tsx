@@ -30,7 +30,7 @@ export default function TermsPage() {
         </div>
         <div className="prose prose-slate max-w-none">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Terms of Service</h1>
-          <p className="text-gray-600 mb-8">Last updated: January 29, 2026</p>
+          <p className="text-gray-600 mb-8">Last updated: February 1, 2026</p>
 
           <section className="mb-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">Business Information</h2>
