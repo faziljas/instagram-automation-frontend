@@ -30,7 +30,7 @@ export default function PrivacyPage() {
         </div>
         <div className="prose prose-slate max-w-none">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Privacy Policy</h1>
-          <p className="text-gray-600 mb-8">Last updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+          <p className="text-gray-600 mb-8">Last updated: January 29, 2026</p>
 
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">Introduction</h2>
@@ -71,6 +71,20 @@ export default function PrivacyPage() {
               <li>Respond to your comments, questions, and requests</li>
               <li>Monitor and analyze trends, usage, and activities in connection with our service</li>
             </ul>
+          </section>
+
+          <section className="mb-8">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">Payment Processing</h2>
+            <p className="text-gray-700 leading-relaxed mb-4">
+              We use <strong className="font-semibold text-gray-900">Stripe</strong> to process payments for subscriptions and purchases. When you make a payment, your card details and billing information are collected and processed directly by Stripe. We do not store your full card number on our servers. Stripe&apos;s processing is subject to their Privacy Policy and security standards.
+            </p>
+          </section>
+
+          <section className="mb-8">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">Data Residency</h2>
+            <p className="text-gray-700 leading-relaxed mb-4">
+              For Indian users, payment data is processed and stored in compliance with local RBI mandates. We and our payment processor work to ensure that data handling meets applicable regional requirements.
+            </p>
           </section>
 
           <section className="mb-8">

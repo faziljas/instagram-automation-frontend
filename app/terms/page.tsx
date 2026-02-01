@@ -30,7 +30,17 @@ export default function TermsPage() {
         </div>
         <div className="prose prose-slate max-w-none">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Terms of Service</h1>
-          <p className="text-gray-600 mb-8">Last updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+          <p className="text-gray-600 mb-8">Last updated: January 29, 2026</p>
+
+          <section className="mb-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">Business Information</h2>
+            <ul className="list-none text-gray-700 leading-relaxed space-y-2">
+              <li><strong className="font-semibold text-gray-900">Legal Entity:</strong> LOGIC DM (Sole Proprietorship)</li>
+              <li><strong className="font-semibold text-gray-900">Registration Number:</strong> UDYAM-TN-02-0447225</li>
+              <li><strong className="font-semibold text-gray-900">Registered Address:</strong> 18/15, Nainiappan Garden 3rd Lane, Chennai, TN, India</li>
+              <li><strong className="font-semibold text-gray-900">Support Phone:</strong> +91-9791046914</li>
+            </ul>
+          </section>
 
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Acceptance of Terms</h2>
@@ -151,14 +161,21 @@ export default function TermsPage() {
           </section>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">12. Governing Law</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">12. Payment & Pricing</h2>
+            <p className="text-gray-700 leading-relaxed mb-4">
+              Payments are processed in USD for international users and INR for domestic users. Charges will appear on your statement as &quot;LOGICDM.APP&quot;. By subscribing or making a purchase, you agree to the pricing and billing terms applicable at the time of the transaction.
+            </p>
+          </section>
+
+          <section className="mb-8">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">13. Governing Law</h2>
             <p className="text-gray-700 leading-relaxed mb-4">
               These Terms shall be interpreted and governed by the laws of the jurisdiction in which LogicDM operates, without regard to its conflict of law provisions. Our failure to enforce any right or provision of these Terms will not be considered a waiver of those rights.
             </p>
           </section>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">13. Contact Information</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">14. Contact Information</h2>
             <p className="text-gray-700 leading-relaxed mb-4">
               If you have any questions about these Terms of Service, please contact us at:
             </p>

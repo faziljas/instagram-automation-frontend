@@ -473,14 +473,19 @@ export default function SubscriptionPage() {
             </div>
           </div>
           {displayPlan === 'free' && subscriptionData.status !== 'cancelled' && (
-            <button
-              onClick={handleUpgrade}
-              disabled={checkoutLoading}
-              className="inline-flex items-center px-6 py-3 border border-transparent rounded-xl shadow-lg text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105"
-            >
-              <ArrowUpIcon className="h-5 w-5 mr-2" />
-              {checkoutLoading ? 'Processing...' : 'Upgrade Plan'}
-            </button>
+            <div>
+              <button
+                onClick={handleUpgrade}
+                disabled={checkoutLoading}
+                className="inline-flex items-center px-6 py-3 border border-transparent rounded-xl shadow-lg text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105"
+              >
+                <ArrowUpIcon className="h-5 w-5 mr-2" />
+                {checkoutLoading ? 'Processing...' : 'Upgrade Plan'}
+              </button>
+              <p className="mt-2 text-xs text-gray-500">
+                Secure payments powered by Stripe. International cards accepted.
+              </p>
+            </div>
           )}
         </div>
       </div>

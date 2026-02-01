@@ -508,13 +508,21 @@ function LoginPageContent() {
 
           {/* Footer Links */}
           <div className="mt-auto pt-8 pb-4">
-            <div className="flex items-center justify-center gap-4 text-xs text-gray-400">
+            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-gray-400">
               <Link href="/privacy" className="hover:text-gray-600 transition-colors">
                 Privacy Policy
               </Link>
               <span className="text-gray-300">•</span>
               <Link href="/terms" className="hover:text-gray-600 transition-colors">
                 Terms of Service
+              </Link>
+              <span className="text-gray-300">•</span>
+              <Link href="/refund-policy" className="hover:text-gray-600 transition-colors">
+                Refund Policy
+              </Link>
+              <span className="text-gray-300">•</span>
+              <Link href="/contact" className="hover:text-gray-600 transition-colors">
+                Contact Us
               </Link>
             </div>
           </div>

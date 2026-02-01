@@ -194,10 +194,14 @@ export default function PricingPage() {
               <button
                 onClick={handleUpgrade}
                 disabled={checkoutLoading}
-                className="w-full py-3 px-6 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3 px-6 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl mb-3 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {checkoutLoading ? 'Processing...' : 'Upgrade to Pro'}
               </button>
+
+              <p className="text-xs text-gray-500 text-center mb-4">
+                Secure payments powered by Stripe. International cards accepted.
+              </p>
 
               {/* Guarantee */}
               <div className="flex items-center justify-center gap-2 text-xs text-gray-600 mb-6">

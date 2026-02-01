@@ -285,14 +285,17 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
             <Link href="/privacy" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
-              Privacy
+              Privacy Policy
             </Link>
             <Link href="/terms" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
-              Terms
+              Terms of Service
             </Link>
-            <a href="mailto:admin@logicdm.app" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
+            <Link href="/refund-policy" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
+              Refund Policy
+            </Link>
+            <Link href="/contact" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
               Contact Us
-            </a>
+            </Link>
           </div>
           <div className="mt-8 pt-8 border-t border-gray-200 text-center">
             <p className="text-sm text-gray-500">
