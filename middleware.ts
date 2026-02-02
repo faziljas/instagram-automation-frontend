@@ -16,5 +16,11 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  return NextResponse.next();
+  // Pass pathname to layout for dynamic canonical tag (SEO)
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-pathname', pathname);
+
+  return NextResponse.next({
+    request: { headers: requestHeaders },
+  });
 }

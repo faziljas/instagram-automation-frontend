@@ -1,17 +1,28 @@
 import type { Metadata } from 'next';
+import { headers } from 'next/headers';
 import { Inter } from 'next/font/google';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import ConditionalFooter from '@/components/ConditionalFooter';
+import { getCanonicalUrl } from '@/lib/canonical';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://instagramauto.com';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://logicdm.app';
 
-export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
-  viewport: {
+export async function generateMetadata(): Promise<Metadata> {
+  const headersList = await headers();
+  const pathname = headersList.get('x-pathname') ?? '/';
+  const canonical = getCanonicalUrl(pathname);
+  const baseUrl = siteUrl.startsWith('http') ? siteUrl : `https://${siteUrl}`;
+
+  return {
+    metadataBase: new URL(baseUrl),
+    alternates: {
+      canonical,
+    },
+    viewport: {
     width: 'device-width',
     initialScale: 1,
     maximumScale: 5,
@@ -35,13 +46,13 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: siteUrl,
+    url: baseUrl,
     siteName: 'LogicDM Automation',
     title: 'LogicDM Automation - Automate Your Instagram Marketing',
     description: 'Automate your Instagram marketing and engagement with powerful automation rules, scheduled posts, and analytics.',
     images: [
       {
-        url: `${siteUrl}/og-image.png`,
+        url: `${baseUrl}/og-image.png`,
         width: 1200,
         height: 630,
         alt: 'LogicDM Automation',
@@ -52,7 +63,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'LogicDM Automation',
     description: 'Automate your Instagram marketing and engagement with powerful automation rules.',
-    images: [`${siteUrl}/og-image.png`],
+    images: [`${baseUrl}/og-image.png`],
     creator: '@instagramauto',
   },
   icons: {

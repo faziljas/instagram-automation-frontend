@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 
 const defaultTitle = 'LogicDM Automation';
 const defaultDescription = 'Automate your Instagram marketing and engagement with powerful automation rules, scheduled posts, and analytics.';
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://instagramauto.com';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://logicdm.app';
 
 /**
  * Generate metadata for pages
