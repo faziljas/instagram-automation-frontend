@@ -1,28 +1,19 @@
 import type { Metadata } from 'next';
-import { headers } from 'next/headers';
 import { Inter } from 'next/font/google';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import ConditionalFooter from '@/components/ConditionalFooter';
-import { getCanonicalUrl } from '@/lib/canonical';
+import { CanonicalLink } from '@/components/CanonicalLink';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://logicdm.app';
+const baseUrl = siteUrl.startsWith('http') ? siteUrl : `https://${siteUrl}`;
 
-export async function generateMetadata(): Promise<Metadata> {
-  const headersList = await headers();
-  const pathname = headersList.get('x-pathname') ?? '/';
-  const canonical = getCanonicalUrl(pathname);
-  const baseUrl = siteUrl.startsWith('http') ? siteUrl : `https://${siteUrl}`;
-
-  return {
-    metadataBase: new URL(baseUrl),
-    alternates: {
-      canonical,
-    },
-    viewport: {
+export const metadata: Metadata = {
+  metadataBase: new URL(baseUrl),
+  viewport: {
     width: 'device-width',
     initialScale: 1,
     maximumScale: 5,
@@ -82,6 +73,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} flex flex-col min-h-screen`}>
+        <CanonicalLink />
         <ErrorBoundary>
           <AuthProvider>
             <div className="flex-1">
