@@ -19,43 +19,47 @@ export const metadata: Metadata = {
     maximumScale: 5,
   },
   title: {
-    default: 'LogicDM',
+    default: 'LogicDM - Instagram Automation & Marketing',
+    template: '%s | LogicDM',
   },
-  description: 'Automate your Instagram marketing and engagement with powerful automation rules, scheduled posts, and analytics. Grow your audience effortlessly.',
-  keywords: ['Instagram automation', 'Instagram marketing', 'social media automation', 'Instagram growth', 'auto like', 'auto follow', 'scheduled posts'],
-  authors: [{ name: 'Instagram Automation SaaS' }],
-  creator: 'Instagram Automation SaaS',
-  publisher: 'Instagram Automation SaaS',
+  description: 'Automate your Instagram DMs, replies, and engagement with powerful automation rules. Get 1,000 free DMs per month. Grow your audience effortlessly with Instagram API-compliant automation.',
+  keywords: ['Instagram automation', 'Instagram DM automation', 'Instagram marketing', 'social media automation', 'Instagram growth', 'auto reply', 'Instagram engagement', 'lead generation', 'Instagram API'],
+  authors: [{ name: 'LogicDM' }],
+  creator: 'LogicDM',
+  publisher: 'LogicDM',
   robots: {
     index: true,
     follow: true,
     googleBot: {
       index: true,
       follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
     },
   },
   openGraph: {
     type: 'website',
     locale: 'en_US',
     url: baseUrl,
-    siteName: 'LogicDM Automation',
-    title: 'LogicDM Automation - Automate Your Instagram Marketing',
-    description: 'Automate your Instagram marketing and engagement with powerful automation rules, scheduled posts, and analytics.',
+    siteName: 'LogicDM',
+    title: 'LogicDM - Instagram Automation & Marketing Made Easy',
+    description: 'Automate your Instagram DMs, replies, and engagement with powerful automation rules. Get 1,000 free DMs per month.',
     images: [
       {
         url: `${baseUrl}/og-image.png`,
         width: 1200,
         height: 630,
-        alt: 'LogicDM Automation',
+        alt: 'LogicDM - Instagram Automation Platform',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'LogicDM Automation',
-    description: 'Automate your Instagram marketing and engagement with powerful automation rules.',
+    title: 'LogicDM - Instagram Automation',
+    description: 'Automate your Instagram DMs and engagement with powerful automation rules. Start free today.',
     images: [`${baseUrl}/og-image.png`],
-    creator: '@instagramauto',
+    creator: '@logicdm',
   },
   icons: {
     icon: '/favicon.ico',
@@ -63,6 +67,9 @@ export const metadata: Metadata = {
     apple: '/apple-touch-icon.png',
   },
   manifest: '/site.webmanifest',
+  verification: {
+    google: 'your-google-verification-code',
+  },
 };
 
 export default function RootLayout({

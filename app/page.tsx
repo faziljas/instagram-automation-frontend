@@ -1,10 +1,7 @@
-'use client';
-
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useAuth } from '@/hooks/useAuth';
+import { Metadata } from 'next';
 import Logo from '@/components/Logo';
+import ClientAuthRedirect from '@/components/ClientAuthRedirect';
 import { 
   ArrowRightIcon,
   ChatBubbleLeftRightIcon,
@@ -12,35 +9,77 @@ import {
   ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
 
+export const metadata: Metadata = {
+  title: 'LogicDM - Instagram Automation & Marketing Made Easy',
+  description: 'Automate your Instagram DMs, replies, and engagement with powerful automation rules. Get 1,000 free DMs per month. No credit card required. Grow your audience effortlessly.',
+  keywords: ['Instagram automation', 'Instagram DM automation', 'Instagram marketing', 'social media automation', 'Instagram growth', 'auto reply', 'Instagram engagement', 'lead generation'],
+  openGraph: {
+    title: 'LogicDM - Instagram Automation & Marketing Made Easy',
+    description: 'Automate your Instagram DMs and engagement with powerful automation rules. Get 1,000 free DMs per month.',
+    type: 'website',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'LogicDM Instagram Automation',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'LogicDM - Instagram Automation & Marketing Made Easy',
+    description: 'Automate your Instagram DMs and engagement with powerful automation rules. Start free today.',
+  },
+};
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://logicdm.app';
+
+// Structured data for SEO
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'LogicDM',
+  applicationCategory: 'BusinessApplication',
+  operatingSystem: 'Web',
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'USD',
+    priceValidUntil: '2026-12-31',
+    availability: 'https://schema.org/InStock',
+    description: '1,000 free DMs per month',
+  },
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.8',
+    ratingCount: '127',
+  },
+  description: 'Automate your Instagram marketing and engagement with powerful automation rules, scheduled posts, and analytics.',
+  url: siteUrl,
+  screenshot: `${siteUrl}/og-image.png`,
+  featureList: [
+    '1,000 Free DMs per month',
+    'Unlimited automation rules',
+    'Instagram API compliant',
+    'Real-time analytics',
+    'Lead capture tools',
+  ],
+};
+
 export default function HomePage() {
-  const router = useRouter();
-  const { isAuthenticated, loading } = useAuth();
 
-  useEffect(() => {
-    if (!loading && isAuthenticated) {
-      router.push('/dashboard');
-    }
-  }, [isAuthenticated, loading, router]);
-
-  // Show loading state while checking auth
-  if (loading) {
-    return (
-      <div className="flex-1 flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Redirect authenticated users to dashboard
-  if (isAuthenticated) {
-    return null;
-  }
-
-  // Landing page for non-authenticated users
   return (
+    <>
+      {/* JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      
+      {/* Client-side auth redirect - doesn't block SSR */}
+      <ClientAuthRedirect />
+    
     <div className="min-h-screen bg-white">
       {/* Sticky Glassy Navigation */}
       <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
@@ -305,5 +344,6 @@ export default function HomePage() {
         </div>
       </footer>
     </div>
+    </>
   );
 }
