@@ -116,12 +116,18 @@ const nextConfig = {
     ];
   },
 
-  // Redirects
+  // Redirects (301 permanent for SEO - prevents "Page with redirect" in GSC)
   async redirects() {
     return [
       {
         source: '/home',
         destination: '/',
+        permanent: true,
+      },
+      // Trailing slash → no trailing slash (canonical form; root / stays as is)
+      {
+        source: '/:path+/',
+        destination: '/:path+',
         permanent: true,
       },
     ];

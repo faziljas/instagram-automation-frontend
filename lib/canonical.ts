@@ -1,9 +1,26 @@
 /**
  * Canonical URL utilities for SEO.
- * Ensures consistent canonical tags: https, no trailing slash (except root).
+ * Ensures consistent canonical tags: https, non-www, no trailing slash (except root).
+ * Single source of truth for logicdm.app URL structure to avoid GSC "Page with redirect" errors.
  */
 
 const DEFAULT_BASE = 'https://logicdm.app';
+
+/**
+ * Normalize a base URL: https, non-www, no trailing slash.
+ * Used for canonical tags, sitemap, auth redirects - ensures Googlebot sees one URL per page.
+ */
+export function getCanonicalBase(): string {
+  const raw = (process.env.NEXT_PUBLIC_SITE_URL || DEFAULT_BASE).trim();
+  let url = raw;
+  if (url.startsWith('http://')) url = 'https://' + url.slice(7);
+  else if (!url.startsWith('https://')) url = 'https://' + url;
+  // Prefer non-www (strip www. for consistency with sitemap/canonical)
+  if (url.includes('://www.')) {
+    url = url.replace('://www.', '://');
+  }
+  return url.replace(/\/+$/, '') || DEFAULT_BASE;
+}
 
 /**
  * Normalize a base URL to use https.
@@ -37,10 +54,7 @@ function normalizePath(pathname: string): string {
  * - Defaults to base domain when path is /
  */
 export function getCanonicalUrl(pathname?: string | null): string {
-  const base = ensureHttps(
-    process.env.NEXT_PUBLIC_SITE_URL || DEFAULT_BASE
-  );
-  const baseUrl = base.replace(/\/+$/, '');
+  const baseUrl = getCanonicalBase();
   const path = normalizePath(pathname || '/');
   return path === '/' ? baseUrl + '/' : `${baseUrl}${path}`;
 }

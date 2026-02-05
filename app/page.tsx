@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Metadata } from 'next';
+import { getCanonicalBase } from '@/lib/canonical';
 import Logo from '@/components/Logo';
 import ClientAuthRedirect from '@/components/ClientAuthRedirect';
 import { 
@@ -33,7 +34,7 @@ export const metadata: Metadata = {
   },
 };
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://logicdm.app';
+const siteUrl = getCanonicalBase();
 
 // Structured data for SEO
 const structuredData = {

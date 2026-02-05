@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
+import { getCanonicalBase } from '@/lib/canonical';
 
 const defaultTitle = 'LogicDM Automation';
 const defaultDescription = 'Automate your Instagram marketing and engagement with powerful automation rules, scheduled posts, and analytics.';
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://logicdm.app';
 
 /**
  * Generate metadata for pages
@@ -20,9 +20,10 @@ export function generateMetadata({
   image?: string;
   noIndex?: boolean;
 }): Metadata {
+  const siteUrl = getCanonicalBase();
   const pageTitle = title ? `${title} | ${defaultTitle}` : defaultTitle;
   const pageDescription = description || defaultDescription;
-  const pageUrl = `${siteUrl}${path}`;
+  const pageUrl = `${siteUrl}${path.startsWith('/') ? path : '/' + path}`;
   const pageImage = image || `${siteUrl}/og-image.png`;
 
   return {

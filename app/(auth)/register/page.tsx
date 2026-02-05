@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { getCanonicalBase } from '@/lib/canonical';
 import { useAuth } from '@/hooks/useAuth';
 import { z } from 'zod';
 import Logo from '@/components/Logo';
@@ -112,7 +113,7 @@ function RegisterPageContent() {
         email: normalizedEmail,
         password: formData.password,
         options: {
-          emailRedirectTo: 'https://www.logicdm.app/auth/callback',
+          emailRedirectTo: `${getCanonicalBase()}/auth/callback`,
         },
       });
 

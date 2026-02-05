@@ -4,12 +4,11 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import ConditionalFooter from '@/components/ConditionalFooter';
 import { CanonicalLink } from '@/components/CanonicalLink';
+import { getCanonicalBase } from '@/lib/canonical';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://logicdm.app';
-const baseUrl = siteUrl.startsWith('http') ? siteUrl : `https://${siteUrl}`;
+const baseUrl = getCanonicalBase();
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),

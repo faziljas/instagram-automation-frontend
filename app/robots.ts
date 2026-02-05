@@ -1,7 +1,8 @@
 import { MetadataRoute } from 'next';
+import { getCanonicalBase } from '@/lib/canonical';
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://logicdm.app';
+  const baseUrl = getCanonicalBase();
 
   return {
     rules: [

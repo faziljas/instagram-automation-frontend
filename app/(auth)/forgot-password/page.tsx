@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { z } from 'zod';
 import { supabase } from '@/lib/supabase';
+import { getCanonicalBase } from '@/lib/canonical';
 import { get } from '@/utils/api';
 import Logo from '@/components/Logo';
 
@@ -75,7 +76,7 @@ function ForgotPasswordForm() {
 
       // User exists in backend, proceed with Supabase password reset
       const { error } = await supabase.auth.resetPasswordForEmail(formData.email.trim(), {
-        redirectTo: 'https://www.logicdm.app/update-password',
+        redirectTo: `${getCanonicalBase()}/update-password`,
       });
 
       if (error) {
