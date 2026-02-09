@@ -131,11 +131,10 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
           ? (initialConfig.simpleKeywords || [])
           : (initialConfig.simpleKeywords || initialConfig.keywords || []),
         leadKeywords: initialConfig.leadKeywords || [],
-        autoReplyToComments: initialConfig.autoReplyToComments ?? true,
-        // Load toggle states from initialConfig - these should already be correctly set from the backend
-        // No fallback to avoid cross-mode contamination - default to true for required field
-        simpleAutoReplyToComments: initialConfig.simpleAutoReplyToComments ?? true,
-        leadAutoReplyToComments: initialConfig.leadAutoReplyToComments ?? true,
+        // Public Acknowledgement Reply is always required (forced to true)
+        autoReplyToComments: true,
+        simpleAutoReplyToComments: true,
+        leadAutoReplyToComments: true,
         // Ensure commentReplies has valid content, not just empty strings
         commentReplies: (initialConfig.commentReplies && initialConfig.commentReplies.length > 0 && initialConfig.commentReplies.some(r => r.trim()))
           ? initialConfig.commentReplies
@@ -211,9 +210,8 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
         activeTab === 'simple' ? config.simpleKeywords : config.leadKeywords;
       const activeDmMessages =
         activeTab === 'simple' ? config.simpleDmMessages : config.leadDmMessages;
-      const activeAutoReplyToComments = (activeTab === 'simple' 
-        ? config.simpleAutoReplyToComments 
-        : config.leadAutoReplyToComments) ?? true;
+      // Public Acknowledgement Reply is always required (forced to true)
+      const activeAutoReplyToComments = true;
       const activeCommentReplies = activeAutoReplyToComments
         ? activeTab === 'simple'
           ? config.simpleCommentReplies
@@ -235,8 +233,8 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
               simpleAutoReplyToComments: activeAutoReplyToComments,
               simpleCommentReplies: activeCommentReplies,
               simpleDmMessages: activeDmMessages,
-              // preserve lead-capture toggle state, but clear other lead-capture data if switching away
-              leadAutoReplyToComments: config.leadAutoReplyToComments ?? true,
+              // Public Acknowledgement Reply is always required (forced to true)
+              leadAutoReplyToComments: true,
               leadKeywords: [],
               leadCommentReplies: [],
               leadDmMessages: [],
@@ -253,8 +251,8 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
               leadAutoReplyToComments: activeAutoReplyToComments,
               leadCommentReplies: activeCommentReplies,
               leadDmMessages: activeDmMessages,
-              // preserve simple reply toggle state, but clear other simple reply data if switching away
-              simpleAutoReplyToComments: config.simpleAutoReplyToComments ?? true,
+              // Public Acknowledgement Reply is always required (forced to true)
+              simpleAutoReplyToComments: true,
               simpleKeywords: [],
               simpleCommentReplies: [],
               simpleDmMessages: [],
@@ -455,39 +453,9 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                         A public reply is automatically posted to confirm message delivery and prevent spam.
                       </p>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (activeTab === 'simple') {
-                          setConfig({
-                            ...config,
-                            simpleAutoReplyToComments: !config.simpleAutoReplyToComments,
-                          });
-                        } else {
-                          setConfig({
-                            ...config,
-                            leadAutoReplyToComments: !config.leadAutoReplyToComments,
-                          });
-                        }
-                      }}
-                          className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:ring-offset-2 ${
-                        (activeTab === 'simple' 
-                          ? (config.simpleAutoReplyToComments ?? true)
-                          : (config.leadAutoReplyToComments ?? true))
-                          ? 'bg-blue-600'
-                          : 'bg-gray-200'
-                      }`}
-                    >
-                      <span
-                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
-                          (activeTab === 'simple' 
-                            ? (config.simpleAutoReplyToComments ?? true)
-                            : (config.leadAutoReplyToComments ?? true))
-                            ? 'translate-x-5'
-                            : 'translate-x-0'
-                        }`}
-                      />
-                    </button>
+                    <div className="relative inline-flex h-6 w-11 flex-shrink-0 rounded-full border-2 border-transparent bg-blue-600 opacity-75 cursor-not-allowed" title="Required - Cannot be disabled">
+                      <span className="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 translate-x-5" />
+                    </div>
                   </div>
                   {(activeTab === 'simple' 
                     ? (config.simpleAutoReplyToComments ?? true)
