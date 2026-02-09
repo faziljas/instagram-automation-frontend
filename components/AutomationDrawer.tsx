@@ -432,30 +432,25 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
               {/* Public Comment Replies */}
               {media.media_product_type !== 'STORY' && (
                 <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <label className="block text-sm font-medium text-gray-700">
-                          Public Acknowledgement Reply (required)
-                        </label>
-                        <div className="relative group">
-                          <InformationCircleIcon className="h-5 w-5 text-blue-500 hover:text-blue-600 cursor-help transition-colors" />
-                          <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-64 md:w-72 max-w-[calc(100vw-2rem)] p-3 bg-gray-900 text-white text-xs rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none whitespace-normal">
-                            <p className="text-center leading-relaxed">
-                              A public reply is automatically posted to confirm message delivery and prevent spam.
-                            </p>
-                            {/* Tooltip arrow */}
-                            <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
-                          </div>
+                  <div className="mb-3">
+                    <div className="flex items-center gap-2 mb-1">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Public Acknowledgement Reply (required)
+                      </label>
+                      <div className="relative group">
+                        <InformationCircleIcon className="h-5 w-5 text-blue-500 hover:text-blue-600 cursor-help transition-colors" />
+                        <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-64 md:w-72 max-w-[calc(100vw-2rem)] p-3 bg-gray-900 text-white text-xs rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none whitespace-normal">
+                          <p className="text-center leading-relaxed">
+                            A public reply is automatically posted to confirm message delivery and prevent spam.
+                          </p>
+                          {/* Tooltip arrow */}
+                          <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
                         </div>
                       </div>
-                      <p className="text-xs text-gray-500">
-                        A public reply is automatically posted to confirm message delivery and prevent spam.
-                      </p>
                     </div>
-                    <div className="relative inline-flex h-6 w-11 flex-shrink-0 rounded-full border-2 border-transparent bg-blue-600 opacity-75 cursor-not-allowed" title="Required - Cannot be disabled">
-                      <span className="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 translate-x-5" />
-                    </div>
+                    <p className="text-xs text-gray-500">
+                      A public reply is automatically posted to confirm message delivery and prevent spam.
+                    </p>
                   </div>
                   {(activeTab === 'simple' 
                     ? (config.simpleAutoReplyToComments ?? true)
