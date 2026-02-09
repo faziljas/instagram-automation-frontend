@@ -76,9 +76,9 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
     keywords: [],
     simpleKeywords: [],
     leadKeywords: [],
-    autoReplyToComments: false,
-    simpleAutoReplyToComments: false,
-    leadAutoReplyToComments: false,
+    autoReplyToComments: true,
+    simpleAutoReplyToComments: true,
+    leadAutoReplyToComments: true,
     commentReplies: ['Thanks! Please see DMs.', 'Sent you a message! Check it out!', 'Nice! Check your DMs!'],
     simpleCommentReplies: ['Thanks! Please see DMs.', 'Sent you a message! Check it out!', 'Nice! Check your DMs!'],
     leadCommentReplies: ['Thanks! Please see DMs.', 'Sent you a message! Check it out!', 'Nice! Check your DMs!'],
@@ -131,11 +131,11 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
           ? (initialConfig.simpleKeywords || [])
           : (initialConfig.simpleKeywords || initialConfig.keywords || []),
         leadKeywords: initialConfig.leadKeywords || [],
-        autoReplyToComments: initialConfig.autoReplyToComments || false,
+        autoReplyToComments: initialConfig.autoReplyToComments ?? true,
         // Load toggle states from initialConfig - these should already be correctly set from the backend
-        // No fallback to avoid cross-mode contamination
-        simpleAutoReplyToComments: initialConfig.simpleAutoReplyToComments ?? false,
-        leadAutoReplyToComments: initialConfig.leadAutoReplyToComments ?? false,
+        // No fallback to avoid cross-mode contamination - default to true for required field
+        simpleAutoReplyToComments: initialConfig.simpleAutoReplyToComments ?? true,
+        leadAutoReplyToComments: initialConfig.leadAutoReplyToComments ?? true,
         // Ensure commentReplies has valid content, not just empty strings
         commentReplies: (initialConfig.commentReplies && initialConfig.commentReplies.length > 0 && initialConfig.commentReplies.some(r => r.trim()))
           ? initialConfig.commentReplies
@@ -213,7 +213,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
         activeTab === 'simple' ? config.simpleDmMessages : config.leadDmMessages;
       const activeAutoReplyToComments = (activeTab === 'simple' 
         ? config.simpleAutoReplyToComments 
-        : config.leadAutoReplyToComments) ?? false;
+        : config.leadAutoReplyToComments) ?? true;
       const activeCommentReplies = activeAutoReplyToComments
         ? activeTab === 'simple'
           ? config.simpleCommentReplies
@@ -236,7 +236,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
               simpleCommentReplies: activeCommentReplies,
               simpleDmMessages: activeDmMessages,
               // preserve lead-capture toggle state, but clear other lead-capture data if switching away
-              leadAutoReplyToComments: config.leadAutoReplyToComments ?? false,
+              leadAutoReplyToComments: config.leadAutoReplyToComments ?? true,
               leadKeywords: [],
               leadCommentReplies: [],
               leadDmMessages: [],
@@ -254,7 +254,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
               leadCommentReplies: activeCommentReplies,
               leadDmMessages: activeDmMessages,
               // preserve simple reply toggle state, but clear other simple reply data if switching away
-              simpleAutoReplyToComments: config.simpleAutoReplyToComments ?? false,
+              simpleAutoReplyToComments: config.simpleAutoReplyToComments ?? true,
               simpleKeywords: [],
               simpleCommentReplies: [],
               simpleDmMessages: [],
@@ -435,20 +435,25 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
               {media.media_product_type !== 'STORY' && (
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <label className="block text-sm font-medium text-gray-700">
-                        Public Comment Replies
-                      </label>
-                      <div className="relative group">
-                        <InformationCircleIcon className="h-5 w-5 text-blue-500 hover:text-blue-600 cursor-help transition-colors" />
-                        <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-64 md:w-72 max-w-[calc(100vw-2rem)] p-3 bg-gray-900 text-white text-xs rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none whitespace-normal">
-                          <p className="text-center leading-relaxed">
-                            Enable this to automatically reply to public comments on your post. Replies will be sent as public comments visible to everyone.
-                          </p>
-                          {/* Tooltip arrow */}
-                          <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <label className="block text-sm font-medium text-gray-700">
+                          Public Acknowledgement Reply (required)
+                        </label>
+                        <div className="relative group">
+                          <InformationCircleIcon className="h-5 w-5 text-blue-500 hover:text-blue-600 cursor-help transition-colors" />
+                          <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-64 md:w-72 max-w-[calc(100vw-2rem)] p-3 bg-gray-900 text-white text-xs rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none whitespace-normal">
+                            <p className="text-center leading-relaxed">
+                              A public reply is automatically posted to confirm message delivery and prevent spam.
+                            </p>
+                            {/* Tooltip arrow */}
+                            <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                          </div>
                         </div>
                       </div>
+                      <p className="text-xs text-gray-500">
+                        A public reply is automatically posted to confirm message delivery and prevent spam.
+                      </p>
                     </div>
                     <button
                       type="button"
@@ -467,8 +472,8 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                       }}
                           className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:ring-offset-2 ${
                         (activeTab === 'simple' 
-                          ? (config.simpleAutoReplyToComments ?? false)
-                          : (config.leadAutoReplyToComments ?? false))
+                          ? (config.simpleAutoReplyToComments ?? true)
+                          : (config.leadAutoReplyToComments ?? true))
                           ? 'bg-blue-600'
                           : 'bg-gray-200'
                       }`}
@@ -476,8 +481,8 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                       <span
                         className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
                           (activeTab === 'simple' 
-                            ? (config.simpleAutoReplyToComments ?? false)
-                            : (config.leadAutoReplyToComments ?? false))
+                            ? (config.simpleAutoReplyToComments ?? true)
+                            : (config.leadAutoReplyToComments ?? true))
                             ? 'translate-x-5'
                             : 'translate-x-0'
                         }`}
@@ -485,8 +490,8 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                     </button>
                   </div>
                   {(activeTab === 'simple' 
-                    ? (config.simpleAutoReplyToComments ?? false)
-                    : (config.leadAutoReplyToComments ?? false)) && (
+                    ? (config.simpleAutoReplyToComments ?? true)
+                    : (config.leadAutoReplyToComments ?? true)) && (
                     <div className="space-y-3 mt-3">
                       {Array.from({ length: 3 }, (_, index) => {
                         const replies = activeTab === 'simple' ? config.simpleCommentReplies : config.leadCommentReplies;
