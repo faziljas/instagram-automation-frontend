@@ -340,7 +340,7 @@ export default function SubscriptionPage() {
 
   const handleCancelSubscription = async () => {
     try {
-      const response = await cancelSubscription('/users/subscription/cancel', {});
+      const response = await cancelSubscription('/api/dodo/cancel-subscription', {});
       setShowCancelModal(false);
       
       // Show success message with cancellation end date

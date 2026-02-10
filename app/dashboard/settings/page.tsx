@@ -561,7 +561,7 @@ export default function SettingsPage() {
 
   const handleCancelSubscription = async () => {
     try {
-      await cancelSubscription('/users/subscription/cancel', {});
+      await cancelSubscription('/api/dodo/cancel-subscription', {});
       alert(
         'Your subscription has been canceled. You will retain access to Pro features until the end of your current billing period.'
       );
