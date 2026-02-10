@@ -82,10 +82,13 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       // Don't redirect if this is a sync-user request - let the auth context handle the error
       const isAuthRequest = originalRequest.url?.includes('/auth/sync-user');
+      // Also avoid redirecting for Dodo payment endpoints so we can surface
+      // upgrade errors in the UI instead of forcing a login redirect.
+      const isDodoPaymentRequest = originalRequest.url?.includes('/api/dodo/');
       
-      console.log('[API Interceptor] Is auth request?', isAuthRequest);
+      console.log('[API Interceptor] Is auth request?', isAuthRequest, 'Is Dodo request?', isDodoPaymentRequest);
       
-      if (!isAuthRequest && !originalRequest._retry) {
+      if (!isAuthRequest && !isDodoPaymentRequest && !originalRequest._retry) {
         // Only redirect for authenticated routes with expired tokens
         console.log('[API Interceptor] Redirecting to login');
         if (typeof window !== 'undefined') {
