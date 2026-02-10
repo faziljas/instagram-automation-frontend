@@ -34,7 +34,7 @@ export default function PricingPage() {
 
   const handleUpgrade = async () => {
     try {
-      const response = await createCheckoutSession('/api/stripe/create-checkout-session', {});
+      const response = await createCheckoutSession('/api/dodo/create-checkout-session', {});
       if (response?.checkout_url) {
         window.location.href = response.checkout_url;
       }

@@ -214,7 +214,7 @@ export default function SubscriptionPage() {
         
         try {
           console.log('🔄 Verifying checkout session:', sessionId);
-          const data = await post('/api/stripe/verify-checkout-session', { session_id: sessionId });
+          const data = await post('/api/dodo/verify-checkout-session', { session_id: sessionId });
           console.log('✅ Subscription verified:', data);
           setSuccessMessage('Thanks for upgrading! Your subscription is being processed...');
         } catch (error) {
@@ -290,7 +290,7 @@ export default function SubscriptionPage() {
       console.log('🔄 Creating Stripe checkout session...');
       console.log('API URL:', process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000');
       
-      const response = await createCheckoutSession('/api/stripe/create-checkout-session', {});
+      const response = await createCheckoutSession('/api/dodo/create-checkout-session', {});
       
       console.log('✅ Checkout session response:', response);
       

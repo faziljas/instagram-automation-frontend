@@ -492,7 +492,7 @@ export default function SettingsPage() {
 
   const handleOpenStripePortal = async () => {
     try {
-      const response = await createPortalSession('/api/stripe/create-portal-session', {});
+      const response = await createPortalSession('/api/dodo/create-portal-session', {});
       if (response?.portal_url) {
         window.location.href = response.portal_url;
       } else {
