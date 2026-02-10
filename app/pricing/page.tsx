@@ -34,12 +34,19 @@ export default function PricingPage() {
 
   const handleUpgrade = async () => {
     try {
+      // Require a valid session to start upgrade so we can pass auth to backend
+      if (!session?.access_token) {
+        console.warn('⚠️ No valid session found when trying to upgrade from pricing page');
+        router.push('/login?redirect=/dashboard/subscription');
+        return;
+      }
+
       const response = await createCheckoutSession('/api/dodo/create-checkout-session', {});
       if (response?.checkout_url) {
         window.location.href = response.checkout_url;
       }
     } catch (error) {
-      console.error('Failed to create checkout session:', error);
+      console.error('Failed to create checkout session from pricing page:', error);
     }
   };
 

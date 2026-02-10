@@ -286,6 +286,16 @@ export default function SubscriptionPage() {
     try {
       setErrorMessage(null);
       setSuccessMessage(null);
+
+      // Ensure we have a valid auth session before calling the backend
+      if (!session?.access_token) {
+        console.warn('⚠️ No valid session found when trying to upgrade plan');
+        setErrorMessage('Your session has expired. Please log in again to upgrade your plan.');
+        setTimeout(() => {
+          router.push('/login?redirect=/dashboard/subscription');
+        }, 2000);
+        return;
+      }
       
       console.log('🔄 Creating Stripe checkout session...');
       console.log('API URL:', process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000');
@@ -300,7 +310,7 @@ export default function SubscriptionPage() {
         window.location.href = response.checkout_url;
       } else {
         console.error('❌ No checkout_url in response:', response);
-        setErrorMessage('Failed to create checkout session. Please try again.');
+        setErrorMessage('Unable to start the upgrade process. Please try again in a moment.');
       }
     } catch (error) {
       console.error('❌ Failed to create checkout session:', error);
@@ -309,7 +319,22 @@ export default function SubscriptionPage() {
         message: errorMessage,
         apiUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
       });
-      setErrorMessage(errorMessage || 'Failed to create checkout session. Please check your connection and try again.');
+
+      // Friendlier error handling:
+      // - Treat auth/token errors as session expiry
+      // - Treat Dodo API errors as payment service issues
+      if (errorMessage.includes('Missing authorization header') ||
+          errorMessage.includes('Invalid token') ||
+          errorMessage.toLowerCase().includes('session expired')) {
+        setErrorMessage('Your session has expired. Please log in again to upgrade your plan.');
+        setTimeout(() => {
+          router.push('/login?redirect=/dashboard/subscription');
+        }, 2000);
+      } else if (errorMessage.startsWith('Dodo API error')) {
+        setErrorMessage('Our payment provider temporarily rejected the request. Please try again or contact support if this keeps happening.');
+      } else {
+        setErrorMessage(errorMessage || 'Failed to create checkout session. Please check your connection and try again.');
+      }
     }
   };
 

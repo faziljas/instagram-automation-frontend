@@ -82,21 +82,35 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       // Don't redirect if this is a sync-user request - let the auth context handle the error
       const isAuthRequest = originalRequest.url?.includes('/auth/sync-user');
-      // Also avoid redirecting for Dodo payment endpoints so we can surface
-      // upgrade errors in the UI instead of forcing a login redirect.
       const isDodoPaymentRequest = originalRequest.url?.includes('/api/dodo/');
+      const dodoDetail = error.response?.data?.detail;
+      const isDodoApiError =
+        isDodoPaymentRequest &&
+        typeof dodoDetail === 'string' &&
+        dodoDetail.startsWith('Dodo API error');
       
-      console.log('[API Interceptor] Is auth request?', isAuthRequest, 'Is Dodo request?', isDodoPaymentRequest);
+      console.log(
+        '[API Interceptor] Is auth request?',
+        isAuthRequest,
+        'Is Dodo request?',
+        isDodoPaymentRequest,
+        'Is Dodo API error?',
+        isDodoApiError
+      );
       
-      if (!isAuthRequest && !isDodoPaymentRequest && !originalRequest._retry) {
-        // Only redirect for authenticated routes with expired tokens
-        console.log('[API Interceptor] Redirecting to login');
-        if (typeof window !== 'undefined') {
-          // Sign out from Supabase
-          await supabase.auth.signOut();
-          window.location.href = '/login';
+      // Only redirect for real auth errors (expired/missing token),
+      // not for upstream Dodo API errors.
+      if (!isAuthRequest && !originalRequest._retry) {
+        if (!isDodoApiError) {
+          console.log('[API Interceptor] Redirecting to login');
+          if (typeof window !== 'undefined') {
+            // Sign out from Supabase
+            await supabase.auth.signOut();
+            window.location.href = '/login';
+          }
+          return Promise.reject(new Error('Session expired. Please login again.'));
         }
-        return Promise.reject(new Error('Session expired. Please login again.'));
+        // For Dodo API 401s, fall through to generic error handling below
       }
     }
 
