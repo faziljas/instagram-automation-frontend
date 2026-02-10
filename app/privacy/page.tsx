@@ -76,7 +76,7 @@ export default function PrivacyPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">Payment Processing</h2>
             <p className="text-gray-700 leading-relaxed mb-4">
-              We use <strong className="font-semibold text-gray-900">Stripe</strong> to process payments for subscriptions and purchases. When you make a payment, your card details and billing information are collected and processed directly by Stripe. We do not store your full card number on our servers. Stripe&apos;s processing is subject to their Privacy Policy and security standards.
+              We use a third-party Merchant of Record (MoR), <strong className="font-semibold text-gray-900">Dodo Payments</strong>, to handle secured payments and billing. When you make a purchase, your payment details are processed directly by Dodo Payments. We do not store your full card number or sensitive payment data on our servers. Dodo Payments handles your data in accordance with their Privacy Policy and complies with global PCI-DSS security standards.
             </p>
           </section>
 

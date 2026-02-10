@@ -45,7 +45,9 @@ export default function RefundPolicyPage() {
               <a href="mailto:admin@logicdm.app" className="text-blue-600 hover:text-blue-800 underline">
                 admin@logicdm.app
               </a>
-              {' '}to request a full refund.
+              {' '}to request a full refund. Please contact our support team at{' '}
+              <a href="mailto:admin@logicdm.app" className="text-blue-600 hover:text-blue-800 underline">admin@logicdm.app</a>
+              {' '}before initiating a dispute or chargeback with your bank. We are committed to resolving all valid refund requests within 24-48 hours.
             </p>
           </section>
 

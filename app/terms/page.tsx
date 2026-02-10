@@ -32,6 +32,13 @@ export default function TermsPage() {
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Terms of Service</h1>
           <p className="text-gray-600 mb-8">Last updated: February 1, 2026</p>
 
+          <section className="mb-8 p-4 bg-amber-50 rounded-lg border border-amber-200">
+            <p className="text-gray-700 leading-relaxed font-medium">
+              <strong className="font-semibold text-gray-900">Disclaimer:</strong> Not Affiliated with Meta — LogicDM is an independent SaaS productivity tool and is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Instagram, Meta Platforms, Inc., or any of their subsidiaries or affiliates. The official Instagram website can be found at{' '}
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline">https://instagram.com</a>.
+            </p>
+          </section>
+
           <section className="mb-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">Business Information</h2>
             <ul className="list-none text-gray-700 leading-relaxed space-y-2">
@@ -161,9 +168,9 @@ export default function TermsPage() {
           </section>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">12. Payment & Pricing</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">12. Payment & Billing</h2>
             <p className="text-gray-700 leading-relaxed mb-4">
-              Payments are processed in USD for international users and INR for domestic users. Charges will appear on your statement as &quot;LOGICDM.APP&quot;. By subscribing or making a purchase, you agree to the pricing and billing terms applicable at the time of the transaction.
+              Our order process is conducted by our online reseller and Merchant of Record, Dodo Payments. Payment processing services for LogicDM are provided by Dodo Payments and are subject to the Dodo Payments Account Agreement, which includes the Dodo Payments Terms of Service. By agreeing to these terms or continuing to operate as a customer of LogicDM, you agree to be bound by the Dodo Services Agreement, as the same may be modified by Dodo Payments from time to time. As a condition of LogicDM enabling payment processing services through Dodo Payments, you agree to provide LogicDM accurate and complete information about you and your business, and you authorize LogicDM to share it and transaction information related to your use of the payment processing services provided by Dodo Payments.
             </p>
           </section>
 
