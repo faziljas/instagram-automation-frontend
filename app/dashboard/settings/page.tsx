@@ -44,24 +44,38 @@ interface SubscriptionSummary {
   };
 }
 
+interface Invoice {
+  id: number;
+  amount: number; // minor units (e.g. cents)
+  currency: string;
+  status: string;
+  invoice_url?: string | null;
+  paid_at?: string | null;
+  created_at?: string | null;
+}
+
 interface BillingSettingsProps {
   isLoading: boolean;
   subscription: SubscriptionSummary | undefined;
+  invoices: Invoice[] | undefined;
+  invoicesLoading: boolean;
   onUpgrade: () => void;
-  onManageSubscription: () => void;
   onCancelPlan: () => void;
-  portalLoading: boolean;
   cancelLoading: boolean;
+  onOpenInvoicePortal: () => void;
+  portalLoading: boolean;
 }
 
 const BillingSettings: React.FC<BillingSettingsProps> = ({
   isLoading,
   subscription,
+  invoices,
+  invoicesLoading,
   onUpgrade,
-  onManageSubscription,
   onCancelPlan,
   portalLoading,
   cancelLoading,
+  onOpenInvoicePortal,
 }) => {
   if (isLoading) {
     return (
@@ -92,16 +106,27 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
     ? new Date(subscription.cancellation_end_date)
     : null;
 
-  // Fallback invoice date (one month before currentPeriodEnd, or today)
-  const invoiceDate = (() => {
-    const base = currentPeriodEnd ? new Date(currentPeriodEnd) : new Date();
-    base.setMonth(base.getMonth() - 1);
-    return base.toLocaleDateString('en-US', {
+  // Derived invoice helpers
+  const formatDate = (iso: string | null | undefined) => {
+    if (!iso) return '-';
+    const d = new Date(iso);
+    return d.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
     });
-  })();
+  };
+
+  const formatAmount = (amountMinor: number, currency: string) => {
+    const divisor = 100; // Dodo sends minor units
+    const value = amountMinor / divisor;
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currency || 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(value);
+  };
 
   const renewalText = currentPeriodEnd
     ? `Your plan renews on ${currentPeriodEnd.toLocaleDateString('en-US', {
@@ -192,25 +217,65 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 text-sm">
-              <tr>
-                <td className="px-6 py-3 text-gray-900">{invoiceDate}</td>
-                <td className="px-6 py-3 text-gray-900">$9.00</td>
-                <td className="px-6 py-3">
-                  <span className="inline-flex items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-700 border border-green-100">
-                    Paid
-                  </span>
-                </td>
-                <td className="px-6 py-3 text-right">
-                  <button
-                    type="button"
-                    onClick={onManageSubscription}
-                    disabled={portalLoading}
-                    className="text-sm font-medium text-gray-700 hover:text-gray-900 underline disabled:opacity-60"
-                  >
-                    View
-                  </button>
-                </td>
-              </tr>
+              {invoicesLoading && (
+                <tr>
+                  <td colSpan={4} className="px-6 py-4 text-sm text-gray-500">
+                    Loading invoices…
+                  </td>
+                </tr>
+              )}
+              {!invoicesLoading && (!invoices || invoices.length === 0) && (
+                <tr>
+                  <td colSpan={4} className="px-6 py-4 text-sm text-gray-500">
+                    No invoices available yet.
+                  </td>
+                </tr>
+              )}
+              {!invoicesLoading &&
+                invoices &&
+                invoices.map((inv) => (
+                  <tr key={inv.id}>
+                    <td className="px-6 py-3 text-gray-900">
+                      {formatDate(inv.paid_at || inv.created_at || null)}
+                    </td>
+                    <td className="px-6 py-3 text-gray-900">
+                      {formatAmount(inv.amount, inv.currency)}
+                    </td>
+                    <td className="px-6 py-3">
+                      <span
+                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium border ${
+                          inv.status === 'succeeded' || inv.status === 'paid'
+                            ? 'bg-green-50 text-green-700 border-green-100'
+                            : inv.status === 'failed'
+                            ? 'bg-red-50 text-red-700 border-red-100'
+                            : 'bg-gray-50 text-gray-700 border-gray-200'
+                        }`}
+                      >
+                        {inv.status === 'succeeded' ? 'Paid' : inv.status.charAt(0).toUpperCase() + inv.status.slice(1)}
+                      </span>
+                    </td>
+                    <td className="px-6 py-3 text-right">
+                      {inv.invoice_url ? (
+                        <button
+                          type="button"
+                          onClick={() => window.open(inv.invoice_url as string, '_blank', 'noopener,noreferrer')}
+                          className="text-sm font-medium text-gray-700 hover:text-gray-900 underline"
+                        >
+                          View
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={onOpenInvoicePortal}
+                          disabled={portalLoading}
+                          className="text-sm font-medium text-gray-700 hover:text-gray-900 underline disabled:opacity-60"
+                        >
+                          View
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
           </div>
@@ -266,6 +331,10 @@ export default function SettingsPage() {
     data: subscription,
     isLoading: isSubscriptionLoading,
   } = useFetch<SubscriptionSummary>('/users/subscription');
+  const {
+    data: invoices,
+    isLoading: isInvoicesLoading,
+  } = useFetch<Invoice[]>('/users/invoices');
   const { execute: updateProfile, loading: profileLoading, error: profileError } = usePut();
   const { execute: updatePassword, loading: passwordLoading, error: passwordError } = usePut();
   const { execute: deleteAccount, loading: deleteLoading } = useDelete();
@@ -768,9 +837,11 @@ export default function SettingsPage() {
       <BillingSettings
         isLoading={isSubscriptionLoading}
         subscription={subscription}
+        invoices={invoices}
+        invoicesLoading={isInvoicesLoading}
         onUpgrade={handleUpgradeClick}
-        onManageSubscription={handleOpenStripePortal}
         onCancelPlan={handleCancelSubscription}
+        onOpenInvoicePortal={handleOpenStripePortal}
         portalLoading={portalLoading}
         cancelLoading={cancelLoading}
       />
