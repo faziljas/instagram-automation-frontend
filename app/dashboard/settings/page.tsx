@@ -172,8 +172,8 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
               S
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-900">Link by Stripe</p>
-              <p className="text-xs text-gray-500">Your payment details are securely managed via Stripe.</p>
+              <p className="text-sm font-medium text-gray-900">Link by Dodo Payments</p>
+              <p className="text-xs text-gray-500">Your payment details are securely managed via Dodo Payments.</p>
             </div>
           </div>
           <button

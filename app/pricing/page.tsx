@@ -200,7 +200,7 @@ export default function PricingPage() {
               </button>
 
               <p className="text-xs text-gray-500 text-center mb-4">
-                Secure payments powered by Stripe. International cards accepted.
+                Secure payments powered by Dodo Payments. International cards accepted.
               </p>
 
               {/* Guarantee */}

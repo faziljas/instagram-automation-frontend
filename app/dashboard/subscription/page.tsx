@@ -483,7 +483,7 @@ export default function SubscriptionPage() {
                 {checkoutLoading ? 'Processing...' : 'Upgrade Plan'}
               </button>
               <p className="mt-2 text-xs text-gray-500">
-                Secure payments powered by Stripe. International cards accepted.
+                Secure payments powered by Dodo Payments. International cards accepted.
               </p>
             </div>
           )}
