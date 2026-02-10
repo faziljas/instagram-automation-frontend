@@ -158,8 +158,8 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
         <h3 className="text-sm font-semibold text-gray-900">Payment Method</h3>
         <div className="flex flex-col items-start justify-between gap-4 rounded-xl border border-gray-100 bg-white px-6 py-5 sm:flex-row sm:items-center">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-emerald-600 text-xs font-semibold text-white">
-              S
+            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-emerald-500 text-xs font-semibold text-white">
+              D
             </div>
             <div>
               <p className="text-sm font-medium text-gray-900">Link by Dodo Payments</p>
