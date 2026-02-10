@@ -166,20 +166,12 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
               <p className="text-xs text-gray-500">Your payment details are securely managed via Dodo Payments.</p>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={onManageSubscription}
-            disabled={portalLoading}
-            className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 disabled:opacity-60"
-          >
-            {portalLoading ? 'Opening…' : 'Update'}
-          </button>
         </div>
       </section>
 
-      {/* Invoices */}
+      {/* Invoice and payment details */}
       <section className="space-y-3">
-        <h3 className="text-sm font-semibold text-gray-900">Invoices</h3>
+        <h3 className="text-sm font-semibold text-gray-900">Invoice and payment details</h3>
         <div className="overflow-hidden rounded-xl border border-gray-100 bg-white w-full">
           <div className="overflow-x-auto w-full">
             <table className="min-w-full divide-y divide-gray-100">
