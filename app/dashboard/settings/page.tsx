@@ -484,7 +484,10 @@ export default function SettingsPage() {
     try {
       const response = await createPortalSession('/api/dodo/create-portal-session', {});
       if (response?.portal_url) {
-        window.location.href = response.portal_url;
+        // Open Dodo billing portal in a new tab so users can
+        // simply close the tab to return to LogicDM settings.
+        const portalUrl = response.portal_url as string;
+        window.open(portalUrl, '_blank', 'noopener,noreferrer');
       } else {
         console.error('No portal_url returned from Stripe portal session API', response);
         alert('Unable to open billing portal. Please try again or manage billing from the Subscription page.');
