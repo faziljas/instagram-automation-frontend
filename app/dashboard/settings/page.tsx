@@ -148,19 +148,9 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
   return (
     <div className="space-y-8 font-inter">
       {/* Current Plan */}
-      <section className="bg-gray-50/50 border border-gray-200 rounded-xl p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h2 className="text-base font-semibold text-gray-900">Pro Plan</h2>
-          <p className="mt-1 text-sm text-gray-600">{renewalText}</p>
-        </div>
-        <button
-          type="button"
-          onClick={onManageSubscription}
-          disabled={portalLoading}
-          className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 disabled:opacity-60"
-        >
-          {portalLoading ? 'Opening…' : 'Manage Subscription'}
-        </button>
+      <section className="bg-gray-50/50 border border-gray-200 rounded-xl p-6">
+        <h2 className="text-base font-semibold text-gray-900">Pro Plan</h2>
+        <p className="mt-1 text-sm text-gray-600">{renewalText}</p>
       </section>
 
       {/* Payment Method */}
