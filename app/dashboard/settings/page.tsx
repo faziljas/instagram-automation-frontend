@@ -301,20 +301,28 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
           </button>
         )}
 
-        {isCancelled && currentPeriodEnd && (
+        {isCancelled && (
           <div className="mt-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
             <p className="font-semibold mb-1">Subscription Cancelled</p>
             <p>Your subscription has been successfully canceled.</p>
             <p>
-              You will continue to have full access to <span className="font-semibold">Pro</span> features until{' '}
-              <span className="font-semibold">
-                {currentPeriodEnd.toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                })}
-              </span>
-              .
+              You will continue to have full access to <span className="font-semibold">Pro</span> features
+              {currentPeriodEnd ? (
+                <>
+                  {' '}
+                  until{' '}
+                  <span className="font-semibold">
+                    {currentPeriodEnd.toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                  </span>
+                  .
+                </>
+              ) : (
+                ' until the end of your current billing period.'
+              )}
             </p>
             <p>You will not be charged again.</p>
           </div>
