@@ -166,8 +166,9 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
     );
   }
 
-  const isCancelled =
-    subscription.status === 'cancelled' && subscription.cancellation_end_date;
+  // Treat subscription as cancelled as soon as backend marks status='cancelled'.
+  // cancellation_end_date is nice to have for messaging, but should not block UI state.
+  const isCancelled = subscription.status === 'cancelled';
 
   // Pro (or higher) layout
   return (
