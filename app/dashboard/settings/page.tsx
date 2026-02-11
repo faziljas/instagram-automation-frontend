@@ -337,7 +337,7 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
 
 export default function SettingsPage() {
   const router = useRouter();
-  const { updateUser, logout } = useAuth();
+  const { updateUser, logout, supabaseUser } = useAuth();
   const { data: user, isLoading } = useFetch<User>('/users/me');
   const {
     data: subscription,
@@ -375,6 +375,8 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<'general' | 'security' | 'notifications' | 'billing'>('general');
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const isGoogleUser = !!supabaseUser && supabaseUser.app_metadata?.provider === 'google';
 
   // Pre-fill profile form with user data
   useEffect(() => {
@@ -750,99 +752,124 @@ export default function SettingsPage() {
     </div>
   );
 
-  const renderSecurityContent = () => (
-    <div className="space-y-8">
-      <div>
-        <h2 className="text-xl font-semibold text-gray-900">Security</h2>
-        <p className="mt-1 text-sm text-gray-500">Update your password to keep your account secure.</p>
+  const renderSecurityContent = () => {
+    if (isGoogleUser) {
+      return (
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900">Security</h2>
+            <p className="mt-1 text-sm text-gray-500">
+              Your account is managed by Google. To keep your account secure, continue using the
+              {' '}
+              <span className="font-semibold">Sign in with Google</span>
+              {' '}
+              option on the login page.
+            </p>
+          </div>
+          <div className="rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 text-sm text-yellow-800">
+            Password changes for Google sign-in accounts are managed through your Google Account.
+            LogicDM does not store a password for this login, so changing it here is disabled.
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-8">
+        <div>
+          <h2 className="text-xl font-semibold text-gray-900">Security</h2>
+          <p className="mt-1 text-sm text-gray-500">Update your password to keep your account secure.</p>
+        </div>
+
+        <section>
+          <form onSubmit={handlePasswordSubmit} className="space-y-6 max-w-lg">
+            <div>
+              <label htmlFor="oldPassword" className="block text-sm font-medium text-gray-700">
+                Current Password
+              </label>
+              <input
+                id="oldPassword"
+                name="oldPassword"
+                type="password"
+                required
+                value={passwordData.oldPassword}
+                onChange={handlePasswordChange}
+                className={`mt-1 block w-full rounded-lg border-none bg-white px-3 py-2 text-sm text-gray-900 shadow-sm ring-1 ${
+                  passwordErrors.oldPassword ? 'ring-red-500 focus:ring-red-500' : 'ring-gray-200 focus:ring-blue-500'
+                } focus:outline-none focus:ring-2`}
+              />
+              {passwordErrors.oldPassword && (
+                <p className="mt-1 text-xs text-red-600">{passwordErrors.oldPassword}</p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700">
+                New Password
+              </label>
+              <input
+                id="newPassword"
+                name="newPassword"
+                type="password"
+                required
+                value={passwordData.newPassword}
+                onChange={handlePasswordChange}
+                className={`mt-1 block w-full rounded-lg border-none bg-white px-3 py-2 text-sm text-gray-900 shadow-sm ring-1 ${
+                  passwordErrors.newPassword ? 'ring-red-500 focus:ring-red-500' : 'ring-gray-200 focus:ring-blue-500'
+                } focus:outline-none focus:ring-2`}
+              />
+              {passwordErrors.newPassword && (
+                <p className="mt-1 text-xs text-red-600">{passwordErrors.newPassword}</p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                Confirm New Password
+              </label>
+              <input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                required
+                value={passwordData.confirmPassword}
+                onChange={handlePasswordChange}
+                className={`mt-1 block w-full rounded-lg border-none bg-white px-3 py-2 text-sm text-gray-900 shadow-sm ring-1 ${
+                  passwordErrors.confirmPassword
+                    ? 'ring-red-500 focus:ring-red-500'
+                    : 'ring-gray-200 focus:ring-blue-500'
+                } focus:outline-none focus:ring-2`}
+              />
+              {passwordErrors.confirmPassword && (
+                <p className="mt-1 text-xs text-red-600">{passwordErrors.confirmPassword}</p>
+              )}
+            </div>
+
+            {passwordError && (
+              <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {passwordError.message}
+              </div>
+            )}
+            {passwordSuccess && (
+              <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+                Password changed successfully.
+              </div>
+            )}
+
+            <div className="flex justify-end">
+              <button
+                type="submit"
+                disabled={passwordLoading}
+                className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 disabled:opacity-60"
+              >
+                {passwordLoading ? 'Updating…' : 'Update Password'}
+              </button>
+            </div>
+          </form>
+        </section>
       </div>
-
-      <section>
-        <form onSubmit={handlePasswordSubmit} className="space-y-6 max-w-lg">
-          <div>
-            <label htmlFor="oldPassword" className="block text-sm font-medium text-gray-700">
-              Current Password
-            </label>
-            <input
-              id="oldPassword"
-              name="oldPassword"
-              type="password"
-              required
-              value={passwordData.oldPassword}
-              onChange={handlePasswordChange}
-              className={`mt-1 block w-full rounded-lg border-none bg-white px-3 py-2 text-sm text-gray-900 shadow-sm ring-1 ${
-                passwordErrors.oldPassword ? 'ring-red-500 focus:ring-red-500' : 'ring-gray-200 focus:ring-blue-500'
-              } focus:outline-none focus:ring-2`}
-            />
-            {passwordErrors.oldPassword && (
-              <p className="mt-1 text-xs text-red-600">{passwordErrors.oldPassword}</p>
-            )}
-          </div>
-
-          <div>
-            <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700">
-              New Password
-            </label>
-            <input
-              id="newPassword"
-              name="newPassword"
-              type="password"
-              required
-              value={passwordData.newPassword}
-              onChange={handlePasswordChange}
-              className={`mt-1 block w-full rounded-lg border-none bg-white px-3 py-2 text-sm text-gray-900 shadow-sm ring-1 ${
-                passwordErrors.newPassword ? 'ring-red-500 focus:ring-red-500' : 'ring-gray-200 focus:ring-blue-500'
-              } focus:outline-none focus:ring-2`}
-            />
-            {passwordErrors.newPassword && (
-              <p className="mt-1 text-xs text-red-600">{passwordErrors.newPassword}</p>
-            )}
-          </div>
-
-          <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-              Confirm New Password
-            </label>
-            <input
-              id="confirmPassword"
-              name="confirmPassword"
-              type="password"
-              required
-              value={passwordData.confirmPassword}
-              onChange={handlePasswordChange}
-              className={`mt-1 block w-full rounded-lg border-none bg-white px-3 py-2 text-sm text-gray-900 shadow-sm ring-1 ${
-                passwordErrors.confirmPassword ? 'ring-red-500 focus:ring-red-500' : 'ring-gray-200 focus:ring-blue-500'
-              } focus:outline-none focus:ring-2`}
-            />
-            {passwordErrors.confirmPassword && (
-              <p className="mt-1 text-xs text-red-600">{passwordErrors.confirmPassword}</p>
-            )}
-          </div>
-
-          {passwordError && (
-            <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-              {passwordError.message}
-            </div>
-          )}
-          {passwordSuccess && (
-            <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
-              Password changed successfully.
-            </div>
-          )}
-
-          <div className="flex justify-end">
-            <button
-              type="submit"
-              disabled={passwordLoading}
-              className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 disabled:opacity-60"
-            >
-              {passwordLoading ? 'Updating…' : 'Update Password'}
-            </button>
-          </div>
-        </form>
-      </section>
-    </div>
-  );
+    );
+  };
 
   const renderNotificationsContent = () => (
     <div className="space-y-4">
