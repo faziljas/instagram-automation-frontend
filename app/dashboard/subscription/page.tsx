@@ -47,7 +47,19 @@ const PLAN_FEATURES: Record<string, string[]> = {
 export default function SubscriptionPage() {
   const router = useRouter();
   const { session } = useAuth();
-  const { data: subscriptionData, isLoading, mutate: refetchSubscription } = useFetch<SubscriptionResponse>('/users/subscription');
+  const { data: subscriptionData, isLoading, mutate: refetchSubscription } = useFetch<SubscriptionResponse>('/users/subscription', {
+    // Retry on 404 errors for new users (user might be auto-created on retry)
+    onErrorRetry: (error, key, config, revalidate, { retryCount }) => {
+      // Retry up to 3 times for 404 errors (new user race condition)
+      if (error?.response?.status === 404 && retryCount < 3) {
+        // Wait 1 second before retrying to allow backend to auto-create user
+        setTimeout(() => revalidate({ retryCount }), 1000);
+      }
+      // Don't retry other errors or after max retries
+    },
+    errorRetryCount: 3,
+    errorRetryInterval: 1000,
+  });
   const { execute: cancelSubscription, loading: cancelLoading } = usePost();
   const { execute: createCheckoutSession, loading: checkoutLoading } = usePost();
   const [showCancelModal, setShowCancelModal] = useState(false);
@@ -295,6 +307,18 @@ export default function SubscriptionPage() {
           router.push('/login?redirect=/dashboard/subscription');
         }, 2000);
         return;
+      }
+      
+      // If subscription data hasn't loaded yet, refetch it first
+      // This ensures user exists in backend before creating checkout session
+      if (!subscriptionData) {
+        console.log('🔄 Subscription data not loaded, refetching before upgrade...');
+        try {
+          await refetchSubscription(undefined, { revalidate: true });
+        } catch (refetchError) {
+          console.warn('⚠️ Failed to refetch subscription data:', refetchError);
+          // Continue anyway - backend will handle missing user
+        }
       }
       
       console.log('🔄 Creating Stripe checkout session...');
