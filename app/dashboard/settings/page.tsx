@@ -286,9 +286,12 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
       {/* Cancellation */}
       <section className="space-y-3 border-t border-gray-100 pt-5">
         <h3 className="text-sm font-semibold text-gray-900">Cancellation</h3>
-        <p className="text-sm text-gray-500">
-          You can cancel your plan at any time. Your access will continue until the end of the billing period.
-        </p>
+
+        {!isCancelled && (
+          <p className="text-sm text-gray-500">
+            You can cancel your plan at any time. Your access will continue until the end of the billing period.
+          </p>
+        )}
 
         {!isCancelled && (
           <button
