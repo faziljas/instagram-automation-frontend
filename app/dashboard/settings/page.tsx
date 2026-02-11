@@ -568,8 +568,8 @@ export default function SettingsPage() {
 
   const confirmCancelSubscription = async () => {
     try {
-      setShowCancelConfirmModal(false);
       await cancelSubscription('/api/dodo/cancel-subscription', {});
+      setShowCancelConfirmModal(false);
       alert(
         'Your subscription has been canceled. You will retain access to Pro features until the end of your current billing period.'
       );
@@ -578,6 +578,7 @@ export default function SettingsPage() {
     } catch (error) {
       console.error('Failed to cancel subscription from Settings:', error);
       alert('Unable to cancel your subscription right now. Please try again or contact support.');
+      // Keep modal open on error so user can try again if needed
     }
   };
 
@@ -993,7 +994,7 @@ export default function SettingsPage() {
           <div className="flex items-center justify-center min-h-screen px-4">
             <div
               className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-              onClick={() => setShowCancelConfirmModal(false)}
+              onClick={() => !cancelLoading && setShowCancelConfirmModal(false)}
             />
             <div className="relative bg-white rounded-2xl px-6 pt-6 pb-6 text-center shadow-2xl sm:p-8 max-w-md border-2 border-gray-200">
               <div className="mx-auto flex items-center justify-center h-14 w-14 rounded-full bg-gradient-to-br from-orange-100 to-amber-100 mb-4">
@@ -1008,7 +1009,8 @@ export default function SettingsPage() {
               <div className="mt-6 flex justify-center space-x-4">
                 <button
                   onClick={() => setShowCancelConfirmModal(false)}
-                  className="px-6 py-3 text-sm font-bold text-gray-700 bg-white border-2 border-gray-300 rounded-xl hover:bg-gray-50 transition-all duration-200"
+                  disabled={cancelLoading}
+                  className="px-6 py-3 text-sm font-bold text-gray-700 bg-white border-2 border-gray-300 rounded-xl hover:bg-gray-50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   No, Keep Subscription
                 </button>
