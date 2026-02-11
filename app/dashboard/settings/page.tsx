@@ -360,6 +360,7 @@ export default function SettingsPage() {
   const [passwordSuccess, setPasswordSuccess] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showCancelConfirmModal, setShowCancelConfirmModal] = useState(false);
+  const [localCancelled, setLocalCancelled] = useState(false);
   const [activeTab, setActiveTab] = useState<'general' | 'security' | 'notifications' | 'billing'>('general');
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -570,6 +571,7 @@ export default function SettingsPage() {
     try {
       await cancelSubscription('/api/dodo/cancel-subscription', {});
       setShowCancelConfirmModal(false);
+      setLocalCancelled(true);
       alert(
         'Your subscription has been canceled. You will retain access to Pro features until the end of your current billing period.'
       );
@@ -842,10 +844,19 @@ export default function SettingsPage() {
   );
 
   const renderBillingContent = () => {
+    // Optimistic UI: if we've just successfully requested cancellation in this
+    // session, treat the subscription as cancelled even if the backend still
+    // reports `status: "active"` (e.g. due to eventual consistency or delayed
+    // webhooks). This ensures the first successful cancel click updates the UI.
+    const effectiveSubscription =
+      subscription && (localCancelled || subscription.status === 'cancelled')
+        ? { ...subscription, status: 'cancelled' as const }
+        : subscription;
+
     return (
       <BillingSettings
         isLoading={isSubscriptionLoading}
-        subscription={subscription}
+        subscription={effectiveSubscription}
         invoices={invoices}
         invoicesLoading={isInvoicesLoading}
         onUpgrade={handleUpgradeClick}
