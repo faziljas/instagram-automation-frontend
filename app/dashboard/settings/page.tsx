@@ -358,6 +358,7 @@ export default function SettingsPage() {
   const [profileSuccess, setProfileSuccess] = useState(false);
   const [passwordSuccess, setPasswordSuccess] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showCancelConfirmModal, setShowCancelConfirmModal] = useState(false);
   const [activeTab, setActiveTab] = useState<'general' | 'security' | 'notifications' | 'billing'>('general');
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -559,8 +560,14 @@ export default function SettingsPage() {
     }
   };
 
-  const handleCancelSubscription = async () => {
+  const handleCancelSubscription = () => {
+    // Show confirmation dialog first
+    setShowCancelConfirmModal(true);
+  };
+
+  const confirmCancelSubscription = async () => {
     try {
+      setShowCancelConfirmModal(false);
       await cancelSubscription('/api/dodo/cancel-subscription', {});
       alert(
         'Your subscription has been canceled. You will retain access to Pro features until the end of your current billing period.'
@@ -972,6 +979,44 @@ export default function SettingsPage() {
                   className="px-6 py-3 text-sm font-bold text-white bg-gradient-to-r from-red-600 to-rose-600 rounded-xl hover:from-red-700 hover:to-rose-700 disabled:opacity-50 transition-all duration-200 hover:scale-105"
                 >
                   {deleteLoading ? 'Deleting...' : 'Delete Account'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Cancel Subscription Confirmation Modal */}
+      {showCancelConfirmModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen px-4">
+            <div
+              className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+              onClick={() => setShowCancelConfirmModal(false)}
+            />
+            <div className="relative bg-white rounded-2xl px-6 pt-6 pb-6 text-center shadow-2xl sm:p-8 max-w-md border-2 border-gray-200">
+              <div className="mx-auto flex items-center justify-center h-14 w-14 rounded-full bg-gradient-to-br from-orange-100 to-amber-100 mb-4">
+                <ExclamationTriangleIcon className="h-7 w-7 text-orange-600" />
+              </div>
+              <div className="mt-3">
+                <h3 className="text-xl font-bold text-gray-900">Cancel Subscription</h3>
+                <p className="mt-2 text-sm font-medium text-gray-600">
+                  Are you sure you want to cancel your subscription? You will retain access to Pro features until the end of your current billing period, but your subscription will not renew.
+                </p>
+              </div>
+              <div className="mt-6 flex justify-center space-x-4">
+                <button
+                  onClick={() => setShowCancelConfirmModal(false)}
+                  className="px-6 py-3 text-sm font-bold text-gray-700 bg-white border-2 border-gray-300 rounded-xl hover:bg-gray-50 transition-all duration-200"
+                >
+                  No, Keep Subscription
+                </button>
+                <button
+                  onClick={confirmCancelSubscription}
+                  disabled={cancelLoading}
+                  className="px-6 py-3 text-sm font-bold text-white bg-gradient-to-r from-orange-600 to-amber-600 rounded-xl hover:from-orange-700 hover:to-amber-700 disabled:opacity-50 transition-all duration-200 hover:scale-105"
+                >
+                  {cancelLoading ? 'Canceling...' : 'Yes, Cancel Subscription'}
                 </button>
               </div>
             </div>
