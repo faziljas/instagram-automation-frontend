@@ -28,10 +28,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Sync user to backend database
   const syncUserToBackend = async (supabaseUser: SupabaseUser) => {
     try {
+      // Extract name from Supabase user metadata (Google OAuth provides this)
+      const firstName = supabaseUser.user_metadata?.first_name || 
+                       supabaseUser.user_metadata?.full_name?.split(' ')[0] ||
+                       supabaseUser.user_metadata?.name?.split(' ')[0] ||
+                       null;
+      const lastName = supabaseUser.user_metadata?.last_name ||
+                      (supabaseUser.user_metadata?.full_name?.split(' ').slice(1).join(' ') || null) ||
+                      (supabaseUser.user_metadata?.name?.split(' ').slice(1).join(' ') || null) ||
+                      null;
+      
       // Call backend endpoint to sync/create user
       await post('/auth/sync-user', {
         id: supabaseUser.id,
         email: supabaseUser.email,
+        first_name: firstName,
+        last_name: lastName,
       });
     } catch (error) {
       console.error('Failed to sync user to backend:', error);
