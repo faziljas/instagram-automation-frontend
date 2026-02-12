@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { User as SupabaseUser, Session } from '@supabase/supabase-js';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { User } from '@/types';
-import { post } from '@/utils/api';
+import { post, get } from '@/utils/api';
 
 interface AuthContextType {
   user: User | null;
@@ -62,24 +62,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // First sync user to backend
       await syncUserToBackend(supabaseUser);
 
-      // Then fetch user data from backend using Supabase token
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/me`, {
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-        },
-      });
-
-      if (response.ok) {
-        const userData = await response.json();
-        setUser(userData);
-      } else {
-        // If backend user doesn't exist yet, create a minimal user object
-        setUser({
-          id: supabaseUser.id,
-          email: supabaseUser.email || '',
-          plan_tier: 'free',
-        });
-      }
+      // Then fetch user data from backend using API utility (handles transformation)
+      const userData = await get<User>('/users/me');
+      setUser(userData);
     } catch (error) {
       console.error('Failed to fetch user:', error);
       // Fallback to minimal user object

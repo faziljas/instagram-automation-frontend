@@ -389,12 +389,12 @@ export default function SettingsPage() {
     }
   }, [user]);
 
-  // Load stored avatar (local-only persistence for now)
+  // Load avatar from user profile (backend)
   useEffect(() => {
-    if (typeof window === 'undefined' || !user) return;
-    const stored = window.localStorage.getItem(`logicdm_avatar_${user.id}`);
-    if (stored) {
-      setAvatarPreview(stored);
+    if (user?.profilePictureUrl) {
+      setAvatarPreview(user.profilePictureUrl);
+    } else {
+      setAvatarPreview(null);
     }
   }, [user]);
 
@@ -440,11 +440,18 @@ export default function SettingsPage() {
     // Submit profile update
     try {
       // Convert camelCase to snake_case for backend
-      const response = await updateProfile('/users/me', {
+      const updatePayload: any = {
         first_name: profileData.firstName,
         last_name: profileData.lastName,
         email: profileData.email,
-      });
+      };
+      
+      // Include profile picture if it exists
+      if (avatarPreview) {
+        updatePayload.profile_picture_url = avatarPreview;
+      }
+      
+      const response = await updateProfile('/users/me', updatePayload);
       if (response) {
         // Update auth context with new user data
         updateUser(response as User);
@@ -532,24 +539,52 @@ export default function SettingsPage() {
     }
 
     const reader = new FileReader();
-    reader.onloadend = () => {
+    reader.onloadend = async () => {
       const result = typeof reader.result === 'string' ? reader.result : null;
       if (!result) return;
       setAvatarPreview(result);
-      if (typeof window !== 'undefined' && user) {
-        window.localStorage.setItem(`logicdm_avatar_${user.id}`, result);
+      
+      // Save to backend instead of localStorage
+      if (user) {
+        try {
+          const response = await updateProfile('/users/me', {
+            profile_picture_url: result,
+          });
+          if (response) {
+            updateUser(response as User);
+            mutate('/users/me');
+          }
+        } catch (error) {
+          console.error('Failed to save profile picture:', error);
+          // Revert preview on error
+          setAvatarPreview(user.profilePictureUrl || null);
+        }
       }
     };
     reader.readAsDataURL(file);
   };
 
-  const handleAvatarRemove = () => {
+  const handleAvatarRemove = async () => {
     setAvatarPreview(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-    if (typeof window !== 'undefined' && user) {
-      window.localStorage.removeItem(`logicdm_avatar_${user.id}`);
+    
+    // Remove from backend
+    if (user) {
+      try {
+        const response = await updateProfile('/users/me', {
+          profile_picture_url: null,
+        });
+        if (response) {
+          updateUser(response as User);
+          mutate('/users/me');
+        }
+      } catch (error) {
+        console.error('Failed to remove profile picture:', error);
+        // Revert preview on error
+        setAvatarPreview(user.profilePictureUrl || null);
+      }
     }
   };
 

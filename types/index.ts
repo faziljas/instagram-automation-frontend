@@ -4,6 +4,7 @@ export interface User {
   email: string;
   firstName?: string;
   lastName?: string;
+  profilePictureUrl?: string;
   plan_tier?: string;
   is_active?: boolean;
   is_verified?: boolean;

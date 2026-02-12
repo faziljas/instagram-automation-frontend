@@ -130,13 +130,25 @@ api.interceptors.response.use(
 // Transform snake_case to camelCase for user objects
 function transformUserResponse(data: any): any {
   if (data && typeof data === 'object') {
+    const transformed: any = { ...data };
+    
+    // Transform user fields
     if (data.first_name !== undefined || data.last_name !== undefined) {
-      return {
-        ...data,
-        firstName: data.first_name,
-        lastName: data.last_name,
-      };
+      transformed.firstName = data.first_name;
+      transformed.lastName = data.last_name;
     }
+    
+    // Transform profile picture URL
+    if (data.profile_picture_url !== undefined) {
+      transformed.profilePictureUrl = data.profile_picture_url;
+    }
+    
+    // Convert id from number to string for frontend consistency
+    if (data.id !== undefined && typeof data.id === 'number') {
+      transformed.id = String(data.id);
+    }
+    
+    return transformed;
   }
   return data;
 }
