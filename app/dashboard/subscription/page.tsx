@@ -48,16 +48,22 @@ export default function SubscriptionPage() {
   const router = useRouter();
   const { session } = useAuth();
   const { data: subscriptionData, isLoading, mutate: refetchSubscription } = useFetch<SubscriptionResponse>('/users/subscription', {
-    // Retry on 404 errors for new users (user might be auto-created on retry)
+    // Retry on 404 and 500 errors for new users (user might be auto-created on retry)
     onErrorRetry: (error, key, config, revalidate, { retryCount }) => {
-      // Retry up to 3 times for 404 errors (new user race condition)
-      if (error?.response?.status === 404 && retryCount < 3) {
-        // Wait 1 second before retrying to allow backend to auto-create user
-        setTimeout(() => revalidate({ retryCount }), 1000);
+      const status = error?.response?.status;
+      const maxRetries = 5; // Increased retries for new user creation
+      
+      // Retry on 404 (user not found) or 500 (user creation failed) errors
+      if ((status === 404 || status === 500) && retryCount < maxRetries) {
+        // Wait progressively longer before retrying (exponential backoff)
+        const delay = Math.min(1000 * Math.pow(2, retryCount), 5000);
+        console.log(`[Subscription] Retrying after ${delay}ms (attempt ${retryCount + 1}/${maxRetries})`);
+        setTimeout(() => revalidate({ retryCount }), delay);
+        return;
       }
       // Don't retry other errors or after max retries
     },
-    errorRetryCount: 3,
+    errorRetryCount: 5,
     errorRetryInterval: 1000,
   });
   const { execute: cancelSubscription, loading: cancelLoading } = usePost();

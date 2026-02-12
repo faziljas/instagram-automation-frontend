@@ -64,7 +64,26 @@ export default function AnalyticsPage() {
   const [leadsPage, setLeadsPage] = useState(1);
   const [leadsPageSize, setLeadsPageSize] = useState(50);
   const { data, error, isLoading, mutate } = useFetch<AnalyticsSummary>(
-    `/api/analytics/dashboard?days=${days}`
+    `/api/analytics/dashboard?days=${days}`,
+    {
+      // Retry on 404 and 500 errors for new users (user might be auto-created on retry)
+      onErrorRetry: (error, key, config, revalidate, { retryCount }) => {
+        const status = error?.response?.status;
+        const maxRetries = 5; // Increased retries for new user creation
+        
+        // Retry on 404 (user not found) or 500 (user creation failed) errors
+        if ((status === 404 || status === 500) && retryCount < maxRetries) {
+          // Wait progressively longer before retrying (exponential backoff)
+          const delay = Math.min(1000 * Math.pow(2, retryCount), 5000);
+          console.log(`[Analytics] Retrying after ${delay}ms (attempt ${retryCount + 1}/${maxRetries})`);
+          setTimeout(() => revalidate({ retryCount }), delay);
+          return;
+        }
+        // Don't retry other errors or after max retries
+      },
+      errorRetryCount: 5,
+      errorRetryInterval: 1000,
+    }
   );
   const { data: leadsData } = useFetch<Lead[]>('/api/leads');
   const allLeads = leadsData || [];
