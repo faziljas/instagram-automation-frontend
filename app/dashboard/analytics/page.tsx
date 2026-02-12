@@ -90,7 +90,8 @@ export default function AnalyticsPage() {
     }
   );
   const { data: leadsData } = useFetch<Lead[]>('/api/leads');
-  const allLeads = leadsData || [];
+  // Ensure leadsData is always an array - handle cases where API returns error object
+  const allLeads = Array.isArray(leadsData) ? leadsData : [];
   const totalLeads = allLeads.length;
   const totalPages = Math.max(1, Math.ceil(totalLeads / leadsPageSize));
   const recentLeads = allLeads.slice((leadsPage - 1) * leadsPageSize, leadsPage * leadsPageSize);
@@ -194,7 +195,8 @@ export default function AnalyticsPage() {
   ];
 
   // Use real daily breakdown data from API
-  const rawBreakdown = data?.daily_breakdown || [];
+  // Ensure daily_breakdown is always an array - handle cases where API returns error object
+  const rawBreakdown = Array.isArray(data?.daily_breakdown) ? data.daily_breakdown : [];
   // For 90 days, 90 bars are too narrow and break layout. Bucket into weeks (max ~13 bars).
   const activityData =
     days > 30
@@ -447,7 +449,7 @@ export default function AnalyticsPage() {
         ) : (
           <Table
             columns={tableColumns}
-            data={data?.top_posts || []}
+            data={Array.isArray(data?.top_posts) ? data.top_posts : []}
             keyExtractor={(item) => item.media_id}
             emptyMessage="No posts have been triggered yet. Create automation rules to start tracking performance."
           />
