@@ -110,14 +110,16 @@ export default function DashboardPage() {
   const timeSavedHours = totalDMs > 0 ? Math.ceil((totalDMs * 2) / 60) : 0;
 
   // Process daily breakdown for chart (last 7 days)
-  const dailyBreakdown = analyticsData?.daily_breakdown || [];
+  // Ensure daily_breakdown is always an array - handle cases where API returns error object
+  const dailyBreakdown = Array.isArray(analyticsData?.daily_breakdown) ? analyticsData.daily_breakdown : [];
   const maxDailyTotal = Math.max(...dailyBreakdown.map((d) => d.total), 1);
   const engagementData = dailyBreakdown.map((day) =>
     maxDailyTotal > 0 ? (day.total / maxDailyTotal) * 100 : 0
   );
 
   // Recent activity from leads (show when leads were captured)
-  const recentLeads = (leadsData || []).slice(0, 5);
+  // Ensure leadsData is always an array - handle cases where API returns error object
+  const recentLeads = Array.isArray(leadsData) ? leadsData.slice(0, 5) : [];
   const recentActivity = recentLeads.map((lead) => ({
     id: lead.id,
     username: lead.email?.split('@')[0] || lead.name || 'Anonymous',
@@ -126,15 +128,18 @@ export default function DashboardPage() {
   }));
 
   // Top posts from analytics API
-  const topPosts = (analyticsData?.top_posts || []).slice(0, 3).map((post) => ({
-    id: post.media_id,
-    caption: post.permalink
-      ? `View on ${post.media_type === 'STORY' ? 'Story' : 'Instagram'}`
-      : `Media ${post.media_id.substring(0, 18)}...`,
-    dms: post.dms_count,
-    media_url: post.media_url,
-    media_type: post.media_type,
-  }));
+  // Ensure top_posts is always an array - handle cases where API returns error object
+  const topPosts = Array.isArray(analyticsData?.top_posts) 
+    ? analyticsData.top_posts.slice(0, 3).map((post) => ({
+        id: post.media_id,
+        caption: post.permalink
+          ? `View on ${post.media_type === 'STORY' ? 'Story' : 'Instagram'}`
+          : `Media ${post.media_id.substring(0, 18)}...`,
+        dms: post.dms_count,
+        media_url: post.media_url,
+        media_type: post.media_type,
+      }))
+    : [];
 
   const formatTimeAgo = (isoDate: string) => {
     const created = new Date(isoDate);
