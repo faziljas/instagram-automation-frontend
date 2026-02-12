@@ -225,7 +225,7 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
                   </td>
                 </tr>
               )}
-              {!invoicesLoading && (!invoices || invoices.length === 0) && (
+              {!invoicesLoading && invoices.length === 0 && (
                 <tr>
                   <td colSpan={4} className="px-6 py-4 text-sm text-gray-500">
                     No invoices available yet.
@@ -233,7 +233,7 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
                 </tr>
               )}
               {!invoicesLoading &&
-                invoices &&
+                invoices.length > 0 &&
                 invoices.map((inv) => (
                   <tr key={inv.id}>
                     <td className="px-6 py-3 text-gray-900">
