@@ -920,14 +920,24 @@ export default function SettingsPage() {
   );
 
   const renderBillingContent = () => {
+    // Ensure subscription is a valid object (not an error response)
+    // Check if subscription has required properties to determine if it's valid
+    const isValidSubscription = subscription && 
+                                 typeof subscription === 'object' && 
+                                 'plan_tier' in subscription &&
+                                 'status' in subscription;
+    
+    // Use valid subscription or undefined
+    const validSubscription = isValidSubscription ? subscription : undefined;
+    
     // Optimistic UI: if we've just successfully requested cancellation in this
     // session, treat the subscription as cancelled even if the backend still
     // reports `status: "active"` (e.g. due to eventual consistency or delayed
     // webhooks). This ensures the first successful cancel click updates the UI.
     const effectiveSubscription =
-      subscription && (localCancelled || subscription.status === 'cancelled')
-        ? { ...subscription, status: 'cancelled' as const }
-        : subscription;
+      validSubscription && (localCancelled || validSubscription.status === 'cancelled')
+        ? { ...validSubscription, status: 'cancelled' as const }
+        : validSubscription;
 
     return (
       <BillingSettings
