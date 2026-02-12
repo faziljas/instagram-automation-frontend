@@ -344,9 +344,12 @@ export default function SettingsPage() {
     isLoading: isSubscriptionLoading,
   } = useFetch<SubscriptionSummary>('/users/subscription');
   const {
-    data: invoices,
+    data: invoicesData,
     isLoading: isInvoicesLoading,
   } = useFetch<Invoice[]>('/users/invoices');
+  
+  // Ensure invoices is always an array - handle cases where API returns error object
+  const invoices = Array.isArray(invoicesData) ? invoicesData : [];
   const { execute: updateProfile, loading: profileLoading, error: profileError } = usePut();
   const { execute: updatePassword, loading: passwordLoading, error: passwordError } = usePut();
   const { execute: deleteAccount, loading: deleteLoading } = useDelete();
