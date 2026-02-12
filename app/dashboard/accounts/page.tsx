@@ -36,8 +36,11 @@ const PLAN_LIMITS: Record<string, { accounts: number; rules: number; dms: number
 };
 
 export default function AccountsPage() {
-  const { data: accounts, isLoading } = useFetch<InstagramAccountResponse[]>('/users/me/accounts');
+  const { data: accountsData, isLoading } = useFetch<InstagramAccountResponse[]>('/users/me/accounts');
   const { data: subscriptionData } = useFetch<SubscriptionResponse>('/users/subscription');
+  
+  // Ensure accounts is always an array - handle cases where API returns error object
+  const accounts = Array.isArray(accountsData) ? accountsData : [];
   const { execute: deleteAccount, loading: deleteLoading } = useDelete();
   const { loading: connectLoading } = usePost();
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
