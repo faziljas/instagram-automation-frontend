@@ -38,6 +38,7 @@ function LoginPageContent() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [infoMessage, setInfoMessage] = useState<string | null>(null);
   
   // Signup form state
   const [formData, setFormData] = useState<RegisterFormData>({
@@ -63,6 +64,7 @@ function LoginPageContent() {
   const handleGoogleAuth = async (isSignup: boolean = false) => {
     setIsGoogleLoading(true);
     setError(null);
+    setInfoMessage(null);
     try {
       const currentOrigin = typeof window !== 'undefined' ? window.location.origin : '';
       const redirectTo = `${currentOrigin}/dashboard`;
@@ -92,6 +94,7 @@ function LoginPageContent() {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
+    setInfoMessage(null);
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -119,6 +122,7 @@ function LoginPageContent() {
     e.preventDefault();
     setSignupErrors({});
     setError(null);
+    setInfoMessage(null);
 
     const result = registerSchema.safeParse(formData);
     if (!result.success) {
@@ -158,7 +162,7 @@ function LoginPageContent() {
       }
 
       if (data.user && !data.session) {
-        setError('Please check your email to confirm your account.');
+        setInfoMessage('Please check your email to confirm your account.');
         setIsLoading(false);
         return;
       }
