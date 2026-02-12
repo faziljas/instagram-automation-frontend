@@ -7,7 +7,7 @@ import { useFetch } from '@/hooks/useFetch';
 import { usePut, useDelete, usePost } from '@/hooks/useApi';
 import { useAuth } from '@/hooks/useAuth';
 import { User } from '@/types';
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { ExclamationTriangleIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import { mutate } from 'swr';
 
 // Zod validation schemas
@@ -59,11 +59,14 @@ interface BillingSettingsProps {
   subscription: SubscriptionSummary | undefined;
   invoices: Invoice[] | undefined;
   invoicesLoading: boolean;
+  invoicesError: Error | undefined;
   onUpgrade: () => void;
   onCancelPlan: () => void;
   cancelLoading: boolean;
   onOpenInvoicePortal: () => void;
   portalLoading: boolean;
+  onSyncInvoices: () => void;
+  syncInvoicesLoading: boolean;
 }
 
 const BillingSettings: React.FC<BillingSettingsProps> = ({
@@ -71,11 +74,14 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
   subscription,
   invoices,
   invoicesLoading,
+  invoicesError,
   onUpgrade,
   onCancelPlan,
   portalLoading,
   cancelLoading,
   onOpenInvoicePortal,
+  onSyncInvoices,
+  syncInvoicesLoading,
 }) => {
   if (isLoading) {
     return (
@@ -197,7 +203,18 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
 
       {/* Invoice and payment details */}
       <section className="space-y-3">
-        <h3 className="text-sm font-semibold text-gray-900">Invoice and payment details</h3>
+        <div className="flex items-center justify-between gap-3">
+          <h3 className="text-sm font-semibold text-gray-900">Invoice and payment details</h3>
+          <button
+            type="button"
+            onClick={onSyncInvoices}
+            disabled={syncInvoicesLoading || invoicesLoading}
+            className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            <ArrowPathIcon className={`h-4 w-4 ${syncInvoicesLoading ? 'animate-spin' : ''}`} />
+            {syncInvoicesLoading ? 'Syncing…' : 'Sync invoices'}
+          </button>
+        </div>
         <div className="overflow-hidden rounded-xl border border-gray-100 bg-white w-full">
           <div className="overflow-x-auto w-full">
             <table className="min-w-full divide-y divide-gray-100">
@@ -225,7 +242,21 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
                   </td>
                 </tr>
               )}
-              {!invoicesLoading && invoices.length === 0 && (
+              {!invoicesLoading && invoicesError && (
+                <tr>
+                  <td colSpan={4} className="px-6 py-4">
+                    <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+                      <ExclamationTriangleIcon className="h-5 w-5 shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-medium">Unable to load invoices</p>
+                        <p className="mt-1 text-amber-700">{invoicesError.message}</p>
+                        <p className="mt-2 text-xs">Try syncing invoices above or refresh the page.</p>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              )}
+              {!invoicesLoading && !invoicesError && invoices.length === 0 && (
                 <tr>
                   <td colSpan={4} className="px-6 py-4 text-sm text-gray-500">
                     No invoices available yet.
@@ -233,6 +264,7 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
                 </tr>
               )}
               {!invoicesLoading &&
+                !invoicesError &&
                 invoices.length > 0 &&
                 invoices.map((inv) => (
                   <tr key={inv.id}>
@@ -345,7 +377,9 @@ export default function SettingsPage() {
   } = useFetch<SubscriptionSummary>('/users/subscription');
   const {
     data: invoicesData,
+    error: invoicesError,
     isLoading: isInvoicesLoading,
+    mutate: mutateInvoices,
   } = useFetch<Invoice[]>('/users/invoices');
   
   // Ensure invoices is always an array - handle cases where API returns error object
@@ -355,6 +389,7 @@ export default function SettingsPage() {
   const { execute: deleteAccount, loading: deleteLoading } = useDelete();
   const { execute: createPortalSession, loading: portalLoading } = usePost();
   const { execute: cancelSubscription, loading: cancelLoading } = usePost();
+  const { execute: syncInvoices, loading: syncInvoicesLoading } = usePost();
 
   const [profileData, setProfileData] = useState<ProfileFormData>({
     firstName: '',
@@ -595,6 +630,17 @@ export default function SettingsPage() {
     router.push('/dashboard/subscription');
   };
 
+  const handleSyncInvoices = async () => {
+    try {
+      await syncInvoices('/api/dodo/sync-invoices', {});
+      // Refresh invoices list
+      await mutateInvoices(undefined, { revalidate: true });
+    } catch (error) {
+      console.error('Failed to sync invoices:', error);
+      alert(error instanceof Error ? error.message : 'Unable to sync invoices. Please try again.');
+    }
+  };
+
   const handleOpenStripePortal = async () => {
     try {
       const response = await createPortalSession('/api/dodo/create-portal-session', {});
@@ -603,6 +649,8 @@ export default function SettingsPage() {
         // simply close the tab to return to LogicDM settings.
         const portalUrl = response.portal_url as string;
         window.open(portalUrl, '_blank', 'noopener,noreferrer');
+        // Trigger revalidation so invoices refresh when user returns (SWR revalidateOnFocus also helps)
+        mutateInvoices(undefined, { revalidate: true });
       } else {
         console.error('No portal_url returned from Stripe portal session API', response);
         alert('Unable to open billing portal. Please try again or manage billing from the Subscription page.');
@@ -626,8 +674,9 @@ export default function SettingsPage() {
       alert(
         'Your subscription has been canceled. You will retain access to Pro features until the end of your current billing period.'
       );
-      // Refresh subscription data so the Billing tab stays in sync
+      // Refresh subscription and invoices so the Billing tab stays in sync
       mutate('/users/subscription');
+      mutateInvoices(undefined, { revalidate: true });
     } catch (error) {
       console.error('Failed to cancel subscription from Settings:', error);
       alert('Unable to cancel your subscription right now. Please try again or contact support.');
@@ -945,11 +994,14 @@ export default function SettingsPage() {
         subscription={effectiveSubscription}
         invoices={invoices}
         invoicesLoading={isInvoicesLoading}
+        invoicesError={invoicesError}
         onUpgrade={handleUpgradeClick}
         onCancelPlan={handleCancelSubscription}
         onOpenInvoicePortal={handleOpenStripePortal}
         portalLoading={portalLoading}
         cancelLoading={cancelLoading}
+        onSyncInvoices={handleSyncInvoices}
+        syncInvoicesLoading={syncInvoicesLoading}
       />
     );
   };
