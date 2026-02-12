@@ -97,21 +97,6 @@ export default function AccountsPage() {
   const isAccountLimitReached = limits.accounts !== -1 && accountsUsed >= limits.accounts;
 
   const handleConnectAccount = async () => {
-    // Check if this is the first time connecting (no accounts AND never connected before)
-    // Use localStorage to track if user has ever successfully connected an account
-    const hasAccounts = accounts && accounts.length > 0;
-    const hasConnectedBefore = localStorage.getItem('instagram_has_connected') === 'true';
-    
-    // If no accounts AND user has never connected before → redirect to connect page (first-time onboarding)
-    // If no accounts BUT user has connected before → use direct OAuth (user deleted accounts and wants to add again)
-    if (!hasAccounts && !hasConnectedBefore) {
-      // First time connecting - redirect to connect page for onboarding experience
-      console.log('🔄 First time connecting - redirecting to connect page');
-      window.location.href = '/dashboard/accounts/connect';
-      return;
-    }
-
-    // If accounts exist (user deleted and wants to add another), use direct OAuth flow
     // Clear any previous errors/success messages
     setConnectError(null);
     setConnectSuccess(null);
