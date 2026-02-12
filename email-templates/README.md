@@ -10,9 +10,16 @@ This directory contains custom email templates for Supabase authentication email
 
 ### 2. Update Email Verification Template
 1. Click on **"Confirm signup"** template
-2. Copy the contents of `verify-email.html`
-3. Paste it into the Supabase email template editor
-4. Save the template
+2. Copy the **entire contents** of `verify-email.html`
+3. Paste it into the Supabase email template editor (replace all existing content)
+4. **Important:** Make sure to click **Save** button
+5. **Test:** Send a test email to verify the button shows white background with black text
+
+**Note:** If the button still appears blue after updating:
+- Clear your browser cache
+- Check if Supabase saved the template correctly
+- Some email clients may cache old templates - wait a few minutes and try again
+- The template uses `!important` flags to ensure styles aren't overridden
 
 ### 3. Template Variables
 Supabase uses Go template syntax. The following variables are available:

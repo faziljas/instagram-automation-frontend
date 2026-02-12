@@ -174,13 +174,13 @@ function LoginPageContent() {
         setInfoMessage('Please check your email to confirm your account.');
         setIsLoading(false);
         
-        // Redirect to login view after 2 seconds
+        // Redirect to login view after 5 seconds (give user time to read the message)
         setTimeout(() => {
           setViewState('login');
           setInfoMessage(null);
           // Pre-fill email in login form for convenience
           setEmail(normalizedEmail);
-        }, 2000);
+        }, 5000);
         
         return;
       }
