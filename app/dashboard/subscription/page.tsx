@@ -50,21 +50,25 @@ export default function SubscriptionPage() {
   const { data: subscriptionData, isLoading, mutate: refetchSubscription } = useFetch<SubscriptionResponse>('/users/subscription', {
     // Retry on 404 and 500 errors for new users (user might be auto-created on retry)
     onErrorRetry: (error, key, config, revalidate, { retryCount }) => {
-      const status = error?.response?.status;
-      const maxRetries = 5; // Increased retries for new user creation
+      // Check error status from different possible error formats
+      const status = (error as any)?.response?.status || 
+                    (error as any)?.status ||
+                    (error?.message?.includes('404') ? 404 : 
+                     error?.message?.includes('500') ? 500 : null);
+      const maxRetries = 3; // Reduced retries to avoid long waits
       
       // Retry on 404 (user not found) or 500 (user creation failed) errors
       if ((status === 404 || status === 500) && retryCount < maxRetries) {
         // Wait progressively longer before retrying (exponential backoff)
-        const delay = Math.min(1000 * Math.pow(2, retryCount), 5000);
+        const delay = Math.min(500 * Math.pow(2, retryCount), 2000);
         console.log(`[Subscription] Retrying after ${delay}ms (attempt ${retryCount + 1}/${maxRetries})`);
         setTimeout(() => revalidate({ retryCount }), delay);
         return;
       }
       // Don't retry other errors or after max retries
     },
-    errorRetryCount: 5,
-    errorRetryInterval: 1000,
+    errorRetryCount: 3,
+    errorRetryInterval: 500,
   });
   const { execute: cancelSubscription, loading: cancelLoading } = usePost();
   const { execute: createCheckoutSession, loading: checkoutLoading } = usePost();
