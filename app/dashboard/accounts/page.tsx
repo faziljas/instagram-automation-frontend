@@ -304,7 +304,7 @@ export default function AccountsPage() {
       {isLoading && <TableSkeleton rows={3} columns={4} />}
 
       {/* Empty State - Show Login to Instagram Interface */}
-      {!isLoading && (!accounts || accounts.length === 0) && (
+      {!isLoading && accounts.length === 0 && (
         <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl p-8">
           <div className="max-w-2xl mx-auto">
             {/* Header */}
@@ -359,7 +359,7 @@ export default function AccountsPage() {
       )}
 
       {/* Accounts Table */}
-      {!isLoading && accounts && accounts.length > 0 && (
+      {!isLoading && accounts.length > 0 && (
         <div>
           {/* Add Account Button - Only show when accounts exist */}
           <div className="mb-6 flex justify-end">
