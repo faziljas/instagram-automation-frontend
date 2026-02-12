@@ -274,6 +274,17 @@ function LoginPageContent() {
                   <p className="text-sm text-red-600">{error}</p>
                 </div>
               )}
+              
+              {infoMessage && (
+                <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
+                  <div className="flex items-start gap-2">
+                    <svg className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p className="text-sm text-blue-800 font-medium">{infoMessage}</p>
+                  </div>
+                </div>
+              )}
 
               <button
                 onClick={() => handleGoogleAuth(true)}
