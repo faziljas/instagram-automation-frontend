@@ -39,6 +39,7 @@ function LoginPageContent() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [infoMessage, setInfoMessage] = useState<string | null>(null);
+  const [redirectTimer, setRedirectTimer] = useState<NodeJS.Timeout | null>(null);
   
   // Signup form state
   const [formData, setFormData] = useState<RegisterFormData>({
@@ -174,13 +175,23 @@ function LoginPageContent() {
         setInfoMessage('Please check your email to confirm your account.');
         setIsLoading(false);
         
+        // Clear any existing timer
+        if (redirectTimer) {
+          clearTimeout(redirectTimer);
+        }
+        
         // Redirect to login view after 5 seconds (give user time to read the message)
-        setTimeout(() => {
+        const timer = setTimeout(() => {
           setViewState('login');
-          setInfoMessage(null);
           // Pre-fill email in login form for convenience
           setEmail(normalizedEmail);
+          // Clear message after switching to login view
+          setTimeout(() => {
+            setInfoMessage(null);
+          }, 100);
         }, 5000);
+        
+        setRedirectTimer(timer);
         
         return;
       }
@@ -437,6 +448,17 @@ function LoginPageContent() {
               {error && (
                 <div className="p-3 bg-red-50 border border-red-200 rounded-md">
                   <p className="text-sm text-red-600">{error}</p>
+                </div>
+              )}
+              
+              {infoMessage && (
+                <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
+                  <div className="flex items-start gap-2">
+                    <svg className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p className="text-sm text-blue-800 font-medium">{infoMessage}</p>
+                  </div>
                 </div>
               )}
 
