@@ -162,8 +162,26 @@ function LoginPageContent() {
       }
 
       if (data.user && !data.session) {
+        // Clear form fields
+        setFormData({
+          email: '',
+          password: '',
+          confirmPassword: '',
+        });
+        setSignupErrors({});
+        
+        // Show success message
         setInfoMessage('Please check your email to confirm your account.');
         setIsLoading(false);
+        
+        // Redirect to login view after 2 seconds
+        setTimeout(() => {
+          setViewState('login');
+          setInfoMessage(null);
+          // Pre-fill email in login form for convenience
+          setEmail(normalizedEmail);
+        }, 2000);
+        
         return;
       }
 
