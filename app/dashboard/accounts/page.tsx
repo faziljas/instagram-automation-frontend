@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useFetch } from '@/hooks/useFetch';
 import { useDelete, usePost } from '@/hooks/useApi';
 import { TableSkeleton } from '@/components/Skeleton';
-import { PlusIcon, TrashIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, TrashIcon, ExclamationTriangleIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 import { mutate } from 'swr';
 
 interface InstagramAccountResponse {
@@ -233,41 +233,41 @@ export default function AccountsPage() {
         {/* Connect Error/Warning Message */}
         {connectError && (
           <>
-            {/* Special handling for "already connected to another user" - show as warning, not error */}
+            {/* "Already connected elsewhere" – show as friendly info, not an error */}
             {connectError.includes('already connected to another user') || connectError.includes('already connected to a different user') ? (
-              <div className="mt-2 rounded-md bg-amber-50 p-4 border border-amber-300">
-                <div className="flex items-start">
-                  <div className="flex-shrink-0">
-                    <ExclamationTriangleIcon className="h-5 w-5 text-amber-600" />
+              <div className="mt-2 rounded-xl bg-sky-50/80 p-5 border border-sky-200/80 shadow-sm">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-sky-100 flex items-center justify-center">
+                    <InformationCircleIcon className="h-6 w-6 text-sky-600" />
                   </div>
-                  <div className="ml-3 flex-1">
-                    <p className="text-sm text-amber-900 font-semibold">Account Already Connected</p>
-                    <p className="mt-2 text-sm text-amber-800">{connectError}</p>
-                    
-                    <div className="mt-4 p-3 bg-white border border-amber-200 rounded-md">
-                      <p className="text-sm font-medium text-amber-900 mb-2">What you can do:</p>
-                      <ul className="text-sm text-amber-800 list-disc list-inside space-y-1.5">
-                        <li>Use a different Instagram account that hasn&apos;t been connected yet</li>
-                        <li>Contact the other user to disconnect this account first</li>
-                        <li>If this is your account, log in with that user&apos;s credentials</li>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-base font-semibold text-sky-900">This account is already connected</p>
+                    <p className="mt-1.5 text-sm text-sky-800/90">
+                      This Instagram account is linked to another LogicDM user. To use it here, disconnect it from that account first—or connect a different Instagram account.
+                    </p>
+                    <div className="mt-4 p-3.5 bg-white/70 border border-sky-100 rounded-lg">
+                      <p className="text-sm font-medium text-sky-900 mb-2">What you can do</p>
+                      <ul className="text-sm text-sky-800 space-y-1.5 list-disc list-inside">
+                        <li>Connect a different Instagram account that isn&apos;t linked yet</li>
+                        <li>Ask the other user to disconnect this account, then connect it here</li>
+                        <li>If it&apos;s your account, sign in with that user&apos;s credentials</li>
                       </ul>
                     </div>
-                    
                     <div className="mt-4">
                       <button
                         onClick={handleResetConnection}
-                        className="inline-flex items-center px-3 py-1.5 border border-amber-300 rounded-md text-sm font-medium text-amber-800 bg-white hover:bg-amber-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
+                        className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium text-sky-700 bg-white border border-sky-200 hover:bg-sky-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-400"
                       >
-                        Try with a Different Account
+                        Try with a different account
                       </button>
                     </div>
                   </div>
                   <button
                     onClick={() => setConnectError(null)}
-                    className="ml-3 flex-shrink-0 text-amber-600 hover:text-amber-800"
+                    className="flex-shrink-0 p-1 text-sky-500 hover:text-sky-700 rounded hover:bg-sky-100/80"
                     aria-label="Dismiss"
-        >
-                    <span className="text-lg">×</span>
+                  >
+                    <span className="text-xl leading-none">×</span>
                   </button>
                 </div>
               </div>
