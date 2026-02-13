@@ -87,7 +87,7 @@ export default function RootLayout({
               {children}
             </div>
             {/* Footer is conditionally rendered - home page has its own footer */}
-            <div className="auth-pages-footer">
+            <div className="auth-pages-footer flex-shrink-0">
               <ConditionalFooter />
             </div>
           </AuthProvider>

@@ -50,7 +50,7 @@ export default function DashboardLayout({
   return (
     <ToastProvider>
       <ProtectedRoute>
-      <div className="dashboard-main-bg w-full overflow-x-hidden flex flex-col flex-1" style={{ backgroundColor: 'rgb(243 244 246)' }}>
+      <div className="dashboard-main-bg w-full overflow-x-hidden flex flex-col flex-1 min-h-screen" style={{ backgroundColor: 'rgb(243 244 246)' }}>
         {/* Mobile sidebar overlay */}
         {sidebarOpen && (
           <div
@@ -192,7 +192,7 @@ export default function DashboardLayout({
         </div>
 
         {/* Main content area */}
-        <div className="flex-1 w-full lg:pl-64 overflow-x-hidden dashboard-main-bg flex flex-col">
+        <div className="flex flex-col flex-1 min-w-0 w-full lg:pl-64 overflow-x-hidden dashboard-main-bg">
           {/* Top header */}
           <header className="bg-white/80 backdrop-blur-lg border-b border-gray-200 sticky top-0 z-30 shadow-lg w-full flex-shrink-0">
             <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
@@ -215,7 +215,7 @@ export default function DashboardLayout({
           </header>
 
           {/* Page content */}
-          <main className="flex-1 py-6 px-4 sm:px-6 lg:px-8 w-full max-w-full overflow-x-hidden overflow-y-auto">{children}</main>
+          <main className="flex-1 flex flex-col py-6 px-4 sm:px-6 lg:px-8 w-full max-w-full overflow-x-hidden">{children}</main>
         </div>
       </div>
       </ProtectedRoute>
