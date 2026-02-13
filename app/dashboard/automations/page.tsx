@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useFetch } from '@/hooks/useFetch';
+import { useSubscription } from '@/hooks/useSubscription';
 import { TableSkeleton } from '@/components/Skeleton';
 import { mutate } from 'swr';
 import AutomationSetupModal from '@/components/AutomationSetupModal';
@@ -102,7 +103,9 @@ export default function AutomationsPage() {
       window.removeEventListener('focus', handleFocus);
     };
   }, [refreshAccounts]);
-  const { data: subscriptionData } = useFetch<SubscriptionResponse>('/users/subscription');
+  
+  // Use subscription hook with caching to prevent pro users from appearing as free on refresh
+  const { data: subscriptionData, hasProPlan, planTier: subscriptionPlanTier } = useSubscription();
   const [selectedAccount, setSelectedAccount] = useState<number | null>(null);
   const [selectedAccountUsername, setSelectedAccountUsername] = useState<string>('');
   const [selectedTab, setSelectedTab] = useState<'posts' | 'stories' | 'dms' | 'live'>('posts');
@@ -121,12 +124,9 @@ export default function AutomationsPage() {
   const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(false);
   const [deleteConfirmRuleId, setDeleteConfirmRuleId] = useState<number | null>(null);
 
-  // Check if user has Pro plan or higher
-  const hasProPlan = subscriptionData?.plan_tier === 'pro' || subscriptionData?.plan_tier === 'enterprise';
-
   // Check if user has reached automation rules limit
-  // Safely handle undefined subscriptionData
-  const planTier = subscriptionData?.plan_tier || 'free';
+  // Use subscription hook's computed values (already handles caching and fallbacks)
+  const planTier = subscriptionPlanTier;
   const rulesLimit = PLAN_LIMITS[planTier]?.rules ?? -1;
   const currentRulesCount = subscriptionData?.usage?.rules ?? 0;
   // -1 means unlimited, so never reached
@@ -994,6 +994,14 @@ export default function AutomationsPage() {
                                           // Refresh analytics + limits (rules count)
                                           void mutate('/automation/rules');
                                           void mutate('/users/subscription');
+                                          // Clear subscription cache to force refresh
+                                          if (typeof window !== 'undefined') {
+                                            try {
+                                              localStorage.removeItem('logicdm_subscription_cache');
+                                            } catch (e) {
+                                              // Ignore cache errors
+                                            }
+                                          }
                                         } catch (error: any) {
                                           console.error('Failed to delete automation rule:', error);
                                           alert(

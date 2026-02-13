@@ -2,6 +2,7 @@
 
 import { useAuth } from '@/hooks/useAuth';
 import { useFetch } from '@/hooks/useFetch';
+import { useSubscription } from '@/hooks/useSubscription';
 import { GridStatsSkeleton } from '@/components/Skeleton';
 import {
   UserGroupIcon,
@@ -91,14 +92,14 @@ const PLAN_LIMITS: Record<string, { accounts: number; rules: number; dms: number
 export default function DashboardPage() {
   const { user } = useAuth();
   const { data, isLoading } = useFetch<DashboardResponse>('/users/me/dashboard');
-  const { data: subscriptionData } = useFetch<SubscriptionResponse>('/users/subscription');
+  
+  // Use subscription hook with caching to prevent pro users from appearing as free on refresh
+  const { planTier: plan } = useSubscription();
+  
   const { data: analyticsData, isLoading: isAnalyticsLoading } = useFetch<AnalyticsSummary>(
     '/api/analytics/dashboard?days=7'
   );
   const { data: leadsData } = useFetch<Lead[]>('/api/leads');
-
-  // Check if account and rule limits are reached
-  const plan = subscriptionData?.plan_tier || 'free';
   const limits = PLAN_LIMITS[plan] || PLAN_LIMITS.free;
 
   // Extract metrics from analytics API
@@ -170,7 +171,8 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {isLoading || isAnalyticsLoading ? (
+      {/* Show content immediately with cached data - only show skeleton if no cached data available */}
+      {isLoading && !data ? (
         <div className="mb-8">
           <GridStatsSkeleton />
         </div>

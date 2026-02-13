@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
-import { useFetch } from '@/hooks/useFetch';
+import { useSubscription } from '@/hooks/useSubscription';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import UserProfileMenu from '@/components/UserProfileMenu';
 import Logo from '@/components/Logo';
@@ -20,12 +20,6 @@ import {
   SparklesIcon,
   ChartBarIcon,
 } from '@heroicons/react/24/outline';
-
-interface SubscriptionResponse {
-  plan_tier: string;
-  status: string;
-  stripe_subscription_id: string | null;
-}
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
@@ -48,11 +42,9 @@ export default function DashboardLayout({
   const router = useRouter();
   const { user, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { data: subscriptionData } = useFetch<SubscriptionResponse>('/users/subscription');
-
-
-  // Check if user is on Pro or Enterprise plan
-  const isProOrEnterprise = subscriptionData?.plan_tier === 'pro' || subscriptionData?.plan_tier === 'enterprise';
+  
+  // Use subscription hook with caching to prevent pro users from appearing as free on refresh
+  const { hasProPlan: isProOrEnterprise } = useSubscription();
 
   return (
     <ToastProvider>

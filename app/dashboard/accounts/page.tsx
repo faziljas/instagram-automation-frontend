@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useFetch } from '@/hooks/useFetch';
+import { useSubscription } from '@/hooks/useSubscription';
 import { useDelete, usePost } from '@/hooks/useApi';
 import { TableSkeleton } from '@/components/Skeleton';
 import { PlusIcon, TrashIcon, ExclamationTriangleIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
@@ -37,7 +38,9 @@ const PLAN_LIMITS: Record<string, { accounts: number; rules: number; dms: number
 
 export default function AccountsPage() {
   const { data: accountsData, error: accountsError, isLoading, mutate: mutateAccounts } = useFetch<InstagramAccountResponse[]>('/users/me/accounts');
-  const { data: subscriptionData, isLoading: subscriptionLoading, mutate: mutateSubscription } = useFetch<SubscriptionResponse>('/users/subscription');
+  
+  // Use subscription hook with caching to prevent pro users from appearing as free on refresh
+  const { data: subscriptionData, isLoading: subscriptionLoading, mutate: mutateSubscription, planTier } = useSubscription();
   
   // Ensure accounts is always an array - handle cases where API returns error object
   const accounts = Array.isArray(accountsData) ? accountsData : [];
@@ -109,7 +112,8 @@ export default function AccountsPage() {
   }, [refreshingAfterConnect, accounts.length]);
 
   // Check if account limit is reached (needed before effects below)
-  const plan = subscriptionData?.plan_tier || 'free';
+  // Use planTier from subscription hook (handles caching and fallbacks)
+  const plan = planTier;
   const limits = PLAN_LIMITS[plan] || PLAN_LIMITS.free;
   const accountsUsed = subscriptionData?.usage?.accounts || 0;
   const isAccountLimitReached = limits.accounts !== -1 && accountsUsed >= limits.accounts;
@@ -188,6 +192,14 @@ export default function AccountsPage() {
       // Refresh accounts list and subscription data (to update account limit)
       mutate('/users/me/accounts');
       mutate('/users/subscription');
+      // Clear subscription cache to force refresh
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.removeItem('logicdm_subscription_cache');
+        } catch (e) {
+          // Ignore cache errors
+        }
+      }
       setDeleteConfirm(null);
     } catch (error) {
       console.error('Failed to delete account:', error);
