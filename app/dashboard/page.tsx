@@ -144,13 +144,15 @@ export default function DashboardPage() {
   const { totalDMs, leadsCaptured, activeRules, timeSavedHours } = metrics;
 
   // OPTIMIZED: Memoize daily breakdown processing
-  const { dailyBreakdown, engagementData } = useMemo(() => {
+  const { dailyBreakdown, engagementData, hasAnyActivity } = useMemo(() => {
     const breakdown = Array.isArray(analyticsData?.daily_breakdown) ? analyticsData.daily_breakdown : [];
-    const maxTotal = Math.max(...breakdown.map((d) => d.total), 1);
-    const engagement = breakdown.map((day) =>
-      maxTotal > 0 ? (day.total / maxTotal) * 100 : 0
-    );
-    return { dailyBreakdown: breakdown, engagementData: engagement };
+    const maxTotal = Math.max(...breakdown.map((d) => d.total || 0), 1);
+    const hasActivity = breakdown.some((d) => (d.total || 0) > 0);
+    const engagement = breakdown.map((day) => {
+      const dayTotal = day.total || 0;
+      return maxTotal > 0 ? (dayTotal / maxTotal) * 100 : 0;
+    });
+    return { dailyBreakdown: breakdown, engagementData: engagement, hasAnyActivity: hasActivity };
   }, [analyticsData?.daily_breakdown]);
 
   // OPTIMIZED: Memoize recent activity processing
@@ -327,7 +329,7 @@ export default function DashboardPage() {
                 <span className="text-xs text-gray-400">DMs / day</span>
               </div>
 
-              {dailyBreakdown.length === 0 || totalDMs === 0 ? (
+              {dailyBreakdown.length === 0 || !hasAnyActivity ? (
                 <div className="mt-6 h-40 flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-200 bg-gray-50/60 text-center">
                   <p className="text-sm font-medium text-gray-700">
                     Waiting for data...
@@ -341,20 +343,23 @@ export default function DashboardPage() {
                 <div className="mt-4 h-40 flex items-end space-x-2">
                   {engagementData.map((value, index) => {
                     const day = dailyBreakdown[index];
-                    const dayName = day?.date.split(' ')[0] || ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][index];
-                    // Ensure bars are visible: use calculated value or minimum height when there's data
-                    const barHeight = value > 0 ? Math.max(value, 15) : 0; // 15% minimum when there's data
+                    const dayName = day?.date?.split(' ')[0] || day?.date_label?.split('/')[1] || ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][index];
+                    // Check if this day has any activity
+                    const dayTotal = day?.total || 0;
+                    const hasDayActivity = dayTotal > 0;
+                    // Calculate bar height: if there's activity, ensure it's visible (minimum 20% when data exists)
+                    const barHeight = hasDayActivity ? Math.max(value, 20) : 0;
                     return (
                       <div
                         key={index}
                         className="flex-1 flex flex-col items-center space-y-2"
                       >
-                        <div className="w-full bg-gray-50 rounded-lg h-32 flex items-end overflow-hidden">
+                        <div className="w-full bg-gray-50 rounded-lg h-32 flex items-end overflow-hidden relative">
                           {barHeight > 0 && (
                             <div
                               className="w-full bg-gradient-to-t from-blue-500 to-indigo-400 rounded-lg transition-all"
-                              style={{ height: `${barHeight}%` }}
-                              title={`${day?.date || ''}: ${day?.total || 0} total (${day?.triggers || 0} triggers, ${day?.dms_sent || 0} DMs, ${day?.leads || 0} leads)`}
+                              style={{ height: `${barHeight}%`, minHeight: '20px' }}
+                              title={`${day?.date || day?.date_label || ''}: ${dayTotal} total (${day?.triggers || 0} triggers, ${day?.dms_sent || 0} DMs, ${day?.leads || 0} leads)`}
                             />
                           )}
                         </div>

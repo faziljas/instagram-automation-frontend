@@ -204,9 +204,9 @@ export default function AnalyticsPage() {
           const weekSize = 7;
           for (let i = 0; i < rawBreakdown.length; i += weekSize) {
             const chunk = rawBreakdown.slice(i, i + weekSize);
-            const triggers = chunk.reduce((s, d) => s + d.triggers, 0);
-            const dms_sent = chunk.reduce((s, d) => s + d.dms_sent, 0);
-            const leads = chunk.reduce((s, d) => s + d.leads, 0);
+            const triggers = chunk.reduce((s, d) => s + (d.triggers || 0), 0);
+            const dms_sent = chunk.reduce((s, d) => s + (d.dms_sent || 0), 0);
+            const leads = chunk.reduce((s, d) => s + (d.leads || 0), 0);
             const total = triggers + dms_sent + leads;
             const first = chunk[0];
             const last = chunk[chunk.length - 1];
@@ -226,10 +226,11 @@ export default function AnalyticsPage() {
         })()
       : rawBreakdown;
   // Ensure maxActivity is at least 1 to prevent division by zero, and ensure bars are visible
-  const maxActivity = Math.max(...activityData.map((d) => d.total), 1);
+  const maxActivity = Math.max(...activityData.map((d) => d.total || 0), 1);
   const chartHeightPx = 200;
-  // Minimum bar height for visibility (20px) when there's any data, even if small
-  const minBarHeightPx = activityData.length > 0 && maxActivity > 0 ? 20 : 4;
+  // Minimum bar height for visibility (25px) when there's any data, even if small
+  const hasAnyData = activityData.some((d) => (d.total || 0) > 0);
+  const minBarHeightPx = hasAnyData && maxActivity > 0 ? 25 : 4;
 
   return (
     <div className="max-w-7xl mx-auto w-full overflow-x-hidden">
@@ -309,8 +310,10 @@ export default function AnalyticsPage() {
           {activityData.length > 0 ? (
             activityData.map((item, index) => {
               // Calculate bar height: ensure minimum visibility, scale proportionally
-              const calculatedHeight = maxActivity > 0 ? (item.total / maxActivity) * chartHeightPx : 0;
-              const barHeightPx = Math.max(minBarHeightPx, calculatedHeight);
+              const itemTotal = item.total || 0;
+              const calculatedHeight = maxActivity > 0 && itemTotal > 0 ? (itemTotal / maxActivity) * chartHeightPx : 0;
+              // If there's data, ensure bar is visible (at least minBarHeightPx)
+              const barHeightPx = itemTotal > 0 ? Math.max(minBarHeightPx, calculatedHeight) : 0;
               return (
                 <div
                   key={index}
