@@ -129,14 +129,16 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
   const messagesContainerRef = useRef<HTMLDivElement | null>(null);
   const didLoadOlderRef = useRef(false);
 
-  const fetchMessages = useCallback(async (loadOlder?: boolean) => {
+  const fetchMessages = useCallback(async (loadOlder?: boolean, silent?: boolean) => {
     if (!selectedConversation || !accountId) return;
     const offset = loadOlder ? nextMessagesOffset : 0;
-    if (loadOlder) {
-      didLoadOlderRef.current = true;
-      setIsLoadingOlderMessages(true);
-    } else {
-      setIsLoadingMessages(true);
+    if (!silent) {
+      if (loadOlder) {
+        didLoadOlderRef.current = true;
+        setIsLoadingOlderMessages(true);
+      } else {
+        setIsLoadingMessages(true);
+      }
     }
     try {
       let url = `/api/instagram/conversations/${encodeURIComponent(selectedConversation)}/messages?account_id=${accountId}&limit=100&offset=${offset}`;
@@ -158,10 +160,12 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
       setNextMessagesOffset(typeof data?.next_offset === 'number' ? data.next_offset : offset + list.length);
     } catch (e) {
       console.error('Fetch messages error:', e);
-      if (!loadOlder) setMessages([]);
+      if (!loadOlder && !silent) setMessages([]);
     } finally {
-      setIsLoadingMessages(false);
-      setIsLoadingOlderMessages(false);
+      if (!silent) {
+        setIsLoadingMessages(false);
+        setIsLoadingOlderMessages(false);
+      }
     }
   }, [selectedConversation, accountId, selectedConvDetails?.user_id, nextMessagesOffset]);
 
@@ -272,9 +276,32 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accountId, session]);
 
+  // Automatic polling for messages in selected conversation (instant updates like Instagram)
+  // Poll messages every 5 seconds when a conversation is selected and page is visible
+  useEffect(() => {
+    if (!accountId || !selectedConversation || typeof document === 'undefined') return;
+    
+    // CRITICAL: Don't start polling until session is ready
+    if (!session?.access_token) {
+      return;
+    }
+
+    // Poll messages silently (no loading indicator) for instant updates
+    const messagePollInterval = setInterval(() => {
+      // Only poll when page is visible
+      if (document.visibilityState !== 'visible') return;
+      
+      // Silent refresh of messages (no loading state) - updates messages instantly
+      fetchMessages(false, true);
+    }, 5000); // Poll every 5 seconds for instant message updates like Instagram
+
+    return () => {
+      clearInterval(messagePollInterval);
+    };
+  }, [accountId, selectedConversation, session, fetchMessages]);
+
   // Silent background polling: refresh stats and conversations list silently (no loading states)
-  // Messages are updated via webhooks, so we don't need to poll them
-  // Increased interval to 60s and removed visibility refresh to prevent constant loading
+  // Reduced interval to 30s for better responsiveness while keeping it efficient
   useEffect(() => {
     if (!accountId || typeof document === 'undefined') return;
     
@@ -302,18 +329,14 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
       refreshStats();
       // Silent conversations refresh (no loading indicator)
       fetchConversations(false, true);
-      // Don't refresh messages - they're updated via webhooks and manual refresh
     };
 
-    // Removed visibility change handler - it was causing too many refreshes
-    // Users can manually refresh if needed, or wait for the polling interval
-
-    // Increased interval to 60 seconds to significantly reduce perceived loading
-    // Only refresh stats and conversations list silently (not messages)
+    // Poll conversations and stats every 30 seconds for better responsiveness
+    // Only refresh when page is visible
     const intervalId = setInterval(() => {
       if (document.visibilityState !== 'visible') return;
       silentRefresh();
-    }, 60000); // 60 seconds - much longer interval to prevent constant loading
+    }, 30000); // 30 seconds - balanced interval for responsiveness and efficiency
 
     return () => {
       clearInterval(intervalId);
