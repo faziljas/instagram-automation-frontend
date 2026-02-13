@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useFetch } from '@/hooks/useFetch';
 import { Card } from '@/components/Card';
 import { Table } from '@/components/Table';
@@ -63,15 +63,28 @@ export default function AnalyticsPage() {
   const [days, setDays] = useState(7);
   const [leadsPage, setLeadsPage] = useState(1);
   const [leadsPageSize, setLeadsPageSize] = useState(50);
+  
+  // OPTIMIZED: Debounce days changes to prevent rapid API calls
+  const [debouncedDays, setDebouncedDays] = useState(7);
+  
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedDays(days);
+    }, 300); // 300ms debounce
+    return () => clearTimeout(timer);
+  }, [days]);
+  
   // Don't block page render - show content immediately
   const { data, error, isLoading, mutate } = useFetch<AnalyticsSummary>(
-    `/api/analytics/dashboard?days=${days}`,
+    `/api/analytics/dashboard?days=${debouncedDays}`,
     {
       // Reduced retries for faster failure handling
       errorRetryCount: 1,
       errorRetryInterval: 500,
       // Don't revalidate on focus to reduce unnecessary requests
       revalidateOnFocus: false,
+      // Increase cache time for analytics (5 minutes)
+      dedupingInterval: 300000,
     }
   );
   const { data: leadsData } = useFetch<Lead[]>('/api/leads');

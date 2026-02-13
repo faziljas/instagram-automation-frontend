@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useFetch } from '@/hooks/useFetch';
 import { useSubscription } from '@/hooks/useSubscription';
 import { TableSkeleton } from '@/components/Skeleton';
@@ -234,9 +234,10 @@ export default function AutomationsPage() {
     if (selectedTab === 'posts' || selectedTab === 'stories' || selectedTab === 'live') {
       fetchMedia();
     }
-  }, [selectedAccount, selectedTab]);
+  }, [selectedAccount, selectedTab, fetchMedia]);
 
-  const fetchMedia = async (opts?: { after?: string | null }) => {
+  // OPTIMIZED: Memoize fetchMedia function to prevent recreation
+  const fetchMedia = useCallback(async (opts?: { after?: string | null }) => {
     if (!selectedAccount) return;
     if (!session?.access_token) {
       console.warn('[AutomationsPage] No session token available, skipping fetchMedia');
@@ -282,9 +283,10 @@ export default function AutomationsPage() {
       setIsLoadingMedia(false);
       setIsLoadingMore(false);
     }
-  };
+  }, [selectedAccount, selectedTab, session?.access_token]);
 
-  const fetchDMs = async () => {
+  // OPTIMIZED: Memoize fetchDMs function
+  const fetchDMs = useCallback(async () => {
     if (!selectedAccount) return;
 
     // CRITICAL: Wait for session token before making API call
@@ -337,12 +339,13 @@ export default function AutomationsPage() {
     } finally {
       setIsLoadingMedia(false);
     }
-  };
+  }, [selectedAccount, session?.access_token]);
 
-  const handleSetupAutomation = (mediaItem: MediaItem) => {
+  // OPTIMIZED: Memoize handler to prevent recreation
+  const handleSetupAutomation = useCallback((mediaItem: MediaItem) => {
     setSelectedMedia(mediaItem);
     setShowDrawer(true);
-  };
+  }, []);
 
   const handleCloseDrawer = () => {
     setShowDrawer(false);
@@ -774,9 +777,10 @@ export default function AutomationsPage() {
                   <h3 className="text-base md:text-xl font-bold text-gray-900">AUTOMATIONS</h3>
                 </div>
                 {/* Show content immediately - don't block on analytics loading */}
-                {(() => {
-              // Create a map of media_id to analytics for quick lookup
-              const analyticsMap = new Map(mediaAnalytics.map(a => [a.media_id, a]));
+                {useMemo(() => {
+              // OPTIMIZED: Memoize analytics map creation
+              const analyticsMap = new Map<string, MediaAnalytics>();
+              mediaAnalytics.forEach(a => analyticsMap.set(a.media_id, a));
               
               // Filter media by selected tab
               const filteredMedia = media.filter((item) => {
@@ -1061,7 +1065,7 @@ export default function AutomationsPage() {
                 )}
                 </>
               );
-                })()}
+                }, [mediaAnalytics, media, selectedTab, automationRules, hasReachedRulesLimit, currentRulesCount, rulesLimit, deleteConfirmRuleId, isLoadingMore, mediaHasMore, mediaNextCursor, handleSetupAutomation])}
               </div>
             ) : media.length > 0 && viewMode === 'grid' ? (
               <>

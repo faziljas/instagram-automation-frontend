@@ -5,7 +5,7 @@ import { useFetch } from '@/hooks/useFetch';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useParallelFetch } from '@/hooks/useParallelFetch';
 import { GridStatsSkeleton } from '@/components/Skeleton';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, memo } from 'react';
 import {
   UserGroupIcon,
   BoltIcon,
@@ -131,45 +131,53 @@ export default function DashboardPage() {
   const leadsData = secondaryData.leads;
   const isAnalyticsLoading = isSecondaryLoading;
 
-  // Extract metrics from analytics API
-  const totalDMs = analyticsData?.total_dms_sent || 0;
-  const leadsCaptured = analyticsData?.leads_collected || 0;
-  const activeRules = data?.stats?.active_rules_count || 0;
+  // OPTIMIZED: Memoize expensive computations to prevent recalculation on every render
+  const metrics = useMemo(() => {
+    const totalDMs = analyticsData?.total_dms_sent || 0;
+    const leadsCaptured = analyticsData?.leads_collected || 0;
+    const activeRules = data?.stats?.active_rules_count || 0;
+    const timeSavedHours = totalDMs > 0 ? Math.ceil((totalDMs * 2) / 60) : 0;
+    
+    return { totalDMs, leadsCaptured, activeRules, timeSavedHours };
+  }, [analyticsData?.total_dms_sent, analyticsData?.leads_collected, data?.stats?.active_rules_count]);
 
-  // Time saved: each DM = 2 minutes
-  const timeSavedHours = totalDMs > 0 ? Math.ceil((totalDMs * 2) / 60) : 0;
+  const { totalDMs, leadsCaptured, activeRules, timeSavedHours } = metrics;
 
-  // Process daily breakdown for chart (last 7 days)
-  // Ensure daily_breakdown is always an array - handle cases where API returns error object
-  const dailyBreakdown = Array.isArray(analyticsData?.daily_breakdown) ? analyticsData.daily_breakdown : [];
-  const maxDailyTotal = Math.max(...dailyBreakdown.map((d) => d.total), 1);
-  const engagementData = dailyBreakdown.map((day) =>
-    maxDailyTotal > 0 ? (day.total / maxDailyTotal) * 100 : 0
-  );
+  // OPTIMIZED: Memoize daily breakdown processing
+  const { dailyBreakdown, engagementData } = useMemo(() => {
+    const breakdown = Array.isArray(analyticsData?.daily_breakdown) ? analyticsData.daily_breakdown : [];
+    const maxTotal = Math.max(...breakdown.map((d) => d.total), 1);
+    const engagement = breakdown.map((day) =>
+      maxTotal > 0 ? (day.total / maxTotal) * 100 : 0
+    );
+    return { dailyBreakdown: breakdown, engagementData: engagement };
+  }, [analyticsData?.daily_breakdown]);
 
-  // Recent activity from leads (show when leads were captured)
-  // Ensure leadsData is always an array - handle cases where API returns error object
-  const recentLeads = Array.isArray(leadsData) ? leadsData.slice(0, 5) : [];
-  const recentActivity = recentLeads.map((lead) => ({
-    id: lead.id,
-    username: lead.email?.split('@')[0] || lead.name || 'Anonymous',
-    label: 'Lead Captured',
-    created_at: lead.captured_at,
-  }));
+  // OPTIMIZED: Memoize recent activity processing
+  const recentActivity = useMemo(() => {
+    const recentLeads = Array.isArray(leadsData) ? leadsData.slice(0, 5) : [];
+    return recentLeads.map((lead) => ({
+      id: lead.id,
+      username: lead.email?.split('@')[0] || lead.name || 'Anonymous',
+      label: 'Lead Captured',
+      created_at: lead.captured_at,
+    }));
+  }, [leadsData]);
 
-  // Top posts from analytics API
-  // Ensure top_posts is always an array - handle cases where API returns error object
-  const topPosts = Array.isArray(analyticsData?.top_posts) 
-    ? analyticsData.top_posts.slice(0, 3).map((post) => ({
-        id: post.media_id,
-        caption: post.permalink
-          ? `View on ${post.media_type === 'STORY' ? 'Story' : 'Instagram'}`
-          : `Media ${post.media_id.substring(0, 18)}...`,
-        dms: post.dms_count,
-        media_url: post.media_url,
-        media_type: post.media_type,
-      }))
-    : [];
+  // OPTIMIZED: Memoize top posts processing
+  const topPosts = useMemo(() => {
+    return Array.isArray(analyticsData?.top_posts) 
+      ? analyticsData.top_posts.slice(0, 3).map((post) => ({
+          id: post.media_id,
+          caption: post.permalink
+            ? `View on ${post.media_type === 'STORY' ? 'Story' : 'Instagram'}`
+            : `Media ${post.media_id.substring(0, 18)}...`,
+          dms: post.dms_count,
+          media_url: post.media_url,
+          media_type: post.media_type,
+        }))
+      : [];
+  }, [analyticsData?.top_posts]);
 
   const formatTimeAgo = (isoDate: string) => {
     const created = new Date(isoDate);
