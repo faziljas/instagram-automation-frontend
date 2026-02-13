@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { useSubscription } from '@/hooks/useSubscription';
+import { useUpgrade } from '@/hooks/useUpgrade';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import UserProfileMenu from '@/components/UserProfileMenu';
 import Logo from '@/components/Logo';
@@ -46,6 +47,9 @@ export default function DashboardLayout({
   
   // Use subscription hook with caching to prevent pro users from appearing as free on refresh
   const { hasProPlan: isProOrEnterprise } = useSubscription();
+  
+  // Upgrade hook for sidebar upgrade button
+  const { handleUpgrade, checkoutLoading } = useUpgrade();
 
   return (
     <ToastProvider>
@@ -111,13 +115,22 @@ export default function DashboardLayout({
                   <p className="text-white/90 text-xs mb-4">
                     Unlock advanced features and unlimited automation
                   </p>
-                  <Link
-                    href="/dashboard/subscription"
-                    onClick={() => setSidebarOpen(false)}
-                    className="block w-full text-center bg-white text-blue-600 text-sm font-medium py-2 rounded-lg hover:bg-white/90 transition-colors"
+                  <button
+                    onClick={async () => {
+                      setSidebarOpen(false);
+                      try {
+                        await handleUpgrade();
+                      } catch (error) {
+                        // Error handling is done in the hook (redirects for auth errors)
+                        // Other errors will be shown via browser console
+                        console.error('Upgrade failed:', error);
+                      }
+                    }}
+                    disabled={checkoutLoading}
+                    className="block w-full text-center bg-white text-blue-600 text-sm font-medium py-2 rounded-lg hover:bg-white/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Upgrade
-                  </Link>
+                    {checkoutLoading ? 'Processing...' : 'Upgrade'}
+                  </button>
                 </div>
               </div>
             )}
@@ -174,12 +187,21 @@ export default function DashboardLayout({
                   <p className="text-white/90 text-xs mb-4">
                     Unlock advanced features and unlimited automation
                   </p>
-                  <Link
-                    href="/dashboard/subscription"
-                    className="block w-full text-center bg-white text-blue-600 text-sm font-medium py-2 rounded-lg hover:bg-white/90 transition-colors"
+                  <button
+                    onClick={async () => {
+                      try {
+                        await handleUpgrade();
+                      } catch (error) {
+                        // Error handling is done in the hook (redirects for auth errors)
+                        // Other errors will be shown via browser console
+                        console.error('Upgrade failed:', error);
+                      }
+                    }}
+                    disabled={checkoutLoading}
+                    className="block w-full text-center bg-white text-blue-600 text-sm font-medium py-2 rounded-lg hover:bg-white/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Upgrade
-                  </Link>
+                    {checkoutLoading ? 'Processing...' : 'Upgrade'}
+                  </button>
                 </div>
               </div>
             )}
