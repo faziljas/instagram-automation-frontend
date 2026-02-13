@@ -127,8 +127,9 @@ api.interceptors.response.use(
   }
 );
 
-// Transform snake_case to camelCase for user objects
+// Transform snake_case to camelCase for user objects (do not transform arrays - e.g. /users/me/accounts)
 function transformUserResponse(data: any): any {
+  if (Array.isArray(data)) return data;
   if (data && typeof data === 'object') {
     const transformed: any = { ...data };
     

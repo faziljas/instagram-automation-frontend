@@ -36,7 +36,7 @@ const PLAN_LIMITS: Record<string, { accounts: number; rules: number; dms: number
 };
 
 export default function AccountsPage() {
-  const { data: accountsData, isLoading, mutate: mutateAccounts } = useFetch<InstagramAccountResponse[]>('/users/me/accounts');
+  const { data: accountsData, error: accountsError, isLoading, mutate: mutateAccounts } = useFetch<InstagramAccountResponse[]>('/users/me/accounts');
   const { data: subscriptionData, isLoading: subscriptionLoading, mutate: mutateSubscription } = useFetch<SubscriptionResponse>('/users/subscription');
   
   // Ensure accounts is always an array - handle cases where API returns error object
@@ -116,8 +116,9 @@ export default function AccountsPage() {
 
   // If subscription says user has accounts but list is empty, treat as loading (never show Connect section)
   const hasAccountsFromUsage = accountsUsed > 0;
-  // Only show Connect section when both requests have loaded and we're sure user has 0 accounts (avoids flash on refresh)
+  // Only show Connect section when both requests have loaded and we're sure user has 0 accounts (avoids flash on refresh). Don't show when accounts fetch failed (show error + retry instead).
   const showConnectEmptyState =
+    !accountsError &&
     !isLoading &&
     !subscriptionLoading &&
     !refreshingAfterConnect &&
@@ -336,8 +337,25 @@ export default function AccountsPage() {
         )}
       </div>
 
-      {/* Loading State - show while loading (accounts or subscription), refetching after OAuth, or when usage says we have accounts but list not yet loaded */}
-      {(isLoading || subscriptionLoading || refreshingAfterConnect || (hasAccountsFromUsage && accounts.length === 0)) && (
+      {/* Error State - accounts fetch failed: show retry instead of infinite loading */}
+      {accountsError && !isLoading && (
+        <div className="bg-white rounded-2xl border-2 border-red-200 shadow-xl p-8">
+          <div className="max-w-xl mx-auto text-center">
+            <ExclamationTriangleIcon className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h3 className="text-lg font-bold text-gray-900 mb-2">Couldn&apos;t load accounts</h3>
+            <p className="text-sm text-gray-600 mb-4">{accountsError.message}</p>
+            <button
+              onClick={() => mutateAccounts(undefined, { revalidate: true })}
+              className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Loading State - show while loading (accounts or subscription), refetching after OAuth, or when usage says we have accounts but list not yet loaded). Don't show when there's an error (show retry above). */}
+      {!accountsError && (isLoading || subscriptionLoading || refreshingAfterConnect || (hasAccountsFromUsage && accounts.length === 0)) && (
         <TableSkeleton rows={3} columns={4} />
       )}
 
