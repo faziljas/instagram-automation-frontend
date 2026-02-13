@@ -693,18 +693,21 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
                       
                       await post(url, { text: messageToSend });
                       
-                      // Refresh messages after sending to get the real message from server
-                      // This ensures we have the correct message_id and timestamp
-                      fetchMessages();
-                      fetchConversations();
+                      // Reset sending state immediately - message already shown optimistically
+                      setIsSending(false);
+                      
+                      // Refresh messages silently (no loading indicator) to get real message from server
+                      // This ensures we have the correct message_id and timestamp without showing loading
+                      fetchMessages(false, true);
+                      fetchConversations(false, true);
                       refreshStats();
                       
-                      // Also refresh after 5 seconds to ensure message appears even if initial refresh missed it
+                      // Also refresh after 2 seconds silently to ensure message appears even if initial refresh missed it
                       // This handles edge cases where the message might not be immediately available
                       setTimeout(() => {
-                        fetchMessages();
+                        fetchMessages(false, true);
                         refreshStats();
-                      }, 5000);
+                      }, 2000);
                     } catch (error: any) {
                       console.error('Failed to send message:', error);
                       
@@ -714,9 +717,10 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
                       // Restore message text so user can retry
                       setMessageText(messageToSend);
                       
-                      alert(error?.message || 'Failed to send message. Please try again.');
-                    } finally {
+                      // Reset sending state on error
                       setIsSending(false);
+                      
+                      alert(error?.message || 'Failed to send message. Please try again.');
                     }
                   }}
                 >
