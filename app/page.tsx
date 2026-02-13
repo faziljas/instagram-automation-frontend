@@ -144,12 +144,15 @@ export default function HomePage() {
             </Link>
           </div>
 
-          {/* Creative Dashboard Preview */}
+          {/* Creative Dashboard Preview - Business Tips */}
           <div className="w-full max-w-4xl mx-auto relative">
-            {/* Dark Background Container */}
-            <div className="bg-gradient-to-br from-slate-900 via-purple-900/30 to-slate-900 rounded-3xl shadow-2xl shadow-purple-500/20 border border-purple-500/20 overflow-hidden p-8 md:p-12">
+            {/* Instagram Gradient Background Container */}
+            <div className="bg-gradient-to-br from-purple-600 via-pink-500 to-orange-500 rounded-3xl shadow-2xl shadow-purple-500/30 border border-white/20 overflow-hidden p-8 md:p-12 relative" style={{ background: 'linear-gradient(to bottom right, #9333ea, #ec4899, #f97316, #eab308)' }}>
+              {/* Overlay for better text readability */}
+              <div className="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+              
               {/* Background Pattern */}
-              <div className="absolute inset-0 opacity-10">
+              <div className="absolute inset-0 opacity-20">
                 <div
                   className="w-full h-full"
                   style={{
@@ -162,122 +165,109 @@ export default function HomePage() {
                 />
               </div>
 
-              {/* Gradient Blobs */}
-              <div className="absolute top-0 right-0 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl opacity-50" />
-              <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl opacity-50" />
-
               {/* Content */}
               <div className="relative z-10">
                 {/* Preview Header */}
                 <div className="text-center mb-10">
                   <div className="inline-flex items-center gap-2 mb-4">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                    <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white font-bold text-sm shadow-lg border border-white/30">
                       LD
                     </div>
-                    <span className="text-white/60 text-sm font-medium">Dashboard Preview</span>
+                    <span className="text-white/90 text-sm font-medium">How We Help Your Business</span>
                   </div>
                   <h2 className="text-4xl md:text-5xl font-bold text-white mb-3">
-                    See What Awaits You
+                    Grow Your Instagram Business
                   </h2>
-                  <p className="text-white/70 text-lg">
-                    Get instant insights into your Instagram automation performance
+                  <p className="text-white/90 text-lg">
+                    Discover how automation can transform your Instagram presence
                   </p>
                 </div>
 
-                {/* Main Stats Cards */}
+                {/* Business Improvement Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                  {/* Card 1: DMs Sent */}
-                  <div className="bg-slate-800/80 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50 shadow-xl hover:border-blue-500/50 transition-all duration-300 hover:scale-105">
+                  {/* Card 1: Save Time */}
+                  <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 shadow-xl hover:border-white/40 transition-all duration-300 hover:scale-105">
                     <div className="flex items-start justify-between mb-4">
-                      <h3 className="text-xs font-semibold text-white/70 uppercase tracking-wide">DMs Sent</h3>
-                      <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
-                        <ChatBubbleLeftRightIcon className="w-5 h-5 text-blue-400" />
+                      <h3 className="text-xs font-semibold text-white/90 uppercase tracking-wide">Save Time</h3>
+                      <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                        <BoltIcon className="w-5 h-5 text-white" />
                       </div>
-                    </div>
-                    <div className="mb-4">
-                      <p className="text-4xl font-bold text-white mb-3">847</p>
-                      <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full" style={{ width: '75%' }}></div>
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <p className="text-sm text-white/60">Today: <span className="text-white font-medium">23 DMs</span></p>
-                      <p className="text-sm text-white/60">This week: <span className="text-white font-medium">156 DMs</span></p>
-                    </div>
-                  </div>
-
-                  {/* Card 2: Leads Captured */}
-                  <div className="bg-slate-800/80 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50 shadow-xl hover:border-purple-500/50 transition-all duration-300 hover:scale-105">
-                    <div className="flex items-start justify-between mb-4">
-                      <h3 className="text-xs font-semibold text-white/70 uppercase tracking-wide">Leads</h3>
-                      <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
-                        <BoltIcon className="w-5 h-5 text-purple-400" />
-                      </div>
-                    </div>
-                    <div className="mb-4">
-                      <p className="text-4xl font-bold text-white mb-2">42</p>
-                      <div className="flex items-center gap-1">
-                        <span className="text-sm text-green-400 font-medium">+12 this week</span>
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <p className="text-sm text-white/60">Conversion: <span className="text-white font-medium">4.9%</span></p>
-                      <p className="text-sm text-white/60">Avg response: <span className="text-white font-medium">2.3h</span></p>
-                    </div>
-                  </div>
-
-                  {/* Card 3: Active Rules */}
-                  <div className="bg-slate-800/80 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50 shadow-xl hover:border-green-500/50 transition-all duration-300 hover:scale-105">
-                    <div className="flex items-start justify-between mb-4">
-                      <h3 className="text-xs font-semibold text-white/70 uppercase tracking-wide">Active Rules</h3>
-                      <div className="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center">
-                        <ShieldCheckIcon className="w-5 h-5 text-green-400" />
-                      </div>
-                    </div>
-                    <div className="mb-4">
-                      <p className="text-4xl font-bold text-white">3</p>
                     </div>
                     <div className="space-y-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-2.5 h-2.5 rounded-full bg-green-400"></div>
-                        <div className="flex-1">
-                          <p className="text-sm text-white font-medium">Story Reply</p>
-                          <p className="text-xs text-white/50">12 triggers today</p>
-                        </div>
+                      <p className="text-white text-base leading-relaxed">
+                        Automate repetitive responses and free up <span className="font-semibold">20+ hours per week</span> to focus on creating content and growing your brand.
+                      </p>
+                      <div className="pt-2 border-t border-white/20">
+                        <p className="text-sm text-white/80">
+                          Never miss a comment or DM again, even while you sleep.
+                        </p>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <div className="w-2.5 h-2.5 rounded-full bg-green-400"></div>
-                        <div className="flex-1">
-                          <p className="text-sm text-white font-medium">DM Follow-up</p>
-                          <p className="text-xs text-white/50">8 triggers today</p>
-                        </div>
+                    </div>
+                  </div>
+
+                  {/* Card 2: Increase Engagement */}
+                  <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 shadow-xl hover:border-white/40 transition-all duration-300 hover:scale-105">
+                    <div className="flex items-start justify-between mb-4">
+                      <h3 className="text-xs font-semibold text-white/90 uppercase tracking-wide">Boost Engagement</h3>
+                      <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                        <ChatBubbleLeftRightIcon className="w-5 h-5 text-white" />
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <p className="text-white text-base leading-relaxed">
+                        Respond to comments and DMs instantly, improving your <span className="font-semibold">response rate by 300%</span> and building stronger relationships with your audience.
+                      </p>
+                      <div className="pt-2 border-t border-white/20">
+                        <p className="text-sm text-white/80">
+                          Fast responses show you care and boost Instagram algorithm favor.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Card 3: Capture Leads */}
+                  <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 shadow-xl hover:border-white/40 transition-all duration-300 hover:scale-105">
+                    <div className="flex items-start justify-between mb-4">
+                      <h3 className="text-xs font-semibold text-white/90 uppercase tracking-wide">Generate Leads</h3>
+                      <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                        <ShieldCheckIcon className="w-5 h-5 text-white" />
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <p className="text-white text-base leading-relaxed">
+                        Automatically capture contact information from interested followers and turn <span className="font-semibold">comments into customers</span> without manual work.
+                      </p>
+                      <div className="pt-2 border-t border-white/20">
+                        <p className="text-sm text-white/80">
+                          Build your email list and nurture leads automatically.
+                        </p>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Bottom Stats Bar */}
-                <div className="bg-gradient-to-r from-slate-800/90 via-slate-800/80 to-slate-800/90 backdrop-blur-md rounded-2xl p-8 border border-slate-700/50 shadow-xl">
-                  <div className="grid grid-cols-3 gap-6">
+                {/* Bottom Benefits Bar */}
+                <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20 shadow-xl">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="text-center">
-                      <p className="text-3xl font-bold text-white mb-2">5,000+</p>
-                      <p className="text-xs text-white/60 uppercase tracking-wide">Active Creators</p>
+                      <p className="text-2xl font-bold text-white mb-2">24/7 Availability</p>
+                      <p className="text-sm text-white/80">Your automation works around the clock, engaging followers even when you're offline</p>
                     </div>
-                    <div className="text-center border-x border-slate-700">
-                      <p className="text-3xl font-bold text-white mb-2">2M+</p>
-                      <p className="text-xs text-white/60 uppercase tracking-wide">DMs Automated</p>
+                    <div className="text-center border-y border-white/20 md:border-y-0 md:border-x border-white/20 py-4 md:py-0">
+                      <p className="text-2xl font-bold text-white mb-2">Scale Effortlessly</p>
+                      <p className="text-sm text-white/80">Handle thousands of interactions without hiring additional staff</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-3xl font-bold text-white mb-2">99.9%</p>
-                      <p className="text-xs text-white/60 uppercase tracking-wide">Uptime</p>
+                      <p className="text-2xl font-bold text-white mb-2">Data-Driven Growth</p>
+                      <p className="text-sm text-white/80">Track performance metrics and optimize your automation strategy</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Call to Action */}
                 <div className="mt-8 text-center">
-                  <p className="text-white/80 text-base">
-                    Start automating in <span className="text-white font-semibold">60 seconds</span> • No credit card required
+                  <p className="text-white text-lg font-medium">
+                    Ready to transform your Instagram business? <span className="font-bold">Start free today</span> • No credit card required
                   </p>
                 </div>
               </div>
