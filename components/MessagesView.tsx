@@ -395,8 +395,18 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
           <div className="bg-white border border-gray-200 rounded-lg p-4">
             <div className="flex items-center">
               <PaperAirplaneIcon className="h-8 w-8 text-purple-600 mr-3" />
-              <div>
-                <p className="text-sm text-gray-600">Messages Sent</p>
+              <div className="flex-1">
+                <div className="flex items-center gap-1">
+                  <p className="text-sm text-gray-600">Messages Sent</p>
+                  <div className="group relative">
+                    <svg className="h-4 w-4 text-gray-400 cursor-help" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 p-2 bg-gray-900 text-white text-xs rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                      Total messages sent across all conversations for this Instagram account
+                    </div>
+                  </div>
+                </div>
                 <p className="text-2xl font-bold text-gray-900">{stats?.messages_sent || 0}</p>
               </div>
             </div>
@@ -404,8 +414,18 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
           <div className="bg-white border border-gray-200 rounded-lg p-4">
             <div className="flex items-center">
               <ChatBubbleLeftRightIcon className="h-8 w-8 text-teal-600 mr-3" />
-              <div>
-                <p className="text-sm text-gray-600">Messages Received</p>
+              <div className="flex-1">
+                <div className="flex items-center gap-1">
+                  <p className="text-sm text-gray-600">Messages Received</p>
+                  <div className="group relative">
+                    <svg className="h-4 w-4 text-gray-400 cursor-help" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 p-2 bg-gray-900 text-white text-xs rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                      Total messages received across all conversations for this Instagram account
+                    </div>
+                  </div>
+                </div>
                 <p className="text-2xl font-bold text-gray-900">{stats?.messages_received || 0}</p>
               </div>
             </div>
