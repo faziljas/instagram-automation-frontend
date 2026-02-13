@@ -195,7 +195,23 @@ export default function AnalyticsPage() {
 
   // Use real daily breakdown data from API
   // Ensure daily_breakdown is always an array - handle cases where API returns error object
-  const rawBreakdown = Array.isArray(data?.daily_breakdown) ? data.daily_breakdown : [];
+  let rawBreakdown = Array.isArray(data?.daily_breakdown) ? data.daily_breakdown : [];
+  // Fallback: when aggregate metrics show activity but daily_breakdown has all zeros,
+  // put totals in the last day so the Activity Over Time graph displays
+  const hasAggregateActivity =
+    (data?.total_triggers || 0) + (data?.total_dms_sent || 0) + (data?.leads_collected || 0) > 0;
+  const hasPerDayActivity = rawBreakdown.some((d) => (d.total || 0) > 0);
+  if (!hasPerDayActivity && hasAggregateActivity && rawBreakdown.length > 0) {
+    const totalTriggers = data?.total_triggers || 0;
+    const totalDms = data?.total_dms_sent || 0;
+    const totalLeads = data?.leads_collected || 0;
+    rawBreakdown = rawBreakdown.map((d, i) => {
+      const isLast = i === rawBreakdown.length - 1;
+      return isLast
+        ? { ...d, triggers: totalTriggers, dms_sent: totalDms, leads: totalLeads, total: totalTriggers + totalDms + totalLeads }
+        : d;
+    });
+  }
   // For 90 days, 90 bars are too narrow and break layout. Bucket into weeks (max ~13 bars).
   const activityData =
     days > 30

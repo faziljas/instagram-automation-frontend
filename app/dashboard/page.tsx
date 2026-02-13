@@ -5,7 +5,7 @@ import { useFetch } from '@/hooks/useFetch';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useParallelFetch } from '@/hooks/useParallelFetch';
 import { GridStatsSkeleton } from '@/components/Skeleton';
-import { useState, useEffect, useMemo, memo } from 'react';
+import { useMemo } from 'react';
 import {
   UserGroupIcon,
   BoltIcon,
@@ -101,18 +101,10 @@ export default function DashboardPage() {
   // Fetch critical data first (dashboard stats)
   const { data, isLoading } = useFetch<DashboardResponse>('/users/me/dashboard');
   
-  // Lazy load non-critical data (analytics and leads) after initial render
-  const [shouldLoadSecondaryData, setShouldLoadSecondaryData] = useState(false);
-  
-  useEffect(() => {
-    // Load secondary data after a short delay to prioritize critical content
-    const timer = setTimeout(() => {
-      setShouldLoadSecondaryData(true);
-    }, 100);
-    return () => clearTimeout(timer);
-  }, []);
+  // Fetch analytics and leads immediately (no delay) so values display as fast as possible
+  const shouldLoadSecondaryData = true;
 
-  // Fetch analytics and leads in parallel (only after initial render)
+  // Fetch analytics and leads in parallel
   const {
     data: secondaryData,
     isLoading: isSecondaryLoading,
