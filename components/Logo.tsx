@@ -53,7 +53,17 @@ export default function Logo({ className = '', size = 'md', variant = 'light' }:
         <span className={textColor}>c</span>
 
         {/* "DM" with gradient – immediately after Logic */}
-        <span className="bg-gradient-to-r from-orange-500 via-pink-500 to-purple-600 bg-clip-text text-transparent">
+        <span 
+          className={`${
+            variant === 'light' 
+              ? 'bg-gradient-to-r from-yellow-200 via-pink-200 to-purple-200 bg-clip-text text-transparent' 
+              : 'bg-gradient-to-r from-orange-500 via-pink-500 to-purple-600 bg-clip-text text-transparent'
+          }`}
+          style={variant === 'light' ? { 
+            textShadow: '0 0 10px rgba(255,255,255,0.8), 0 0 20px rgba(255,192,203,0.5)',
+            filter: 'brightness(1.2)'
+          } : {}}
+        >
           DM
         </span>
       </div>
