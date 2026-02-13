@@ -769,13 +769,12 @@ export default function AutomationsPage() {
             )}
             {/* Show content immediately if we have media, even if still loading more */}
             {media.length > 0 && viewMode === 'table' ? (
-          // Table View with Analytics
-          <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl overflow-hidden w-full">
-            <div className="px-4 md:px-6 py-3 md:py-4 border-b-2 border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
-              <h3 className="text-base md:text-xl font-bold text-gray-900">AUTOMATIONS</h3>
-            </div>
-            {/* Show content immediately - don't block on analytics loading */}
-            {(() => {
+              <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl overflow-hidden w-full">
+                <div className="px-4 md:px-6 py-3 md:py-4 border-b-2 border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
+                  <h3 className="text-base md:text-xl font-bold text-gray-900">AUTOMATIONS</h3>
+                </div>
+                {/* Show content immediately - don't block on analytics loading */}
+                {(() => {
               // Create a map of media_id to analytics for quick lookup
               const analyticsMap = new Map(mediaAnalytics.map(a => [a.media_id, a]));
               
@@ -1062,11 +1061,11 @@ export default function AutomationsPage() {
                 )}
                 </>
               );
-            })()}
-          </div>
-        ) : media.length > 0 && viewMode === 'grid' ? (
-          <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                })()}
+              </div>
+            ) : media.length > 0 && viewMode === 'grid' ? (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...media]
               .sort((a, b) => {
                 // Show media with automation rules first (same as table view)
@@ -1259,6 +1258,7 @@ export default function AutomationsPage() {
               </button>
             </div>
           )}
+                </>
               ) : null}
             {/* Show empty state only if not loading and no media */}
             {!isLoadingMedia && media.length === 0 && (
