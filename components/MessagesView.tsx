@@ -64,11 +64,14 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
   const [isLoadingConversations, setIsLoadingConversations] = useState(false);
   const [isLoadingMoreConversations, setIsLoadingMoreConversations] = useState(false);
 
-  const fetchConversations = useCallback(async (loadMore?: boolean) => {
+  const fetchConversations = useCallback(async (loadMore?: boolean, silent?: boolean) => {
     if (!accountId) return;
     const offset = loadMore ? nextConversationsOffset : 0;
-    if (loadMore) setIsLoadingMoreConversations(true);
-    else setIsLoadingConversations(true);
+    // Only show loading state if not silent refresh
+    if (!silent) {
+      if (loadMore) setIsLoadingMoreConversations(true);
+      else setIsLoadingConversations(true);
+    }
     try {
       const data = await get<{
         success: boolean;
@@ -87,10 +90,12 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
       setNextConversationsOffset(typeof data?.next_offset === 'number' ? data.next_offset : offset + list.length);
     } catch (e) {
       console.error('Fetch conversations error:', e);
-      if (!loadMore) setConversations([]);
+      if (!loadMore && !silent) setConversations([]);
     } finally {
-      setIsLoadingConversations(false);
-      setIsLoadingMoreConversations(false);
+      if (!silent) {
+        setIsLoadingConversations(false);
+        setIsLoadingMoreConversations(false);
+      }
     }
   }, [accountId, nextConversationsOffset]);
 
@@ -264,7 +269,9 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accountId, session]);
 
-  // Polling: refresh only when tab is visible, every 20s. Message sync is via webhooks + Sync button.
+  // Silent background polling: refresh stats and conversations list silently (no loading states)
+  // Messages are updated via webhooks, so we don't need to poll them
+  // Increased interval to 40s to reduce perceived loading and improve stability
   useEffect(() => {
     if (!accountId || typeof document === 'undefined') return;
     
@@ -273,29 +280,38 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
       return;
     }
 
-    const refresh = () => {
+    // Silent refresh: Only refresh stats and conversations list without showing loading states
+    // This prevents the UI from appearing to reload constantly
+    const silentRefresh = () => {
       if (!session?.access_token) return;
+      // Use SWR's mutate for silent stats refresh (no loading indicator)
       refreshStats();
-      fetchConversations();
-      if (selectedConversation) fetchMessages();
+      // Silent conversations refresh (no loading indicator)
+      fetchConversations(false, true);
+      // Don't refresh messages - they're updated via webhooks and manual refresh
     };
 
     const handleVisibility = () => {
-      if (document.visibilityState === 'visible') refresh();
+      if (document.visibilityState === 'visible') {
+        // Silent refresh when tab becomes visible
+        silentRefresh();
+      }
     };
 
     document.addEventListener('visibilitychange', handleVisibility);
 
+    // Increased interval to 40 seconds to reduce perceived loading
+    // Only refresh stats and conversations list silently (not messages)
     const intervalId = setInterval(() => {
       if (document.visibilityState !== 'visible') return;
-      refresh();
-    }, 20000); // 20 seconds when tab visible
+      silentRefresh();
+    }, 40000); // 40 seconds - reduces perceived loading while keeping data fresh
 
     return () => {
       document.removeEventListener('visibilitychange', handleVisibility);
       clearInterval(intervalId);
     };
-  }, [accountId, selectedConversation, session, refreshStats, fetchConversations, fetchMessages]);
+  }, [accountId, session, refreshStats, fetchConversations]);
 
   return (
     <div className="min-h-[calc(100vh-200px)] md:h-[calc(100vh-200px)] flex flex-col bg-white rounded-lg shadow-lg overflow-hidden w-full max-w-full">
