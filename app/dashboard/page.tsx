@@ -370,15 +370,22 @@ export default function DashboardPage() {
                     return (
                       <div
                         key={index}
-                        className="flex-1 flex flex-col items-center space-y-2"
+                        className="group flex-1 flex flex-col items-center space-y-2"
                       >
-                        <div className="w-full bg-gray-50 rounded-lg h-32 flex items-end overflow-hidden relative">
+                        <div className="w-full bg-gray-50 rounded-lg h-32 flex items-end overflow-visible relative">
                           {barHeight > 0 && (
-                            <div
-                              className="w-full bg-gradient-to-t from-blue-500 to-indigo-400 rounded-lg transition-all"
-                              style={{ height: `${barHeight}%`, minHeight: '20px' }}
-                              title={`${day?.date || day?.date_label || ''}: ${dayTotal} total (${day?.triggers || 0} triggers, ${day?.dms_sent || 0} DMs, ${day?.leads || 0} leads)`}
-                            />
+                            <>
+                              <div
+                                className="w-full bg-gradient-to-t from-blue-500 to-indigo-400 rounded-lg transition-colors cursor-pointer hover:from-blue-600 hover:to-indigo-500 relative z-0"
+                                style={{ height: `${barHeight}%`, minHeight: '20px' }}
+                              />
+                              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 opacity-0 group-hover:opacity-100 transition-opacity duration-0 bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-20 pointer-events-none">
+                                {dayTotal} total
+                                <div className="text-[10px] text-gray-300 mt-0.5">
+                                  {day?.triggers || 0}T, {day?.dms_sent || 0}DM, {day?.leads || 0}L
+                                </div>
+                              </div>
+                            </>
                           )}
                         </div>
                         <span className="text-[10px] uppercase tracking-wide text-gray-400">

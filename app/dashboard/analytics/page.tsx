@@ -340,14 +340,13 @@ export default function AnalyticsPage() {
                     style={{ height: chartHeightPx }}
                   >
                     <div
-                      className="w-full bg-gradient-to-t from-blue-500 to-blue-400 rounded-t hover:from-blue-600 hover:to-blue-500 transition-all cursor-pointer shadow-sm group-hover:shadow-md"
+                      className="w-full bg-gradient-to-t from-blue-500 to-blue-400 rounded-t hover:from-blue-600 hover:to-blue-500 transition-colors cursor-pointer shadow-sm group-hover:shadow-md"
                       style={{
                         height: `${barHeightPx}px`,
                         minHeight: '4px',
                       }}
-                      title={`${item.date}: ${item.total} total (${item.triggers} triggers, ${item.dms_sent} DMs, ${item.leads} leads)`}
                     />
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-10 pointer-events-none">
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 opacity-0 group-hover:opacity-100 transition-opacity duration-0 bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-10 pointer-events-none"
                       {item.total} total
                       <div className="text-[10px] text-gray-300 mt-0.5">
                         {item.triggers}T, {item.dms_sent}DM, {item.leads}L
