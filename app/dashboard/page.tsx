@@ -144,16 +144,42 @@ export default function DashboardPage() {
   const { totalDMs, leadsCaptured, activeRules, timeSavedHours } = metrics;
 
   // OPTIMIZED: Memoize daily breakdown processing
+  // Fallback: when aggregate metrics show activity but daily_breakdown has no per-day data
+  // (e.g. date mismatch or cache), synthesize a fallback so the graph displays
   const { dailyBreakdown, engagementData, hasAnyActivity } = useMemo(() => {
-    const breakdown = Array.isArray(analyticsData?.daily_breakdown) ? analyticsData.daily_breakdown : [];
+    let breakdown = Array.isArray(analyticsData?.daily_breakdown) ? analyticsData.daily_breakdown : [];
+    let hasActivity = breakdown.some((d) => (d.total || 0) > 0);
+
+    const totalDms = analyticsData?.total_dms_sent || 0;
+    const totalLeads = analyticsData?.leads_collected || 0;
+    const totalTriggers = analyticsData?.total_triggers || 0;
+    const hasAggregateActivity = totalDms + totalLeads + totalTriggers > 0;
+
+    if (!hasActivity && hasAggregateActivity && breakdown.length > 0) {
+      // Put aggregate totals in the last day (most recent) so graph shows activity
+      const fallbackTotal = totalTriggers + totalDms + totalLeads;
+      breakdown = breakdown.map((d, i) => {
+        const isLastDay = i === breakdown.length - 1;
+        return isLastDay
+          ? {
+              ...d,
+              triggers: totalTriggers,
+              dms_sent: totalDms,
+              leads: totalLeads,
+              total: fallbackTotal,
+            }
+          : d;
+      });
+      hasActivity = true;
+    }
+
     const maxTotal = Math.max(...breakdown.map((d) => d.total || 0), 1);
-    const hasActivity = breakdown.some((d) => (d.total || 0) > 0);
     const engagement = breakdown.map((day) => {
       const dayTotal = day.total || 0;
       return maxTotal > 0 ? (dayTotal / maxTotal) * 100 : 0;
     });
     return { dailyBreakdown: breakdown, engagementData: engagement, hasAnyActivity: hasActivity };
-  }, [analyticsData?.daily_breakdown]);
+  }, [analyticsData?.daily_breakdown, analyticsData?.total_dms_sent, analyticsData?.leads_collected, analyticsData?.total_triggers]);
 
   // OPTIMIZED: Memoize recent activity processing
   const recentActivity = useMemo(() => {
