@@ -173,8 +173,8 @@ export default function HomePage() {
                 {/* Preview Header */}
                 <div className="text-center mb-10">
                   <div className="inline-flex items-center gap-3 mb-4">
-                    <div className="px-4 py-2 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-lg border border-white/30">
-                      <Logo size="sm" variant="light" />
+                    <div className="px-4 py-2 rounded-xl bg-white flex items-center justify-center shadow-lg border border-white/30">
+                      <Logo size="sm" variant="dark" />
                     </div>
                     <span className="text-white/90 text-sm font-medium">How We Help Your Business</span>
                   </div>
