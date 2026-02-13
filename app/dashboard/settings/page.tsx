@@ -7,7 +7,7 @@ import { useFetch } from '@/hooks/useFetch';
 import { usePut, useDelete, usePost } from '@/hooks/useApi';
 import { useAuth } from '@/hooks/useAuth';
 import { User } from '@/types';
-import { ExclamationTriangleIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import { mutate } from 'swr';
 
 // Zod validation schemas
@@ -65,8 +65,6 @@ interface BillingSettingsProps {
   cancelLoading: boolean;
   onOpenInvoicePortal: () => void;
   portalLoading: boolean;
-  onSyncInvoices: () => void;
-  syncInvoicesLoading: boolean;
 }
 
 const BillingSettings: React.FC<BillingSettingsProps> = ({
@@ -80,8 +78,6 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
   portalLoading,
   cancelLoading,
   onOpenInvoicePortal,
-  onSyncInvoices,
-  syncInvoicesLoading,
 }) => {
   if (isLoading) {
     return (
@@ -203,18 +199,7 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
 
       {/* Invoice and payment details */}
       <section className="space-y-3">
-        <div className="flex items-center justify-between gap-3">
-          <h3 className="text-sm font-semibold text-gray-900">Invoice and payment details</h3>
-          <button
-            type="button"
-            onClick={onSyncInvoices}
-            disabled={syncInvoicesLoading || invoicesLoading}
-            className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            <ArrowPathIcon className={`h-4 w-4 ${syncInvoicesLoading ? 'animate-spin' : ''}`} />
-            {syncInvoicesLoading ? 'Syncing…' : 'Sync invoices'}
-          </button>
-        </div>
+        <h3 className="text-sm font-semibold text-gray-900">Invoice and payment details</h3>
         <div className="overflow-hidden rounded-xl border border-gray-100 bg-white w-full">
           <div className="overflow-x-auto w-full">
             <table className="min-w-full divide-y divide-gray-100">
@@ -250,7 +235,7 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
                       <div>
                         <p className="font-medium">Unable to load invoices</p>
                         <p className="mt-1 text-amber-700">{invoicesError.message}</p>
-                        <p className="mt-2 text-xs">Try syncing invoices above or refresh the page.</p>
+                        <p className="mt-2 text-xs">Refresh the page to try again.</p>
                       </div>
                     </div>
                   </td>
@@ -389,7 +374,6 @@ export default function SettingsPage() {
   const { execute: deleteAccount, loading: deleteLoading } = useDelete();
   const { execute: createPortalSession, loading: portalLoading } = usePost();
   const { execute: cancelSubscription, loading: cancelLoading } = usePost();
-  const { execute: syncInvoices, loading: syncInvoicesLoading } = usePost();
 
   const [profileData, setProfileData] = useState<ProfileFormData>({
     firstName: '',
@@ -628,17 +612,6 @@ export default function SettingsPage() {
 
   const handleUpgradeClick = () => {
     router.push('/dashboard/subscription');
-  };
-
-  const handleSyncInvoices = async () => {
-    try {
-      await syncInvoices('/api/dodo/sync-invoices', {});
-      // Refresh invoices list
-      await mutateInvoices(undefined, { revalidate: true });
-    } catch (error) {
-      console.error('Failed to sync invoices:', error);
-      alert(error instanceof Error ? error.message : 'Unable to sync invoices. Please try again.');
-    }
   };
 
   const handleOpenStripePortal = async () => {
@@ -1000,8 +973,6 @@ export default function SettingsPage() {
         onOpenInvoicePortal={handleOpenStripePortal}
         portalLoading={portalLoading}
         cancelLoading={cancelLoading}
-        onSyncInvoices={handleSyncInvoices}
-        syncInvoicesLoading={syncInvoicesLoading}
       />
     );
   };
