@@ -218,25 +218,7 @@ export default function AutomationsPage() {
     }
   }, [selectedAccount, session, media.length, isLoadingMedia]);
 
-  // Fetch media when account or tab is selected
-  useEffect(() => {
-    if (!selectedAccount) {
-      setMedia([]);
-      setMediaNextCursor(null);
-      setMediaHasMore(false);
-      return;
-    }
-
-    setMedia([]);
-    setMediaNextCursor(null);
-    setMediaHasMore(false);
-
-    if (selectedTab === 'posts' || selectedTab === 'stories' || selectedTab === 'live') {
-      fetchMedia();
-    }
-  }, [selectedAccount, selectedTab, fetchMedia]);
-
-  // OPTIMIZED: Memoize fetchMedia function to prevent recreation
+  // OPTIMIZED: Memoize fetchMedia function to prevent recreation (must be defined before useEffect)
   const fetchMedia = useCallback(async (opts?: { after?: string | null }) => {
     if (!selectedAccount) return;
     if (!session?.access_token) {
@@ -284,6 +266,24 @@ export default function AutomationsPage() {
       setIsLoadingMore(false);
     }
   }, [selectedAccount, selectedTab, session?.access_token]);
+
+  // Fetch media when account or tab is selected
+  useEffect(() => {
+    if (!selectedAccount) {
+      setMedia([]);
+      setMediaNextCursor(null);
+      setMediaHasMore(false);
+      return;
+    }
+
+    setMedia([]);
+    setMediaNextCursor(null);
+    setMediaHasMore(false);
+
+    if (selectedTab === 'posts' || selectedTab === 'stories' || selectedTab === 'live') {
+      fetchMedia();
+    }
+  }, [selectedAccount, selectedTab, fetchMedia]);
 
   // OPTIMIZED: Memoize fetchDMs function
   const fetchDMs = useCallback(async () => {
@@ -1065,7 +1065,7 @@ export default function AutomationsPage() {
                 )}
                 </>
               );
-                }, [mediaAnalytics, media, selectedTab, automationRules, hasReachedRulesLimit, currentRulesCount, rulesLimit, deleteConfirmRuleId, isLoadingMore, mediaHasMore, mediaNextCursor, handleSetupAutomation])}
+                }, [mediaAnalytics, media, selectedTab, automationRules, hasReachedRulesLimit, currentRulesCount, rulesLimit, deleteConfirmRuleId, isLoadingMore, mediaHasMore, mediaNextCursor])}
               </div>
             ) : media.length > 0 && viewMode === 'grid' ? (
               <>
