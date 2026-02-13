@@ -748,7 +748,7 @@ export default function AutomationsPage() {
         </div>
       )}
 
-      {/* Content Display */}
+      {/* Content Display - Show immediately, don't block on loading */}
       {selectedAccount ? (
         // CRITICAL FIX: Check for DMs tab FIRST before checking media length
         // This ensures MessagesView is rendered instead of the empty state
@@ -761,53 +761,21 @@ export default function AutomationsPage() {
               <p className="text-gray-500">Please select an Instagram account to view messages</p>
             </div>
           )
-        ) : isLoadingMedia ? (
-          <TableSkeleton rows={6} columns={3} />
-        ) : media.length === 0 ? (
-          <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl text-center py-16 px-6">
-            <div className="bg-gradient-to-br from-gray-100 to-gray-200 rounded-full p-6 w-fit mx-auto mb-6">
-              <svg
-                className="mx-auto h-16 w-16 text-gray-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                />
-              </svg>
-            </div>
-            <h3 className="mt-4 text-2xl font-bold text-gray-900">
-              {selectedTab === 'posts' && 'No posts/reels found'}
-              {selectedTab === 'stories' && 'No stories found'}
-              {selectedTab === 'live' && 'No live videos found'}
-            </h3>
-            <p className="mt-2 text-base text-gray-600">
-              {selectedTab === 'posts' && "We couldn't fetch any posts or reels for this account. Please try again later."}
-              {selectedTab === 'stories' && "We couldn't fetch any stories for this account. Stories are only available for 24 hours after posting."}
-              {selectedTab === 'live' && "We couldn't fetch any live videos for this account. Please try again later."}
-            </p>
-          </div>
-        ) : viewMode === 'table' ? (
+        ) : (
+          <>
+            {/* Show loading skeleton only if no media at all */}
+            {isLoadingMedia && media.length === 0 && (
+              <TableSkeleton rows={6} columns={3} />
+            )}
+            {/* Show content immediately if we have media, even if still loading more */}
+            {media.length > 0 && viewMode === 'table' ? (
           // Table View with Analytics
           <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl overflow-hidden w-full">
             <div className="px-4 md:px-6 py-3 md:py-4 border-b-2 border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
               <h3 className="text-base md:text-xl font-bold text-gray-900">AUTOMATIONS</h3>
             </div>
-            {isLoadingMedia || isLoadingAnalytics ? (
-              <div className="p-6 text-center">
-                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                <p className="mt-2 text-sm text-gray-500">Loading...</p>
-              </div>
-            ) : media.length === 0 ? (
-              <div className="p-12 text-center">
-                <p className="text-gray-500">No media found for this account.</p>
-                <p className="text-sm text-gray-400 mt-2">Posts, reels, and stories will appear here once they're fetched.</p>
-              </div>
-            ) : (() => {
+            {/* Show content immediately - don't block on analytics loading */}
+            {(() => {
               // Create a map of media_id to analytics for quick lookup
               const analyticsMap = new Map(mediaAnalytics.map(a => [a.media_id, a]));
               
@@ -1096,7 +1064,7 @@ export default function AutomationsPage() {
               );
             })()}
           </div>
-        ) : (
+        ) : media.length > 0 && viewMode === 'grid' ? (
           <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...media]
@@ -1291,6 +1259,37 @@ export default function AutomationsPage() {
               </button>
             </div>
           )}
+              ) : null}
+            {/* Show empty state only if not loading and no media */}
+            {!isLoadingMedia && media.length === 0 && (
+              <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl text-center py-16 px-6">
+                <div className="bg-gradient-to-br from-gray-100 to-gray-200 rounded-full p-6 w-fit mx-auto mb-6">
+                  <svg
+                    className="mx-auto h-16 w-16 text-gray-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="mt-4 text-2xl font-bold text-gray-900">
+                  {selectedTab === 'posts' && 'No posts/reels found'}
+                  {selectedTab === 'stories' && 'No stories found'}
+                  {selectedTab === 'live' && 'No live videos found'}
+                </h3>
+                <p className="mt-2 text-base text-gray-600">
+                  {selectedTab === 'posts' && "We couldn't fetch any posts or reels for this account. Please try again later."}
+                  {selectedTab === 'stories' && "We couldn't fetch any stories for this account. Stories are only available for 24 hours after posting."}
+                  {selectedTab === 'live' && "We couldn't fetch any live videos for this account. Please try again later."}
+                </p>
+              </div>
+            )}
           </>
         )
       ) : (

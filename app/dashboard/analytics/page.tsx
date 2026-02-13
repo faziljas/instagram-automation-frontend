@@ -63,30 +63,15 @@ export default function AnalyticsPage() {
   const [days, setDays] = useState(7);
   const [leadsPage, setLeadsPage] = useState(1);
   const [leadsPageSize, setLeadsPageSize] = useState(50);
+  // Don't block page render - show content immediately
   const { data, error, isLoading, mutate } = useFetch<AnalyticsSummary>(
     `/api/analytics/dashboard?days=${days}`,
     {
-      // Retry on 404 and 500 errors for new users (user might be auto-created on retry)
-      onErrorRetry: (error, key, config, revalidate, { retryCount }) => {
-        // Check error status from different possible error formats
-        const status = (error as any)?.response?.status || 
-                      (error as any)?.status ||
-                      (error?.message?.includes('404') ? 404 : 
-                       error?.message?.includes('500') ? 500 : null);
-        const maxRetries = 3; // Reduced retries to avoid long waits
-        
-        // Retry on 404 (user not found) or 500 (user creation failed) errors
-        if ((status === 404 || status === 500) && retryCount < maxRetries) {
-          // Wait progressively longer before retrying (exponential backoff)
-          const delay = Math.min(500 * Math.pow(2, retryCount), 2000);
-          console.log(`[Analytics] Retrying after ${delay}ms (attempt ${retryCount + 1}/${maxRetries})`);
-          setTimeout(() => revalidate({ retryCount }), delay);
-          return;
-        }
-        // Don't retry other errors or after max retries
-      },
-      errorRetryCount: 3,
+      // Reduced retries for faster failure handling
+      errorRetryCount: 1,
       errorRetryInterval: 500,
+      // Don't revalidate on focus to reduce unnecessary requests
+      revalidateOnFocus: false,
     }
   );
   const { data: leadsData } = useFetch<Lead[]>('/api/leads');

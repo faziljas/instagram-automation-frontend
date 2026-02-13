@@ -200,12 +200,8 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Show critical content immediately - analytics can load separately */}
-      {isLoading && !data ? (
-        <div className="mb-8">
-          <GridStatsSkeleton />
-        </div>
-      ) : data ? (
+      {/* Show content immediately - don't block on loading */}
+      {data ? (
         <div className="grid gap-6 mb-10">
           {/* Row 1: Core Metrics */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -498,7 +494,12 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
-      ) : null}
+      ) : (
+        // Show skeleton only if no data at all (first load)
+        <div className="mb-8">
+          <GridStatsSkeleton />
+        </div>
+      )}
     </div>
   );
 }
