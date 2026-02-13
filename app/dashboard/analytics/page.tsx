@@ -225,8 +225,11 @@ export default function AnalyticsPage() {
           return weeks;
         })()
       : rawBreakdown;
+  // Ensure maxActivity is at least 1 to prevent division by zero, and ensure bars are visible
   const maxActivity = Math.max(...activityData.map((d) => d.total), 1);
   const chartHeightPx = 200;
+  // Minimum bar height for visibility (20px) when there's any data, even if small
+  const minBarHeightPx = activityData.length > 0 && maxActivity > 0 ? 20 : 4;
 
   return (
     <div className="max-w-7xl mx-auto w-full overflow-x-hidden">
@@ -305,7 +308,9 @@ export default function AnalyticsPage() {
         >
           {activityData.length > 0 ? (
             activityData.map((item, index) => {
-              const barHeightPx = Math.max(4, (item.total / maxActivity) * chartHeightPx);
+              // Calculate bar height: ensure minimum visibility, scale proportionally
+              const calculatedHeight = maxActivity > 0 ? (item.total / maxActivity) * chartHeightPx : 0;
+              const barHeightPx = Math.max(minBarHeightPx, calculatedHeight);
               return (
                 <div
                   key={index}

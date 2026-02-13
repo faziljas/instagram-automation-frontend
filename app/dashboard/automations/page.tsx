@@ -793,51 +793,32 @@ export default function AutomationsPage() {
             </div>
           </div>
 
-          {/* Summary Stats Cards - Filtered by selected tab */}
+          {/* Summary Stats Cards - Show aggregated stats across ALL automations for the account */}
           {(() => {
-            if (isLoadingAnalytics || mediaAnalytics.length === 0) return null;
-            
-            // Filter analytics by current tab's media type
-            const filteredAnalytics = mediaAnalytics.filter((analytics) => {
-              // Find the corresponding media item to check its type
-              const mediaItem = media.find((m) => m.id === analytics.media_id);
-              if (!mediaItem) return false;
-              
-              // Filter based on selected tab
-              if (selectedTab === 'posts') {
-                // Posts/Reels: show FEED and REELS, exclude STORY
-                return mediaItem.media_product_type !== 'STORY';
-              } else if (selectedTab === 'stories') {
-                // Stories: only show STORY
-                return mediaItem.media_product_type === 'STORY';
-              } else if (selectedTab === 'live') {
-                // Live: show live media (you may need to add a check for live media type)
-                return true; // Adjust based on how live media is identified
-              }
-              return false;
-            });
-            
-            // Only show stats if there's data for this tab
-            if (filteredAnalytics.length === 0) return null;
+            // Always show stats cards, even if loading or empty (show 0)
+            // Aggregate across ALL media analytics for the selected account, not filtered by tab
+            const totalDmsSent = mediaAnalytics.reduce((sum, m) => sum + (m.dms_sent || 0), 0);
+            const totalLeadsGenerated = mediaAnalytics.reduce((sum, m) => sum + (m.leads_collected || 0), 0);
+            const totalFollowersGained = mediaAnalytics.reduce((sum, m) => sum + (m.follow_button_clicks || 0) + (m.im_following_clicks || 0), 0);
             
             return (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6">
                 <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl border-2 border-blue-200 shadow-lg p-4 md:p-6 hover:shadow-xl hover:scale-105 transition-all duration-300">
                   <div className="text-xs md:text-sm font-semibold text-blue-700 mb-1">DMs Sent</div>
                   <div className="text-2xl md:text-3xl font-bold text-blue-900">
-                    {filteredAnalytics.reduce((sum, m) => sum + m.dms_sent, 0)}
+                    {isLoadingAnalytics ? '...' : totalDmsSent}
                   </div>
                 </div>
                 <div className="bg-gradient-to-br from-green-50 to-emerald-100 rounded-2xl border-2 border-green-200 shadow-lg p-4 md:p-6 hover:shadow-xl hover:scale-105 transition-all duration-300">
                   <div className="text-xs md:text-sm font-semibold text-green-700 mb-1">Leads Generated</div>
                   <div className="text-2xl md:text-3xl font-bold text-green-900">
-                    {filteredAnalytics.reduce((sum, m) => sum + m.leads_collected, 0)}
+                    {isLoadingAnalytics ? '...' : totalLeadsGenerated}
                   </div>
                 </div>
                 <div className="bg-gradient-to-br from-purple-50 to-pink-100 rounded-2xl border-2 border-purple-200 shadow-lg p-4 md:p-6 hover:shadow-xl hover:scale-105 transition-all duration-300" title="Increases when users click &quot;Follow Me&quot; or &quot;I&#39;m following&quot; in your DM flow">
                   <div className="text-xs md:text-sm font-semibold text-purple-700 mb-1">Followers Gained via AutoDM</div>
                   <div className="text-2xl md:text-3xl font-bold text-purple-900">
-                    {filteredAnalytics.reduce((sum, m) => sum + (m.follow_button_clicks || 0) + (m.im_following_clicks || 0), 0)}
+                    {isLoadingAnalytics ? '...' : totalFollowersGained}
                   </div>
                   <div className="text-xs font-medium text-purple-600 mt-2">Follow / I&apos;m following button clicks</div>
                 </div>
