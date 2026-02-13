@@ -232,11 +232,30 @@ export default function AutomationSetupModal({
 
   const handleSubmit = async () => {
     // Validate both step 2 (trigger config) and step 3 (action config)
-    if (!validateStep(2) || !validateStep(3)) {
+    const step2Valid = validateStep(2);
+    const step3Valid = validateStep(3);
+    
+    if (!step2Valid || !step3Valid) {
+      // Navigate to the first step with errors
+      if (!step2Valid) {
+        setCurrentStep(2);
+      } else if (!step3Valid) {
+        setCurrentStep(3);
+      }
+      return;
+    }
+    
+    // Additional safety check: prevent submission if keyword trigger is selected but no keywords
+    if (useKeywordTrigger && config.keywords.filter((k) => k.trim().length > 0).length === 0) {
+      setErrors({ keywords: 'At least one trigger keyword is required' });
+      setCurrentStep(2);
       return;
     }
 
     try {
+      // Check if keywords exist (should be validated already, but double-check)
+      const hasKeywords = config.keywords.filter((k) => k.trim().length > 0).length > 0;
+      
       // Build rule configuration
       const ruleConfig: Record<string, any> = {
         delay_minutes: config.delayMinutes,
@@ -248,11 +267,17 @@ export default function AutomationSetupModal({
       }
 
       // Add keywords if "With a specific keyword" is selected
-      if (useKeywordTrigger && config.keywords.filter((k) => k.trim().length > 0).length > 0) {
+      // This should always have keywords at this point due to validation, but double-check
+      if (useKeywordTrigger && hasKeywords) {
         const validKeywords = config.keywords.filter((k) => k.trim().length > 0);
         ruleConfig.keyword = validKeywords[0]; // Backend supports single keyword for now
         // Store all keywords in config for future multi-keyword support
         ruleConfig.keywords = validKeywords;
+      } else if (useKeywordTrigger && !hasKeywords) {
+        // This should never happen due to validation, but fail safely
+        setErrors({ keywords: 'At least one trigger keyword is required' });
+        setCurrentStep(2);
+        return;
       }
 
       // Add comment replies if auto-reply is enabled
@@ -291,10 +316,10 @@ export default function AutomationSetupModal({
       let triggerType = 'post_comment';
       if (media.media_product_type === 'DM') {
         // For DM automation, use 'new_message' or 'keyword' trigger
-        triggerType = useKeywordTrigger && config.keywords.filter((k) => k.trim().length > 0).length > 0 ? 'keyword' : 'new_message';
+        triggerType = useKeywordTrigger && hasKeywords ? 'keyword' : 'new_message';
       } else {
         // For posts/reels/stories, use 'post_comment' or 'keyword' trigger
-        triggerType = useKeywordTrigger && config.keywords.filter((k) => k.trim().length > 0).length > 0 ? 'keyword' : 'post_comment';
+        triggerType = useKeywordTrigger && hasKeywords ? 'keyword' : 'post_comment';
       }
 
       // Determine media type label for rule name
