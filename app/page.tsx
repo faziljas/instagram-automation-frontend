@@ -8,6 +8,9 @@ import {
   ChatBubbleLeftRightIcon,
   BoltIcon,
   ShieldCheckIcon,
+  ClockIcon,
+  ChartBarIcon,
+  UserGroupIcon,
 } from '@heroicons/react/24/outline';
 
 export const metadata: Metadata = {
@@ -183,83 +186,86 @@ export default function HomePage() {
                   </p>
                 </div>
 
-                {/* Business Improvement Cards */}
+                {/* Business Improvement Cards - Visual Focus */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                   {/* Card 1: Save Time */}
                   <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 shadow-xl hover:border-white/40 transition-all duration-300 hover:scale-105">
-                    <div className="flex items-start justify-between mb-4">
-                      <h3 className="text-xs font-semibold text-white/90 uppercase tracking-wide">Save Time</h3>
-                      <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
-                        <BoltIcon className="w-5 h-5 text-white" />
+                    <div className="flex flex-col items-center text-center">
+                      <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center mb-4">
+                        <BoltIcon className="w-8 h-8 text-white" />
                       </div>
-                    </div>
-                    <div className="space-y-3">
-                      <p className="text-white text-base leading-relaxed">
-                        Automate repetitive responses and free up <span className="font-semibold">20+ hours per week</span> to focus on creating content and growing your brand.
-                      </p>
-                      <div className="pt-2 border-t border-white/20">
-                        <p className="text-sm text-white/80">
-                          Never miss a comment or DM again, even while you sleep.
-                        </p>
+                      <h3 className="text-xl font-bold text-white mb-3">Save Time</h3>
+                      <div className="w-full mb-4">
+                        <div className="text-4xl font-bold text-white mb-2">20+</div>
+                        <div className="text-sm text-white/80 mb-3">hours/week saved</div>
+                        <div className="h-2 bg-white/20 rounded-full overflow-hidden">
+                          <div className="h-full bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full" style={{ width: '85%' }}></div>
+                        </div>
                       </div>
+                      <p className="text-xs text-white/70 uppercase tracking-wide">Never miss a DM</p>
                     </div>
                   </div>
 
-                  {/* Card 2: Increase Engagement */}
+                  {/* Card 2: Boost Engagement */}
                   <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 shadow-xl hover:border-white/40 transition-all duration-300 hover:scale-105">
-                    <div className="flex items-start justify-between mb-4">
-                      <h3 className="text-xs font-semibold text-white/90 uppercase tracking-wide">Boost Engagement</h3>
-                      <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
-                        <ChatBubbleLeftRightIcon className="w-5 h-5 text-white" />
+                    <div className="flex flex-col items-center text-center">
+                      <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center mb-4">
+                        <ChatBubbleLeftRightIcon className="w-8 h-8 text-white" />
                       </div>
-                    </div>
-                    <div className="space-y-3">
-                      <p className="text-white text-base leading-relaxed">
-                        Respond to comments and DMs instantly, improving your <span className="font-semibold">response rate by 300%</span> and building stronger relationships with your audience.
-                      </p>
-                      <div className="pt-2 border-t border-white/20">
-                        <p className="text-sm text-white/80">
-                          Fast responses show you care and boost Instagram algorithm favor.
-                        </p>
+                      <h3 className="text-xl font-bold text-white mb-3">Boost Engagement</h3>
+                      <div className="w-full mb-4">
+                        <div className="text-4xl font-bold text-white mb-2">300%</div>
+                        <div className="text-sm text-white/80 mb-3">faster responses</div>
+                        <div className="h-2 bg-white/20 rounded-full overflow-hidden">
+                          <div className="h-full bg-gradient-to-r from-pink-500 to-purple-500 rounded-full" style={{ width: '100%' }}></div>
+                        </div>
                       </div>
+                      <p className="text-xs text-white/70 uppercase tracking-wide">Instant replies</p>
                     </div>
                   </div>
 
-                  {/* Card 3: Capture Leads */}
+                  {/* Card 3: Generate Leads */}
                   <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 shadow-xl hover:border-white/40 transition-all duration-300 hover:scale-105">
-                    <div className="flex items-start justify-between mb-4">
-                      <h3 className="text-xs font-semibold text-white/90 uppercase tracking-wide">Generate Leads</h3>
-                      <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
-                        <ShieldCheckIcon className="w-5 h-5 text-white" />
+                    <div className="flex flex-col items-center text-center">
+                      <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center mb-4">
+                        <ShieldCheckIcon className="w-8 h-8 text-white" />
                       </div>
-                    </div>
-                    <div className="space-y-3">
-                      <p className="text-white text-base leading-relaxed">
-                        Automatically capture contact information from interested followers and turn <span className="font-semibold">comments into customers</span> without manual work.
-                      </p>
-                      <div className="pt-2 border-t border-white/20">
-                        <p className="text-sm text-white/80">
-                          Build your email list and nurture leads automatically.
-                        </p>
+                      <h3 className="text-xl font-bold text-white mb-3">Generate Leads</h3>
+                      <div className="w-full mb-4">
+                        <div className="text-4xl font-bold text-white mb-2">Auto</div>
+                        <div className="text-sm text-white/80 mb-3">capture contacts</div>
+                        <div className="h-2 bg-white/20 rounded-full overflow-hidden">
+                          <div className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full" style={{ width: '90%' }}></div>
+                        </div>
                       </div>
+                      <p className="text-xs text-white/70 uppercase tracking-wide">Comments → Customers</p>
                     </div>
                   </div>
                 </div>
 
-                {/* Bottom Benefits Bar */}
+                {/* Bottom Benefits Bar - Visual */}
                 <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20 shadow-xl">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="text-center">
-                      <p className="text-2xl font-bold text-white mb-2">24/7 Availability</p>
-                      <p className="text-sm text-white/80">Your automation works around the clock, engaging followers even when you're offline</p>
+                      <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center mx-auto mb-3">
+                        <ClockIcon className="w-7 h-7 text-white" />
+                      </div>
+                      <p className="text-xl font-bold text-white mb-1">24/7</p>
+                      <p className="text-xs text-white/70 uppercase tracking-wide">Always Active</p>
                     </div>
-                    <div className="text-center border-y border-white/20 md:border-y-0 md:border-x border-white/20 py-4 md:py-0">
-                      <p className="text-2xl font-bold text-white mb-2">Scale Effortlessly</p>
-                      <p className="text-sm text-white/80">Handle thousands of interactions without hiring additional staff</p>
+                    <div className="text-center border-y md:border-y-0 md:border-x border-white/20 py-4 md:py-0">
+                      <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center mx-auto mb-3">
+                        <UserGroupIcon className="w-7 h-7 text-white" />
+                      </div>
+                      <p className="text-xl font-bold text-white mb-1">Scale</p>
+                      <p className="text-xs text-white/70 uppercase tracking-wide">No Limits</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-2xl font-bold text-white mb-2">Data-Driven Growth</p>
-                      <p className="text-sm text-white/80">Track performance metrics and optimize your automation strategy</p>
+                      <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center mx-auto mb-3">
+                        <ChartBarIcon className="w-7 h-7 text-white" />
+                      </div>
+                      <p className="text-xl font-bold text-white mb-1">Data</p>
+                      <p className="text-xs text-white/70 uppercase tracking-wide">Track Growth</p>
                     </div>
                   </div>
                 </div>
