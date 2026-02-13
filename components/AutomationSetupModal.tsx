@@ -173,9 +173,11 @@ export default function AutomationSetupModal({
     const newErrors: Record<string, string> = {};
 
     if (step === 2) {
-      // Only require keywords if "With a specific keyword" is selected
-      if (useKeywordTrigger && config.keywords.filter((k) => k.trim().length > 0).length === 0) {
-        newErrors.keywords = 'At least one keyword is required';
+      // Require keywords if "With a specific keyword" is selected
+      if (useKeywordTrigger) {
+        if (config.keywords.filter((k) => k.trim().length > 0).length === 0) {
+          newErrors.keywords = 'At least one trigger keyword is required';
+        }
       }
       if (config.autoReplyToComments) {
         const hasReplies = config.commentReplies.some((reply) => reply.trim().length > 0);
@@ -229,7 +231,8 @@ export default function AutomationSetupModal({
   };
 
   const handleSubmit = async () => {
-    if (!validateStep(3)) {
+    // Validate both step 2 (trigger config) and step 3 (action config)
+    if (!validateStep(2) || !validateStep(3)) {
       return;
     }
 
@@ -447,19 +450,29 @@ export default function AutomationSetupModal({
 
                   {useKeywordTrigger && (
                     <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Trigger Keywords <span className="text-red-500">(required)</span>
+                      </label>
                       <div className="flex items-center space-x-2 mb-2">
                         <input
                           type="text"
                           value={keywordInput}
-                          onChange={(e) => setKeywordInput(e.target.value)}
+                          onChange={(e) => {
+                            setKeywordInput(e.target.value);
+                            if (errors.keywords) {
+                              setErrors((prev) => ({ ...prev, keywords: '' }));
+                            }
+                          }}
                           onKeyPress={(e) => {
                             if (e.key === 'Enter') {
                               e.preventDefault();
                               handleAddKeyword();
                             }
                           }}
-                          placeholder="Type a keyword (min. 2 characters)"
-                          className="flex-1 px-4 py-3 border border-[#E5E7EB] rounded-lg bg-[#F9FAFB] focus:outline-none focus:ring-2 focus:ring-[#3B82F6] focus:border-[#3B82F6] transition-colors"
+                          placeholder="Type keyword and press Enter to add"
+                          className={`flex-1 px-4 py-3 border rounded-lg bg-[#F9FAFB] focus:outline-none focus:ring-2 focus:ring-[#3B82F6] focus:border-[#3B82F6] transition-colors ${
+                            errors.keywords ? 'border-red-500' : 'border-[#E5E7EB]'
+                          }`}
                         />
                         <button
                           type="button"
