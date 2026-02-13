@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { FaInstagram, FaBolt, FaRocket, FaClock, FaUsers, FaShieldAlt, FaZap } from 'react-icons/fa';
+import { FaInstagram, FaBolt, FaRocket, FaSyncAlt, FaUsers, FaShield } from 'react-icons/fa';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { getCanonicalBase } from '@/lib/canonical';
 import { useAuth } from '@/hooks/useAuth';
@@ -455,7 +455,7 @@ function RegisterPageContent() {
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 <div className="relative z-10">
                   <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-4 shadow-lg">
-                    <FaZap className="w-7 h-7 text-white" />
+                    <FaBolt className="w-7 h-7 text-white" />
                   </div>
                   <h3 className="text-xl font-bold text-white mb-2">60-Second Setup</h3>
                   <p className="text-sm text-white/80 leading-relaxed">
@@ -469,7 +469,7 @@ function RegisterPageContent() {
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 <div className="relative z-10">
                   <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mb-4 shadow-lg">
-                    <FaClock className="w-7 h-7 text-white" />
+                    <FaSyncAlt className="w-7 h-7 text-white" />
                   </div>
                   <h3 className="text-xl font-bold text-white mb-2">24/7 Automation</h3>
                   <p className="text-sm text-white/80 leading-relaxed">
@@ -497,7 +497,7 @@ function RegisterPageContent() {
                 <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 <div className="relative z-10">
                   <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center mb-4 shadow-lg">
-                    <FaShieldAlt className="w-7 h-7 text-white" />
+                    <FaShield className="w-7 h-7 text-white" />
                   </div>
                   <h3 className="text-xl font-bold text-white mb-2">100% Safe</h3>
                   <p className="text-sm text-white/80 leading-relaxed">
