@@ -179,7 +179,11 @@ export default function HomePage() {
                     <span className="text-white/90 text-sm font-medium">How We Help Your Business</span>
                   </div>
                   <h2 className="text-4xl md:text-5xl font-bold text-white mb-3">
-                    Grow Your Instagram Business
+                    Grow Your{' '}
+                    <span className="bg-gradient-to-r from-purple-600 via-pink-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent" style={{ background: 'linear-gradient(to right, #9333ea, #ec4899, #f97316, #eab308)' }}>
+                      Instagram
+                    </span>
+                    {' '}Business
                   </h2>
                   <p className="text-white/90 text-lg">
                     Discover how automation can transform your Instagram presence
