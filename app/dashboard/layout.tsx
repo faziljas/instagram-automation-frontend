@@ -192,7 +192,7 @@ export default function DashboardLayout({
         </div>
 
         {/* Main content area */}
-        <div className="flex flex-col flex-1 min-w-0 w-full lg:pl-64 overflow-x-hidden dashboard-main-bg">
+        <div className="flex flex-col flex-1 w-full lg:pl-64 overflow-x-hidden dashboard-main-bg">
           {/* Top header */}
           <header className="bg-white/80 backdrop-blur-lg border-b border-gray-200 sticky top-0 z-30 shadow-lg w-full flex-shrink-0">
             <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
@@ -215,7 +215,7 @@ export default function DashboardLayout({
           </header>
 
           {/* Page content */}
-          <main className="flex-1 flex flex-col py-6 px-4 sm:px-6 lg:px-8 w-full max-w-full overflow-x-hidden">{children}</main>
+          <main className="flex-1 py-6 px-4 sm:px-6 lg:px-8 w-full">{children}</main>
         </div>
       </div>
       </ProtectedRoute>
