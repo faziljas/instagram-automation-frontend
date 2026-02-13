@@ -78,12 +78,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={`${inter.className} flex flex-col min-h-screen`}>
+    <html lang="en" style={{ height: '100%', backgroundColor: 'rgb(243 244 246)' }}>
+      <body className={`${inter.className} flex flex-col min-h-screen`} style={{ backgroundColor: 'rgb(243 244 246)' }}>
         <CanonicalLink />
         <ErrorBoundary>
           <AuthProvider>
-            <div className="flex-1">
+            <div className="flex-1 flex flex-col" style={{ minHeight: '100vh', backgroundColor: 'rgb(243 244 246)' }}>
               {children}
             </div>
             {/* Footer is conditionally rendered - home page has its own footer */}
