@@ -144,110 +144,141 @@ export default function HomePage() {
             </Link>
           </div>
 
-          {/* Dashboard Mockup Preview */}
-          <div className="w-full max-w-5xl mx-auto aspect-video bg-gray-900 rounded-xl shadow-2xl shadow-purple-500/20 border border-gray-200/50 overflow-hidden transform hover:scale-[1.01] transition-transform duration-300">
-            <div className="h-full bg-gradient-to-br from-gray-800 to-gray-900 p-6 flex flex-col">
-              {/* Mock Dashboard Header */}
-              <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-700/50">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                    <span className="text-white text-xs font-bold">LD</span>
-                  </div>
-                  <span className="text-gray-300 text-sm font-medium">Dashboard</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-gray-400 text-xs">fazil.jas</span>
-                  <div className="h-8 w-8 bg-gray-700/80 rounded-full"></div>
-                </div>
+          {/* Creative Dashboard Preview */}
+          <div className="w-full max-w-4xl mx-auto relative">
+            {/* Dark Background Container */}
+            <div className="bg-gradient-to-br from-slate-900 via-purple-900/30 to-slate-900 rounded-3xl shadow-2xl shadow-purple-500/20 border border-purple-500/20 overflow-hidden p-8 md:p-12">
+              {/* Background Pattern */}
+              <div className="absolute inset-0 opacity-10">
+                <div
+                  className="w-full h-full"
+                  style={{
+                    backgroundImage: `
+                      linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px),
+                      linear-gradient(to bottom, rgba(255,255,255,0.1) 1px, transparent 1px)
+                    `,
+                    backgroundSize: '50px 50px',
+                  }}
+                />
               </div>
-              
-              {/* Mock Dashboard Content */}
-              <div className="flex-1 grid grid-cols-3 gap-4">
-                {/* Stats Card 1 - DMs Sent */}
-                <div className="bg-gray-800/60 rounded-lg p-5 border border-gray-700/30 flex flex-col">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-gray-400 text-xs font-medium">DMs Sent</span>
-                    <div className="h-5 w-5 bg-blue-500/50 rounded flex items-center justify-center">
-                      <ChatBubbleLeftRightIcon className="h-3 w-3 text-blue-400" />
+
+              {/* Gradient Blobs */}
+              <div className="absolute top-0 right-0 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl opacity-50" />
+              <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl opacity-50" />
+
+              {/* Content */}
+              <div className="relative z-10">
+                {/* Preview Header */}
+                <div className="text-center mb-10">
+                  <div className="inline-flex items-center gap-2 mb-4">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                      LD
+                    </div>
+                    <span className="text-white/60 text-sm font-medium">Dashboard Preview</span>
+                  </div>
+                  <h2 className="text-4xl md:text-5xl font-bold text-white mb-3">
+                    See What Awaits You
+                  </h2>
+                  <p className="text-white/70 text-lg">
+                    Get instant insights into your Instagram automation performance
+                  </p>
+                </div>
+
+                {/* Main Stats Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                  {/* Card 1: DMs Sent */}
+                  <div className="bg-slate-800/80 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50 shadow-xl hover:border-blue-500/50 transition-all duration-300 hover:scale-105">
+                    <div className="flex items-start justify-between mb-4">
+                      <h3 className="text-xs font-semibold text-white/70 uppercase tracking-wide">DMs Sent</h3>
+                      <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
+                        <ChatBubbleLeftRightIcon className="w-5 h-5 text-blue-400" />
+                      </div>
+                    </div>
+                    <div className="mb-4">
+                      <p className="text-4xl font-bold text-white mb-3">847</p>
+                      <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full" style={{ width: '75%' }}></div>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-sm text-white/60">Today: <span className="text-white font-medium">23 DMs</span></p>
+                      <p className="text-sm text-white/60">This week: <span className="text-white font-medium">156 DMs</span></p>
                     </div>
                   </div>
-                  <div className="mb-3">
-                    <div className="text-3xl font-bold text-white mb-2">847</div>
-                    <div className="h-1.5 w-full bg-gray-700/50 rounded-full overflow-hidden">
-                      <div className="h-full w-[75%] bg-gradient-to-r from-blue-500 to-blue-400"></div>
+
+                  {/* Card 2: Leads Captured */}
+                  <div className="bg-slate-800/80 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50 shadow-xl hover:border-purple-500/50 transition-all duration-300 hover:scale-105">
+                    <div className="flex items-start justify-between mb-4">
+                      <h3 className="text-xs font-semibold text-white/70 uppercase tracking-wide">Leads</h3>
+                      <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
+                        <BoltIcon className="w-5 h-5 text-purple-400" />
+                      </div>
                     </div>
-                    <div className="text-xs text-gray-500 mt-1">75% of 1,000 limit</div>
+                    <div className="mb-4">
+                      <p className="text-4xl font-bold text-white mb-2">42</p>
+                      <div className="flex items-center gap-1">
+                        <span className="text-sm text-green-400 font-medium">+12 this week</span>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-sm text-white/60">Conversion: <span className="text-white font-medium">4.9%</span></p>
+                      <p className="text-sm text-white/60">Avg response: <span className="text-white font-medium">2.3h</span></p>
+                    </div>
                   </div>
-                  <div className="mt-auto space-y-2">
-                    <div className="flex items-center gap-2">
-                      <div className="h-1.5 w-1.5 bg-blue-400 rounded-full"></div>
-                      <span className="text-xs text-gray-400">Today: 23 DMs</span>
+
+                  {/* Card 3: Active Rules */}
+                  <div className="bg-slate-800/80 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50 shadow-xl hover:border-green-500/50 transition-all duration-300 hover:scale-105">
+                    <div className="flex items-start justify-between mb-4">
+                      <h3 className="text-xs font-semibold text-white/70 uppercase tracking-wide">Active Rules</h3>
+                      <div className="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center">
+                        <ShieldCheckIcon className="w-5 h-5 text-green-400" />
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <div className="h-1.5 w-1.5 bg-blue-400 rounded-full"></div>
-                      <span className="text-xs text-gray-400">This week: 156 DMs</span>
+                    <div className="mb-4">
+                      <p className="text-4xl font-bold text-white">3</p>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-2.5 h-2.5 rounded-full bg-green-400"></div>
+                        <div className="flex-1">
+                          <p className="text-sm text-white font-medium">Story Reply</p>
+                          <p className="text-xs text-white/50">12 triggers today</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-2.5 h-2.5 rounded-full bg-green-400"></div>
+                        <div className="flex-1">
+                          <p className="text-sm text-white font-medium">DM Follow-up</p>
+                          <p className="text-xs text-white/50">8 triggers today</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
-                
-                {/* Stats Card 2 - Leads Captured */}
-                <div className="bg-gray-800/60 rounded-lg p-5 border border-gray-700/30 flex flex-col">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-gray-400 text-xs font-medium">Leads Captured</span>
-                    <div className="h-5 w-5 bg-purple-500/50 rounded flex items-center justify-center">
-                      <BoltIcon className="h-3 w-3 text-purple-400" />
+
+                {/* Bottom Stats Bar */}
+                <div className="bg-gradient-to-r from-slate-800/90 via-slate-800/80 to-slate-800/90 backdrop-blur-md rounded-2xl p-8 border border-slate-700/50 shadow-xl">
+                  <div className="grid grid-cols-3 gap-6">
+                    <div className="text-center">
+                      <p className="text-3xl font-bold text-white mb-2">5,000+</p>
+                      <p className="text-xs text-white/60 uppercase tracking-wide">Active Creators</p>
                     </div>
-                  </div>
-                  <div className="mb-3">
-                    <div className="text-3xl font-bold text-white mb-2">42</div>
-                    <div className="h-1.5 w-full bg-gray-700/50 rounded-full overflow-hidden">
-                      <div className="h-full w-[60%] bg-gradient-to-r from-purple-500 to-purple-400"></div>
+                    <div className="text-center border-x border-slate-700">
+                      <p className="text-3xl font-bold text-white mb-2">2M+</p>
+                      <p className="text-xs text-white/60 uppercase tracking-wide">DMs Automated</p>
                     </div>
-                    <div className="text-xs text-gray-500 mt-1">+12 this week</div>
-                  </div>
-                  <div className="mt-auto space-y-2">
-                    <div className="flex items-center gap-2">
-                      <div className="h-1.5 w-1.5 bg-purple-400 rounded-full"></div>
-                      <span className="text-xs text-gray-400">Conversion: 4.9%</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="h-1.5 w-1.5 bg-purple-400 rounded-full"></div>
-                      <span className="text-xs text-gray-400">Avg response: 2.3h</span>
+                    <div className="text-center">
+                      <p className="text-3xl font-bold text-white mb-2">99.9%</p>
+                      <p className="text-xs text-white/60 uppercase tracking-wide">Uptime</p>
                     </div>
                   </div>
                 </div>
-                
-                {/* Automation Rules Card */}
-                <div className="bg-gray-800/60 rounded-lg p-5 border border-gray-700/30 flex flex-col">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-gray-400 text-xs font-medium">Active Rules</span>
-                    <div className="h-5 w-5 bg-green-500/50 rounded flex items-center justify-center">
-                      <ShieldCheckIcon className="h-3 w-3 text-green-400" />
-                    </div>
-                  </div>
-                  <div className="flex-1 space-y-2.5">
-                    <div className="flex items-center gap-3 p-2.5 bg-gray-700/40 rounded-lg border border-gray-600/30">
-                      <div className="h-2.5 w-2.5 bg-green-500 rounded-full flex-shrink-0"></div>
-                      <div className="flex-1">
-                        <div className="text-xs font-medium text-gray-200 mb-1">Story Reply Rule</div>
-                        <div className="text-xs text-gray-500">Triggers: 12 today</div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3 p-2.5 bg-gray-700/40 rounded-lg border border-gray-600/30">
-                      <div className="h-2.5 w-2.5 bg-green-500 rounded-full flex-shrink-0"></div>
-                      <div className="flex-1">
-                        <div className="text-xs font-medium text-gray-200 mb-1">DM Follow-up</div>
-                        <div className="text-xs text-gray-500">Triggers: 8 today</div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3 p-2.5 bg-gray-700/40 rounded-lg border border-gray-600/30">
-                      <div className="h-2.5 w-2.5 bg-green-500 rounded-full flex-shrink-0"></div>
-                      <div className="flex-1">
-                        <div className="text-xs font-medium text-gray-200 mb-1">Comment Response</div>
-                        <div className="text-xs text-gray-500">Triggers: 5 today</div>
-                      </div>
-                    </div>
-                  </div>
+
+                {/* Call to Action */}
+                <div className="mt-8 text-center">
+                  <p className="text-white/80 text-base">
+                    Start automating in <span className="text-white font-semibold">60 seconds</span> • No credit card required
+                  </p>
                 </div>
               </div>
             </div>
