@@ -432,10 +432,9 @@ function RegisterPageContent() {
         {/* Quote Card */}
         <div className="relative z-10 flex items-center justify-center h-full px-12">
           <div className="backdrop-blur-md bg-white/10 p-8 rounded-2xl border border-white/20 max-w-md">
-            <p className="text-2xl font-semibold text-white leading-relaxed mb-4">
-              "Automating my DMs saved me 20 hours a week."
+            <p className="text-2xl font-semibold text-white leading-relaxed">
+              "Turn your Instagram DMs into a growth engine. Build relationships at scale, one automated message at a time."
             </p>
-            <p className="text-lg text-white/80">— Creator Name</p>
           </div>
         </div>
       </div>
