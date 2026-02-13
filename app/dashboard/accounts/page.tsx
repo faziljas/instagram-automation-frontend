@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useFetch } from '@/hooks/useFetch';
 import { useDelete, usePost } from '@/hooks/useApi';
 import { TableSkeleton } from '@/components/Skeleton';
@@ -48,6 +48,7 @@ export default function AccountsPage() {
   const [connectSuccess, setConnectSuccess] = useState<string | null>(null);
   // After OAuth success redirect, keep showing loading until refetch completes (avoids flash of "Connect Instagram")
   const [refreshingAfterConnect, setRefreshingAfterConnect] = useState(false);
+  const hasRefetchedForUsageRef = useRef(false);
   
   // Handle URL query parameters (for same-tab redirects from callback)
   useEffect(() => {
@@ -106,12 +107,31 @@ export default function AccountsPage() {
     const t = setTimeout(() => setRefreshingAfterConnect(false), 5000);
     return () => clearTimeout(t);
   }, [refreshingAfterConnect, accounts.length]);
-  
-  // Check if account limit is reached
+
+  // Check if account limit is reached (needed before effects below)
   const plan = subscriptionData?.plan_tier || 'free';
   const limits = PLAN_LIMITS[plan] || PLAN_LIMITS.free;
   const accountsUsed = subscriptionData?.usage?.accounts || 0;
   const isAccountLimitReached = limits.accounts !== -1 && accountsUsed >= limits.accounts;
+
+  // If subscription says user has accounts but list is empty, treat as loading (never show Connect section)
+  const hasAccountsFromUsage = accountsUsed > 0;
+  const showConnectEmptyState =
+    !isLoading &&
+    !refreshingAfterConnect &&
+    accounts.length === 0 &&
+    !hasAccountsFromUsage;
+
+  // When subscription says user has accounts but list is empty, refetch once so we show account details (like ss3)
+  useEffect(() => {
+    if (!hasAccountsFromUsage || accounts.length > 0 || isLoading || hasRefetchedForUsageRef.current) return;
+    hasRefetchedForUsageRef.current = true;
+    const t = setTimeout(() => {
+      void mutateAccounts(undefined, { revalidate: true });
+      void mutateSubscription(undefined, { revalidate: true });
+    }, 300);
+    return () => clearTimeout(t);
+  }, [hasAccountsFromUsage, accounts.length, isLoading, mutateAccounts, mutateSubscription]);
 
   const handleConnectAccount = async () => {
     // Clear any previous errors/success messages
@@ -314,12 +334,13 @@ export default function AccountsPage() {
         )}
       </div>
 
-      {/* Loading State - also show while refetching after OAuth success so we don't flash "Connect Instagram" */}
-      {(isLoading || refreshingAfterConnect) && <TableSkeleton rows={3} columns={4} />}
+      {/* Loading State - show while loading, refetching after OAuth, or when usage says we have accounts but list not yet loaded */}
+      {(isLoading || refreshingAfterConnect || (hasAccountsFromUsage && accounts.length === 0)) && (
+        <TableSkeleton rows={3} columns={4} />
+      )}
 
-      {/* Empty State - Show Login to Instagram Interface */}
-      {/* Show empty state when not loading, not refreshing-after-connect, and no accounts */}
-      {(!isLoading && !refreshingAfterConnect && accounts.length === 0) && (
+      {/* Empty State - only when we're sure user has zero accounts (never show when they have accounts) */}
+      {showConnectEmptyState && (
         <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl p-8">
           <div className="max-w-2xl mx-auto">
             {/* Header */}
