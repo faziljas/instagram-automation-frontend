@@ -347,6 +347,40 @@ export default function AutomationsPage() {
     setShowDrawer(true);
   }, []);
 
+  // OPTIMIZED: Memoize table view data processing (must be at top level, not conditional)
+  const tableViewData = useMemo(() => {
+    // Create analytics map
+    const analyticsMap = new Map<string, MediaAnalytics>();
+    mediaAnalytics.forEach(a => analyticsMap.set(a.media_id, a));
+    
+    // Filter media by selected tab
+    const filteredMedia = media.filter((item) => {
+      if (selectedTab === 'posts') {
+        return item.media_product_type !== 'STORY';
+      } else if (selectedTab === 'stories') {
+        return item.media_product_type === 'STORY';
+      } else if (selectedTab === 'live') {
+        return true;
+      }
+      return false;
+    });
+    
+    // Get rules for each media item
+    const mediaWithRules = filteredMedia.map((item) => {
+      const rules = automationRules[item.id] || [];
+      const activeRule = rules.find((r) => r.is_active) || rules[0];
+      const analytics = analyticsMap.get(item.id);
+      return { mediaItem: item, rule: activeRule, analytics };
+    });
+    
+    // Separate items with rules and without rules
+    const itemsWithRules = mediaWithRules.filter((item) => item.rule);
+    const itemsWithoutRules = mediaWithRules.filter((item) => !item.rule);
+    
+    // Show items with rules first, then items without rules
+    return [...itemsWithRules, ...itemsWithoutRules];
+  }, [mediaAnalytics, media, selectedTab, automationRules]);
+
   const handleCloseDrawer = () => {
     setShowDrawer(false);
     setSelectedMedia(null);
@@ -777,49 +811,12 @@ export default function AutomationsPage() {
                   <h3 className="text-base md:text-xl font-bold text-gray-900">AUTOMATIONS</h3>
                 </div>
                 {/* Show content immediately - don't block on analytics loading */}
-                {useMemo(() => {
-              // OPTIMIZED: Memoize analytics map creation
-              const analyticsMap = new Map<string, MediaAnalytics>();
-              mediaAnalytics.forEach(a => analyticsMap.set(a.media_id, a));
-              
-              // Filter media by selected tab
-              const filteredMedia = media.filter((item) => {
-                if (selectedTab === 'posts') {
-                  return item.media_product_type !== 'STORY';
-                } else if (selectedTab === 'stories') {
-                  return item.media_product_type === 'STORY';
-                } else if (selectedTab === 'live') {
-                  return true; // Adjust based on how live media is identified
-                }
-                return false;
-              });
-              
-              // Get rules for each media item
-              // Show all media items, even if they don't have rules yet
-              const mediaWithRules = filteredMedia.map((item) => {
-                const rules = automationRules[item.id] || [];
-                const activeRule = rules.find((r) => r.is_active) || rules[0];
-                const analytics = analyticsMap.get(item.id);
-                return { mediaItem: item, rule: activeRule, analytics };
-              });
-              
-              if (mediaWithRules.length === 0) {
-                return (
+                {tableViewData.length === 0 ? (
                   <div className="p-12 text-center">
                     <p className="text-gray-500">No media found for this account.</p>
                     <p className="text-sm text-gray-400 mt-2">Posts, reels, and stories will appear here once they're fetched.</p>
                   </div>
-                );
-              }
-              
-              // Separate items with rules and without rules
-              const itemsWithRules = mediaWithRules.filter((item) => item.rule);
-              const itemsWithoutRules = mediaWithRules.filter((item) => !item.rule);
-              
-              // Show items with rules first, then items without rules
-              const sortedMediaWithRules = [...itemsWithRules, ...itemsWithoutRules];
-              
-              return (
+                ) : (
                 <>
                 <div className="overflow-x-auto w-full">
                   <table className="min-w-full divide-y divide-gray-200">
@@ -852,7 +849,7 @@ export default function AutomationsPage() {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {sortedMediaWithRules.map(({ mediaItem, rule, analytics }) => {
+                      {tableViewData.map(({ mediaItem, rule, analytics }) => {
                         const imageUrl = mediaItem.media_type === 'VIDEO'
                           ? mediaItem.thumbnail_url || mediaItem.media_url
                           : mediaItem.media_url || mediaItem.thumbnail_url;
@@ -1064,8 +1061,7 @@ export default function AutomationsPage() {
                   </div>
                 )}
                 </>
-              );
-                }, [mediaAnalytics, media, selectedTab, automationRules, hasReachedRulesLimit, currentRulesCount, rulesLimit, deleteConfirmRuleId, isLoadingMore, mediaHasMore, mediaNextCursor])}
+                )}
               </div>
             ) : media.length > 0 && viewMode === 'grid' ? (
               <>
