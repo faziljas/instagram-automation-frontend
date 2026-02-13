@@ -36,8 +36,8 @@ const PLAN_LIMITS: Record<string, { accounts: number; rules: number; dms: number
 };
 
 export default function AccountsPage() {
-  const { data: accountsData, isLoading } = useFetch<InstagramAccountResponse[]>('/users/me/accounts');
-  const { data: subscriptionData } = useFetch<SubscriptionResponse>('/users/subscription');
+  const { data: accountsData, isLoading, mutate: mutateAccounts } = useFetch<InstagramAccountResponse[]>('/users/me/accounts');
+  const { data: subscriptionData, mutate: mutateSubscription } = useFetch<SubscriptionResponse>('/users/subscription');
   
   // Ensure accounts is always an array - handle cases where API returns error object
   const accounts = Array.isArray(accountsData) ? accountsData : [];
@@ -46,6 +46,8 @@ export default function AccountsPage() {
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
   const [connectError, setConnectError] = useState<string | null>(null);
   const [connectSuccess, setConnectSuccess] = useState<string | null>(null);
+  // After OAuth success redirect, keep showing loading until refetch completes (avoids flash of "Connect Instagram")
+  const [refreshingAfterConnect, setRefreshingAfterConnect] = useState(false);
   
   // Handle URL query parameters (for same-tab redirects from callback)
   useEffect(() => {
@@ -64,11 +66,12 @@ export default function AccountsPage() {
       
       setConnectSuccess(successMessage);
       setConnectError(null);
+      setRefreshingAfterConnect(true); // Show loading until refetch completes
       // Mark that user has successfully connected at least once
       localStorage.setItem('instagram_has_connected', 'true');
-      // Refresh data
-      mutate('/users/me/accounts');
-      mutate('/users/subscription');
+      // Force refetch so the new account appears (don't show empty state before this completes)
+      void mutateAccounts(undefined, { revalidate: true });
+      void mutateSubscription(undefined, { revalidate: true });
       // Clear URL params
       window.history.replaceState({}, '', window.location.pathname);
       // Clear success message after 5 seconds (longer for already_connected since it's informational)
@@ -92,6 +95,17 @@ export default function AccountsPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connectSuccess]);
+
+  // Clear "refreshing after connect" when accounts have loaded or after timeout
+  useEffect(() => {
+    if (!refreshingAfterConnect) return;
+    if (accounts.length > 0) {
+      setRefreshingAfterConnect(false);
+      return;
+    }
+    const t = setTimeout(() => setRefreshingAfterConnect(false), 5000);
+    return () => clearTimeout(t);
+  }, [refreshingAfterConnect, accounts.length]);
   
   // Check if account limit is reached
   const plan = subscriptionData?.plan_tier || 'free';
@@ -300,11 +314,12 @@ export default function AccountsPage() {
         )}
       </div>
 
-      {/* Loading State */}
-      {isLoading && <TableSkeleton rows={3} columns={4} />}
+      {/* Loading State - also show while refetching after OAuth success so we don't flash "Connect Instagram" */}
+      {(isLoading || refreshingAfterConnect) && <TableSkeleton rows={3} columns={4} />}
 
       {/* Empty State - Show Login to Instagram Interface */}
-      {!isLoading && accounts.length === 0 && (
+      {/* Show empty state when not loading, not refreshing-after-connect, and no accounts */}
+      {(!isLoading && !refreshingAfterConnect && accounts.length === 0) && (
         <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl p-8">
           <div className="max-w-2xl mx-auto">
             {/* Header */}
@@ -359,7 +374,7 @@ export default function AccountsPage() {
       )}
 
       {/* Accounts Table */}
-      {!isLoading && accounts.length > 0 && (
+      {!isLoading && !refreshingAfterConnect && accounts.length > 0 && (
         <div>
           {/* Add Account Button - Only show when accounts exist */}
           <div className="mb-6 flex justify-end">
