@@ -132,7 +132,7 @@ export default function AutomationsPage() {
   // -1 means unlimited, so never reached
   const hasReachedRulesLimit = subscriptionData ? (rulesLimit !== -1 && currentRulesCount >= rulesLimit) : false;
 
-  // Fetch automation rules for stats
+  // Fetch automation rules for stats - lazy load after media loads
   useEffect(() => {
     const fetchRules = async () => {
       if (!selectedAccount) return;
@@ -140,6 +140,11 @@ export default function AutomationsPage() {
       // CRITICAL: Wait for session token before making API call
       if (!session?.access_token) {
         console.warn('[AutomationsPage] No session token available, skipping fetchRules');
+        return;
+      }
+
+      // Only fetch rules after media has loaded to prioritize media display
+      if (media.length === 0 && isLoadingMedia) {
         return;
       }
 
@@ -162,11 +167,15 @@ export default function AutomationsPage() {
     };
 
     if (selectedAccount && session?.access_token) {
-      fetchRules();
+      // Delay rules fetch slightly to prioritize media loading
+      const timer = setTimeout(() => {
+        fetchRules();
+      }, 200);
+      return () => clearTimeout(timer);
     }
-  }, [selectedAccount, session]);
+  }, [selectedAccount, session, media.length, isLoadingMedia]);
 
-  // Fetch media analytics
+  // Fetch media analytics - lazy load after media and rules are loaded
   useEffect(() => {
     const fetchAnalytics = async () => {
       if (!selectedAccount) {
@@ -178,6 +187,11 @@ export default function AutomationsPage() {
       if (!session?.access_token) {
         console.warn('[AutomationsPage] No session token available, skipping fetchAnalytics');
         setMediaAnalytics([]);
+        return;
+      }
+
+      // Only fetch analytics after media has loaded to prioritize content display
+      if (media.length === 0 && isLoadingMedia) {
         return;
       }
 
@@ -196,9 +210,13 @@ export default function AutomationsPage() {
     };
 
     if (session?.access_token) {
-      fetchAnalytics();
+      // Delay analytics fetch to prioritize media and rules loading
+      const timer = setTimeout(() => {
+        fetchAnalytics();
+      }, 500);
+      return () => clearTimeout(timer);
     }
-  }, [selectedAccount, session]);
+  }, [selectedAccount, session, media.length, isLoadingMedia]);
 
   // Fetch media when account or tab is selected
   useEffect(() => {
@@ -234,7 +252,8 @@ export default function AutomationsPage() {
       if (selectedTab === 'stories') mediaType = 'stories';
       else if (selectedTab === 'live') mediaType = 'live';
 
-      let url = `/api/instagram/media?account_id=${selectedAccount}&media_type=${mediaType}&limit=100`;
+      // Reduce initial load - fetch 20 items first, user can load more
+      let url = `/api/instagram/media?account_id=${selectedAccount}&media_type=${mediaType}&limit=20`;
       if (opts?.after) url += `&after=${encodeURIComponent(opts.after)}`;
 
       const data = await get<{ media: MediaItem[]; next_cursor?: string | null; has_more?: boolean }>(url);

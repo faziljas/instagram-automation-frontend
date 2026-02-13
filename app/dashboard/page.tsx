@@ -3,7 +3,9 @@
 import { useAuth } from '@/hooks/useAuth';
 import { useFetch } from '@/hooks/useFetch';
 import { useSubscription } from '@/hooks/useSubscription';
+import { useParallelFetch } from '@/hooks/useParallelFetch';
 import { GridStatsSkeleton } from '@/components/Skeleton';
+import { useState, useEffect } from 'react';
 import {
   UserGroupIcon,
   BoltIcon,
@@ -91,16 +93,43 @@ const PLAN_LIMITS: Record<string, { accounts: number; rules: number; dms: number
 
 export default function DashboardPage() {
   const { user } = useAuth();
-  const { data, isLoading } = useFetch<DashboardResponse>('/users/me/dashboard');
   
   // Use subscription hook with caching to prevent pro users from appearing as free on refresh
   const { planTier: plan } = useSubscription();
-  
-  const { data: analyticsData, isLoading: isAnalyticsLoading } = useFetch<AnalyticsSummary>(
-    '/api/analytics/dashboard?days=7'
-  );
-  const { data: leadsData } = useFetch<Lead[]>('/api/leads');
   const limits = PLAN_LIMITS[plan] || PLAN_LIMITS.free;
+
+  // Fetch critical data first (dashboard stats)
+  const { data, isLoading } = useFetch<DashboardResponse>('/users/me/dashboard');
+  
+  // Lazy load non-critical data (analytics and leads) after initial render
+  const [shouldLoadSecondaryData, setShouldLoadSecondaryData] = useState(false);
+  
+  useEffect(() => {
+    // Load secondary data after a short delay to prioritize critical content
+    const timer = setTimeout(() => {
+      setShouldLoadSecondaryData(true);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Fetch analytics and leads in parallel (only after initial render)
+  const {
+    data: secondaryData,
+    isLoading: isSecondaryLoading,
+  } = useParallelFetch<{
+    analytics: AnalyticsSummary;
+    leads: Lead[];
+  }>(
+    {
+      analytics: shouldLoadSecondaryData ? '/api/analytics/dashboard?days=7' : null,
+      leads: shouldLoadSecondaryData ? '/api/leads' : null,
+    },
+    { enabled: shouldLoadSecondaryData }
+  );
+
+  const analyticsData = secondaryData.analytics;
+  const leadsData = secondaryData.leads;
+  const isAnalyticsLoading = isSecondaryLoading;
 
   // Extract metrics from analytics API
   const totalDMs = analyticsData?.total_dms_sent || 0;
@@ -171,12 +200,12 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Show content immediately with cached data - only show skeleton if no cached data available */}
+      {/* Show critical content immediately - analytics can load separately */}
       {isLoading && !data ? (
         <div className="mb-8">
           <GridStatsSkeleton />
         </div>
-      ) : (
+      ) : data ? (
         <div className="grid gap-6 mb-10">
           {/* Row 1: Core Metrics */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -469,7 +498,7 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
