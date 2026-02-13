@@ -50,7 +50,7 @@ export default function DashboardLayout({
   return (
     <ToastProvider>
       <ProtectedRoute>
-      <div className="min-h-screen dashboard-main-bg w-full overflow-x-hidden flex flex-col" style={{ minHeight: '100vh', backgroundColor: 'rgb(243 244 246)' }}>
+      <div className="dashboard-main-bg w-full overflow-x-hidden flex flex-col flex-1" style={{ backgroundColor: 'rgb(243 244 246)' }}>
         {/* Mobile sidebar overlay */}
         {sidebarOpen && (
           <div

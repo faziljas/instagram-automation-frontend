@@ -83,7 +83,7 @@ export default function RootLayout({
         <CanonicalLink />
         <ErrorBoundary>
           <AuthProvider>
-            <div className="flex-1 flex flex-col" style={{ minHeight: '100vh', backgroundColor: 'rgb(243 244 246)' }}>
+            <div className="flex-1 flex flex-col" style={{ backgroundColor: 'rgb(243 244 246)' }}>
               {children}
             </div>
             {/* Footer is conditionally rendered - home page has its own footer */}
