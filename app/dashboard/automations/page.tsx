@@ -123,6 +123,14 @@ export default function AutomationsPage() {
   const [mediaAnalytics, setMediaAnalytics] = useState<MediaAnalytics[]>([]);
   const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(false);
   const [deleteConfirmRuleId, setDeleteConfirmRuleId] = useState<number | null>(null);
+  
+  // PERFORMANCE: Cache media data per tab to avoid refetching when switching tabs
+  const [mediaCache, setMediaCache] = useState<Record<string, {
+    media: MediaItem[];
+    nextCursor: string | null;
+    hasMore: boolean;
+    accountId: number;
+  }>>({});
 
   // Check if user has reached automation rules limit
   // Use subscription hook's computed values (already handles caching and fallbacks)
@@ -219,7 +227,7 @@ export default function AutomationsPage() {
   }, [selectedAccount, session, media.length, isLoadingMedia]);
 
   // OPTIMIZED: Memoize fetchMedia function to prevent recreation (must be defined before useEffect)
-  const fetchMedia = useCallback(async (opts?: { after?: string | null }) => {
+  const fetchMedia = useCallback(async (opts?: { after?: string | null }): Promise<{ media: MediaItem[]; nextCursor: string | null; hasMore: boolean } | undefined> => {
     if (!selectedAccount) return;
     if (!session?.access_token) {
       console.warn('[AutomationsPage] No session token available, skipping fetchMedia');
@@ -253,21 +261,28 @@ export default function AutomationsPage() {
       } else {
         setMedia(fetchedMedia);
       }
-      setMediaNextCursor(data.next_cursor ?? null);
-      setMediaHasMore(Boolean(data.has_more));
+      const result = {
+        media: fetchedMedia,
+        nextCursor: data.next_cursor ?? null,
+        hasMore: Boolean(data.has_more),
+      };
+      setMediaNextCursor(result.nextCursor);
+      setMediaHasMore(result.hasMore);
+      return result;
     } catch (error: any) {
       console.error('Error fetching media:', error);
       if (error?.response?.status !== 403) {
         alert(`Error: ${error?.message || 'Failed to fetch media. Please check console for details.'}`);
       }
       if (!loadMore) setMedia([]);
+      return undefined;
     } finally {
       setIsLoadingMedia(false);
       setIsLoadingMore(false);
     }
   }, [selectedAccount, selectedTab, session?.access_token]);
 
-  // Fetch media when account or tab is selected
+  // PERFORMANCE: Fetch media when account or tab is selected, with caching
   useEffect(() => {
     if (!selectedAccount) {
       setMedia([]);
@@ -276,14 +291,59 @@ export default function AutomationsPage() {
       return;
     }
 
-    setMedia([]);
-    setMediaNextCursor(null);
-    setMediaHasMore(false);
+    // Create cache key: tab + accountId
+    const cacheKey = `${selectedTab}_${selectedAccount}`;
+    const cached = mediaCache[cacheKey];
+    
+    // If we have cached data for this tab+account combo, use it immediately
+    if (cached && cached.accountId === selectedAccount) {
+      setMedia(cached.media);
+      setMediaNextCursor(cached.nextCursor);
+      setMediaHasMore(cached.hasMore);
+      // Still fetch in background to refresh data, but don't block UI
+      if (selectedTab === 'posts' || selectedTab === 'stories' || selectedTab === 'live') {
+        fetchMedia().then((result) => {
+          // Update cache with fresh data
+          if (result && selectedAccount) {
+            setMediaCache(prev => ({
+              ...prev,
+              [cacheKey]: {
+                media: result.media,
+                nextCursor: result.nextCursor,
+                hasMore: result.hasMore,
+                accountId: selectedAccount,
+              }
+            }));
+          }
+        }).catch(() => {
+          // If fetch fails, keep cached data
+        });
+      }
+    } else {
+      // No cache, fetch immediately
+      setMedia([]);
+      setMediaNextCursor(null);
+      setMediaHasMore(false);
 
-    if (selectedTab === 'posts' || selectedTab === 'stories' || selectedTab === 'live') {
-      fetchMedia();
+      if (selectedTab === 'posts' || selectedTab === 'stories' || selectedTab === 'live') {
+        fetchMedia().then((result) => {
+          // Cache the result
+          if (result && selectedAccount) {
+            setMediaCache(prev => ({
+              ...prev,
+              [cacheKey]: {
+                media: result.media,
+                nextCursor: result.nextCursor,
+                hasMore: result.hasMore,
+                accountId: selectedAccount,
+              }
+            }));
+          }
+        });
+      }
     }
-  }, [selectedAccount, selectedTab, fetchMedia]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedAccount, selectedTab]);
 
   // OPTIMIZED: Memoize fetchDMs function
   const fetchDMs = useCallback(async () => {
@@ -567,6 +627,8 @@ export default function AutomationsPage() {
         const firstAccount = accounts[0];
         setSelectedAccount(firstAccount.id);
         setSelectedAccountUsername(firstAccount.username);
+        // Clear cache when account changes
+        setMediaCache({});
       }
     }
   }, [accounts, selectedAccount]);

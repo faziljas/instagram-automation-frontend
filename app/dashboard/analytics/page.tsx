@@ -74,7 +74,7 @@ export default function AnalyticsPage() {
     return () => clearTimeout(timer);
   }, [days]);
   
-  // Don't block page render - show content immediately
+  // PERFORMANCE: Don't block page render - show content immediately with better caching
   const { data, error, isLoading, mutate } = useFetch<AnalyticsSummary>(
     `/api/analytics/dashboard?days=${debouncedDays}`,
     {
@@ -83,8 +83,9 @@ export default function AnalyticsPage() {
       errorRetryInterval: 500,
       // Don't revalidate on focus to reduce unnecessary requests
       revalidateOnFocus: false,
-      // Increase cache time for analytics (5 minutes)
+      // Increase cache time for analytics (5 minutes) - SWR keeps previous data by default
       dedupingInterval: 300000,
+      cacheTime: 300000, // 5 minutes cache
     }
   );
   const { data: leadsData } = useFetch<Lead[]>('/api/leads');

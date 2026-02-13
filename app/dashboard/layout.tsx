@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
@@ -42,6 +42,7 @@ export default function DashboardLayout({
   const router = useRouter();
   const { user, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
   
   // Use subscription hook with caching to prevent pro users from appearing as free on refresh
   const { hasProPlan: isProOrEnterprise } = useSubscription();
@@ -80,12 +81,18 @@ export default function DashboardLayout({
                 <Link
                   key={item.name}
                   href={item.href}
-                  onClick={() => setSidebarOpen(false)}
+                  prefetch={true}
+                  onClick={(e) => {
+                    setSidebarOpen(false);
+                    startTransition(() => {
+                      // Navigation is handled by Next.js Link
+                    });
+                  }}
                   className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
                     isActive
                       ? 'text-white bg-white/10 font-medium'
                       : 'text-gray-400 hover:text-white hover:bg-white/5'
-                  }`}
+                  } ${isPending && !isActive ? 'opacity-70' : ''}`}
                 >
                   <item.icon className="h-5 w-5 mr-3" />
                   {item.name}
@@ -134,11 +141,21 @@ export default function DashboardLayout({
                   <Link
                     key={item.name}
                     href={item.href}
+                    prefetch={true}
+                    onMouseEnter={() => {
+                      // Prefetch on hover for faster navigation
+                      router.prefetch(item.href);
+                    }}
+                    onClick={(e) => {
+                      startTransition(() => {
+                        // Navigation is handled by Next.js Link
+                      });
+                    }}
                     className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
                       isActive
                         ? 'text-white bg-white/10 font-medium'
                         : 'text-gray-400 hover:text-white hover:bg-white/5'
-                    }`}
+                    } ${isPending && !isActive ? 'opacity-70' : ''}`}
                   >
                     <item.icon className="h-5 w-5 mr-3" />
                     {item.name}

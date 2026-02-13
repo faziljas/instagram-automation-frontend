@@ -14,7 +14,7 @@ const CACHE_TIMES: Record<string, number> = {
   '/users/me/accounts': 1 * 60 * 1000, // 1 minute
   '/users/me/dashboard': 30 * 1000, // 30 seconds
   '/automation/rules': 30 * 1000, // 30 seconds
-  '/api/analytics': 1 * 60 * 1000, // 1 minute
+  '/api/analytics': 5 * 60 * 1000, // 5 minutes - increased for better performance
   '/api/leads': 30 * 1000, // 30 seconds
 };
 
@@ -57,11 +57,11 @@ export function useFetch<T = unknown>(
       revalidateOnFocus: false, // Changed to false - reduce unnecessary refetches
       revalidateOnReconnect: true, // Still revalidate on reconnect
       refreshInterval: 0, // Disable auto-refresh (we'll handle it manually)
-      dedupingInterval: 2000, // Increased to 2 seconds - dedupe requests within 2 seconds
+      dedupingInterval: getCacheTime(url), // Use cache time based on endpoint for deduplication
       focusThrottleInterval: 5000, // Throttle focus revalidation to 5 seconds
       ...swrOptions,
-      // Use cache time based on endpoint
-      ...(cacheTime !== undefined ? { dedupingInterval: cacheTime } : {}),
+      // Override dedupingInterval if explicitly provided in options
+      ...(swrOptions.dedupingInterval !== undefined ? {} : {}),
     }
   );
 
