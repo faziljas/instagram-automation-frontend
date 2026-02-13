@@ -636,20 +636,61 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
                     }
                     
                     setIsSending(true);
+                    const messageToSend = messageText.trim();
+                    
+                    // OPTIMISTIC UPDATE: Show message immediately in UI before API confirms
+                    // This provides instant feedback that users expect
+                    const optimisticMessage: Message = {
+                      id: Date.now(), // Temporary ID
+                      message_id: null,
+                      text: messageToSend,
+                      is_from_bot: true, // Sent by us
+                      sender_username: null,
+                      recipient_username: selectedConvDetails?.username || selectedConversation || null,
+                      has_attachments: false,
+                      attachments: null,
+                      created_at: new Date().toISOString()
+                    };
+                    
+                    // Add optimistic message to UI immediately
+                    setMessages((prev) => [...prev, optimisticMessage]);
+                    setMessageText('');
+                    
+                    // Scroll to bottom to show new message
+                    setTimeout(() => {
+                      const el = messagesContainerRef.current;
+                      if (el) el.scrollTop = el.scrollHeight;
+                    }, 100);
+                    
                     try {
                       // Get participant_user_id from selected conversation
                       const participantUserId = selectedConvDetails?.user_id;
                       
                       const url = `/api/instagram/conversations/${encodeURIComponent(selectedConversation)}/messages?account_id=${accountId}${participantUserId ? `&participant_user_id=${participantUserId}` : ''}`;
                       
-                      await post(url, { text: messageText.trim() });
+                      await post(url, { text: messageToSend });
                       
-                      setMessageText('');
+                      // Refresh messages after sending to get the real message from server
+                      // This ensures we have the correct message_id and timestamp
                       fetchMessages();
                       fetchConversations();
                       refreshStats();
+                      
+                      // Also refresh after 5 seconds to ensure message appears even if initial refresh missed it
+                      // This handles edge cases where the message might not be immediately available
+                      setTimeout(() => {
+                        fetchMessages();
+                        refreshStats();
+                      }, 5000);
                     } catch (error: any) {
                       console.error('Failed to send message:', error);
+                      
+                      // Remove optimistic message on error
+                      setMessages((prev) => prev.filter(msg => msg.id !== optimisticMessage.id));
+                      
+                      // Restore message text so user can retry
+                      setMessageText(messageToSend);
+                      
                       alert(error?.message || 'Failed to send message. Please try again.');
                     } finally {
                       setIsSending(false);
