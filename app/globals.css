@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Set default background for body/html to prevent white space */
+@layer base {
+  html, body {
+    background-color: rgb(243 244 246); /* gray-100 – match dashboard background */
+    min-height: 100vh;
+  }
+}
+
 /* Subtle grid pattern background for dashboard main content */
 @layer components {
   .dashboard-main-bg {
@@ -10,6 +18,7 @@
       linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
       linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
     background-size: 24px 24px;
+    min-height: 100vh;
   }
 
   /* Supabase Auth UI Custom Styling */
