@@ -342,17 +342,21 @@ export default function DashboardPage() {
                   {engagementData.map((value, index) => {
                     const day = dailyBreakdown[index];
                     const dayName = day?.date.split(' ')[0] || ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][index];
+                    // Ensure bars are visible: use calculated value or minimum height when there's data
+                    const barHeight = value > 0 ? Math.max(value, 15) : 0; // 15% minimum when there's data
                     return (
                       <div
                         key={index}
                         className="flex-1 flex flex-col items-center space-y-2"
                       >
                         <div className="w-full bg-gray-50 rounded-lg h-32 flex items-end overflow-hidden">
-                          <div
-                            className="w-full bg-gradient-to-t from-blue-500 to-indigo-400 rounded-lg"
-                            style={{ height: `${Math.max(value, 2)}%` }}
-                            title={`${day?.date || ''}: ${day?.total || 0} total (${day?.triggers || 0} triggers, ${day?.dms_sent || 0} DMs, ${day?.leads || 0} leads)`}
-                          />
+                          {barHeight > 0 && (
+                            <div
+                              className="w-full bg-gradient-to-t from-blue-500 to-indigo-400 rounded-lg transition-all"
+                              style={{ height: `${barHeight}%` }}
+                              title={`${day?.date || ''}: ${day?.total || 0} total (${day?.triggers || 0} triggers, ${day?.dms_sent || 0} DMs, ${day?.leads || 0} leads)`}
+                            />
+                          )}
                         </div>
                         <span className="text-[10px] uppercase tracking-wide text-gray-400">
                           {dayName}
