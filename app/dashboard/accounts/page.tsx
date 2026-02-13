@@ -37,7 +37,7 @@ const PLAN_LIMITS: Record<string, { accounts: number; rules: number; dms: number
 
 export default function AccountsPage() {
   const { data: accountsData, isLoading, mutate: mutateAccounts } = useFetch<InstagramAccountResponse[]>('/users/me/accounts');
-  const { data: subscriptionData, mutate: mutateSubscription } = useFetch<SubscriptionResponse>('/users/subscription');
+  const { data: subscriptionData, isLoading: subscriptionLoading, mutate: mutateSubscription } = useFetch<SubscriptionResponse>('/users/subscription');
   
   // Ensure accounts is always an array - handle cases where API returns error object
   const accounts = Array.isArray(accountsData) ? accountsData : [];
@@ -116,8 +116,10 @@ export default function AccountsPage() {
 
   // If subscription says user has accounts but list is empty, treat as loading (never show Connect section)
   const hasAccountsFromUsage = accountsUsed > 0;
+  // Only show Connect section when both requests have loaded and we're sure user has 0 accounts (avoids flash on refresh)
   const showConnectEmptyState =
     !isLoading &&
+    !subscriptionLoading &&
     !refreshingAfterConnect &&
     accounts.length === 0 &&
     !hasAccountsFromUsage;
@@ -334,8 +336,8 @@ export default function AccountsPage() {
         )}
       </div>
 
-      {/* Loading State - show while loading, refetching after OAuth, or when usage says we have accounts but list not yet loaded */}
-      {(isLoading || refreshingAfterConnect || (hasAccountsFromUsage && accounts.length === 0)) && (
+      {/* Loading State - show while loading (accounts or subscription), refetching after OAuth, or when usage says we have accounts but list not yet loaded */}
+      {(isLoading || subscriptionLoading || refreshingAfterConnect || (hasAccountsFromUsage && accounts.length === 0)) && (
         <TableSkeleton rows={3} columns={4} />
       )}
 
