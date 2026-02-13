@@ -53,8 +53,10 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
   const [isSending, setIsSending] = useState(false);
 
   // Fetch conversation stats
+  // Disable revalidateOnFocus to prevent constant refreshes when window regains focus
   const { data: stats, mutate: refreshStats } = useFetch<ConversationStats>(
-    accountId ? `/api/instagram/conversations/stats?account_id=${accountId}` : null
+    accountId ? `/api/instagram/conversations/stats?account_id=${accountId}` : null,
+    { revalidateOnFocus: false } // Prevent auto-refresh on window focus
   );
 
   // Conversations list (paginated, manual fetch for "Load more")
@@ -170,6 +172,7 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
       setNextMessagesOffset(0);
       return;
     }
+    // Only fetch messages when conversation actually changes, not on every render
     fetchMessages();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedConversation, accountId, selectedConvDetails?.user_id]);
@@ -271,7 +274,7 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
 
   // Silent background polling: refresh stats and conversations list silently (no loading states)
   // Messages are updated via webhooks, so we don't need to poll them
-  // Increased interval to 40s to reduce perceived loading and improve stability
+  // Increased interval to 60s and removed visibility refresh to prevent constant loading
   useEffect(() => {
     if (!accountId || typeof document === 'undefined') return;
     
@@ -282,8 +285,19 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
 
     // Silent refresh: Only refresh stats and conversations list without showing loading states
     // This prevents the UI from appearing to reload constantly
+    let lastRefreshTime = 0;
+    const MIN_REFRESH_INTERVAL = 5000; // Minimum 5 seconds between refreshes (debounce)
+    
     const silentRefresh = () => {
       if (!session?.access_token) return;
+      
+      // Debounce: Don't refresh if we just refreshed recently
+      const now = Date.now();
+      if (now - lastRefreshTime < MIN_REFRESH_INTERVAL) {
+        return;
+      }
+      lastRefreshTime = now;
+      
       // Use SWR's mutate for silent stats refresh (no loading indicator)
       refreshStats();
       // Silent conversations refresh (no loading indicator)
@@ -291,24 +305,17 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
       // Don't refresh messages - they're updated via webhooks and manual refresh
     };
 
-    const handleVisibility = () => {
-      if (document.visibilityState === 'visible') {
-        // Silent refresh when tab becomes visible
-        silentRefresh();
-      }
-    };
+    // Removed visibility change handler - it was causing too many refreshes
+    // Users can manually refresh if needed, or wait for the polling interval
 
-    document.addEventListener('visibilitychange', handleVisibility);
-
-    // Increased interval to 40 seconds to reduce perceived loading
+    // Increased interval to 60 seconds to significantly reduce perceived loading
     // Only refresh stats and conversations list silently (not messages)
     const intervalId = setInterval(() => {
       if (document.visibilityState !== 'visible') return;
       silentRefresh();
-    }, 40000); // 40 seconds - reduces perceived loading while keeping data fresh
+    }, 60000); // 60 seconds - much longer interval to prevent constant loading
 
     return () => {
-      document.removeEventListener('visibilitychange', handleVisibility);
       clearInterval(intervalId);
     };
   }, [accountId, session, refreshStats, fetchConversations]);
