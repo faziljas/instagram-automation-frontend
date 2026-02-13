@@ -316,12 +316,12 @@ export default function AnalyticsPage() {
         </div>
       )}
 
-      {/* Activity Chart */}
-      <Card className="mb-8 rounded-2xl border-2 border-gray-200 shadow-xl">
+      {/* Activity Chart - pt-12 reserves space so tooltip renders inside container (not clipped) */}
+      <Card className="mb-8 rounded-2xl border-2 border-gray-200 shadow-xl overflow-visible">
         <h2 className="text-xl font-bold text-gray-900 mb-6">Activity Over Time</h2>
         <div
-          className="flex items-end gap-1 px-4 overflow-x-auto pb-1"
-          style={{ minHeight: chartHeightPx + 52 }}
+          className="flex items-end gap-1 px-4 pt-12 pb-1 overflow-x-auto overflow-y-visible"
+          style={{ minHeight: chartHeightPx + 52 + 48 }}
         >
           {activityData.length > 0 ? (
             activityData.map((item, index) => {
@@ -336,7 +336,7 @@ export default function AnalyticsPage() {
                   className={`flex flex-col items-center group flex-1 min-w-[28px] max-w-[80px] ${days > 30 ? 'flex-shrink-0 basis-12' : ''}`}
                 >
                   <div
-                    className="w-full relative flex flex-col items-center justify-end"
+                    className="w-full relative flex flex-col items-center justify-end overflow-visible"
                     style={{ height: chartHeightPx }}
                   >
                     <div
@@ -345,8 +345,9 @@ export default function AnalyticsPage() {
                         height: `${barHeightPx}px`,
                         minHeight: '4px',
                       }}
+                      title={`${item.date}: ${item.total} total (${item.triggers} triggers, ${item.dms_sent} DMs, ${item.leads} leads)`}
                     />
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 opacity-0 group-hover:opacity-100 transition-opacity duration-0 bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-10 pointer-events-none">
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 opacity-0 group-hover:opacity-100 transition-opacity duration-0 bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-50 pointer-events-none">
                       {item.total} total
                       <div className="text-[10px] text-gray-300 mt-0.5">
                         {item.triggers}T, {item.dms_sent}DM, {item.leads}L
