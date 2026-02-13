@@ -111,6 +111,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
   const [activeTab, setActiveTab] = useState<'simple' | 'lead'>('simple');
   const [currentKeyword, setCurrentKeyword] = useState('');
   const [showPreviewMobile, setShowPreviewMobile] = useState(false);
+  const [keywordError, setKeywordError] = useState<string>('');
 
   useEffect(() => {
     if (initialConfig) {
@@ -200,14 +201,26 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
     } else {
       setCurrentKeyword('');
       setActiveTab('simple');
+      setKeywordError('');
     }
   }, [initialConfig, isOpen]);
 
   const handleSave = async () => {
+    // Validate trigger keywords - must have at least one keyword
+    const activeKeywords =
+      activeTab === 'simple' ? config.simpleKeywords : config.leadKeywords;
+    
+    if (!activeKeywords || activeKeywords.length === 0 || activeKeywords.filter((k) => k.trim().length > 0).length === 0) {
+      setKeywordError('At least one trigger keyword is required');
+      setIsSaving(false);
+      return;
+    }
+    
+    // Clear error if validation passes
+    setKeywordError('');
+    
     setIsSaving(true);
     try {
-      const activeKeywords =
-        activeTab === 'simple' ? config.simpleKeywords : config.leadKeywords;
       const activeDmMessages =
         activeTab === 'simple' ? config.simpleDmMessages : config.leadDmMessages;
       // Public Acknowledgement Reply is always required (forced to true)
@@ -320,7 +333,10 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                 <div className="bg-gray-100 p-1 rounded-lg flex gap-1">
                   <button
                     type="button"
-                    onClick={() => setActiveTab('simple')}
+                    onClick={() => {
+                      setActiveTab('simple');
+                      setKeywordError('');
+                    }}
                     className={`flex-1 px-3 py-1.5 rounded-md transition-all text-sm font-medium ${
                       activeTab === 'simple'
                         ? 'bg-white shadow-sm text-gray-900'
@@ -331,7 +347,10 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                   </button>
                   <button
                     type="button"
-                    onClick={() => setActiveTab('lead')}
+                    onClick={() => {
+                      setActiveTab('lead');
+                      setKeywordError('');
+                    }}
                     className={`flex-1 px-3 py-1.5 rounded-md transition-all text-sm font-medium ${
                       activeTab === 'lead'
                         ? 'bg-white shadow-sm text-gray-900'
@@ -347,13 +366,13 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
               <div>
                 <div className="flex items-center gap-2 mb-1.5">
                   <label className="block text-sm font-medium text-gray-700">
-                    Trigger Keywords
+                    Trigger Keywords <span className="text-red-500">*</span>
                   </label>
                   <div className="relative group">
                     <InformationCircleIcon className="h-5 w-5 text-blue-500 hover:text-blue-600 cursor-help transition-colors" />
                     <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-64 md:w-72 max-w-[calc(100vw-2rem)] p-3 bg-gray-900 text-white text-xs rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none whitespace-normal">
                       <p className="text-center leading-relaxed">
-                        If no keywords are added, replies will be sent for all comments. Add keywords to trigger only on matching comments.
+                        Add keywords to trigger automation only on matching comments. At least one keyword is required.
                       </p>
                       {/* Tooltip arrow */}
                       <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
@@ -364,7 +383,13 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                   <input
                     type="text"
                     value={currentKeyword}
-                    onChange={(e) => setCurrentKeyword(e.target.value)}
+                    onChange={(e) => {
+                      setCurrentKeyword(e.target.value);
+                      // Clear error when user starts typing
+                      if (keywordError) {
+                        setKeywordError('');
+                      }
+                    }}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' && currentKeyword.trim()) {
                         e.preventDefault();
@@ -375,6 +400,10 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                               ...config,
                               simpleKeywords: [...config.simpleKeywords, trimmed],
                             });
+                            // Clear error when keyword is added
+                            if (keywordError) {
+                              setKeywordError('');
+                            }
                           }
                         } else {
                           if (!config.leadKeywords.includes(trimmed)) {
@@ -382,12 +411,18 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                               ...config,
                               leadKeywords: [...config.leadKeywords, trimmed],
                             });
+                            // Clear error when keyword is added
+                            if (keywordError) {
+                              setKeywordError('');
+                            }
                           }
                         }
                         setCurrentKeyword('');
                       }
                     }}
-                    className="w-full h-10 px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all"
+                    className={`w-full h-10 px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all ${
+                      keywordError ? 'border-red-500' : 'border-gray-400'
+                    }`}
                     placeholder="Type keyword and press Enter to add"
                   />
                   {(activeTab === 'simple'
@@ -411,11 +446,21 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                                   ...config,
                                   simpleKeywords: config.simpleKeywords.filter((_, i) => i !== index),
                                 });
+                                // Clear error if keywords still exist after removal
+                                const remaining = config.simpleKeywords.filter((_, i) => i !== index);
+                                if (remaining.length > 0 && keywordError) {
+                                  setKeywordError('');
+                                }
                               } else {
                                 setConfig({
                                   ...config,
                                   leadKeywords: config.leadKeywords.filter((_, i) => i !== index),
                                 });
+                                // Clear error if keywords still exist after removal
+                                const remaining = config.leadKeywords.filter((_, i) => i !== index);
+                                if (remaining.length > 0 && keywordError) {
+                                  setKeywordError('');
+                                }
                               }
                             }}
                             className="text-green-600 hover:text-green-900 font-bold text-base leading-none"
@@ -425,6 +470,9 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                         </span>
                       ))}
                     </div>
+                  )}
+                  {keywordError && (
+                    <p className="mt-1 text-sm text-red-600">{keywordError}</p>
                   )}
                 </div>
               </div>
