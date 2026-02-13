@@ -172,10 +172,8 @@ export default function HomePage() {
               <div className="relative z-10">
                 {/* Preview Header */}
                 <div className="text-center mb-10">
-                  <div className="inline-flex items-center gap-2 mb-4">
-                    <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white font-bold text-sm shadow-lg border border-white/30">
-                      LD
-                    </div>
+                  <div className="inline-flex items-center gap-3 mb-4">
+                    <Logo size="md" variant="light" />
                     <span className="text-white/90 text-sm font-medium">How We Help Your Business</span>
                   </div>
                   <h2 className="text-4xl md:text-5xl font-bold text-white mb-3">
