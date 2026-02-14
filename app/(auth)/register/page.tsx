@@ -111,8 +111,17 @@ function RegisterPageContent() {
       // Normalize email to lowercase before sending to Supabase
       const normalizedEmail = formData.email.trim().toLowerCase();
 
-      // Block if user already has an account in LogicDM (email or Google)
       const { get } = await import('@/utils/api');
+      // Reject disposable/temporary email addresses before sign-up
+      try {
+        await get(`/auth/validate-email?email=${encodeURIComponent(normalizedEmail)}`);
+      } catch (validateErr: any) {
+        setError(validateErr?.message ?? 'Temporary or disposable email addresses are not allowed. Please use a permanent email address.');
+        setIsLoading(false);
+        return;
+      }
+
+      // Block if user already has an account in LogicDM (email or Google)
       const backendCheck = await get(`/auth/check-email/${encodeURIComponent(normalizedEmail)}`).catch(() => null);
       if (backendCheck?.exists) {
         setError('This email is already registered. Please log in instead.');
