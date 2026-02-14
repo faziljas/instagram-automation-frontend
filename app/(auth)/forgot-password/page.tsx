@@ -254,15 +254,15 @@ function ForgotPasswordPageContent() {
       </div>
 
       {/* Right Column - Visual Area */}
-      <div className="hidden lg:flex lg:w-[55%] bg-slate-900 relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-[55%] bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900 relative overflow-hidden">
         {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
+        <div className="absolute inset-0 opacity-20">
           <div
             className="w-full h-full"
             style={{
               backgroundImage: `
-                linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(255,255,255,0.1) 1px, transparent 1px)
+                linear-gradient(to right, rgba(255,255,255,0.12) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,255,255,0.12) 1px, transparent 1px)
               `,
               backgroundSize: '50px 50px',
             }}
@@ -270,13 +270,13 @@ function ForgotPasswordPageContent() {
         </div>
 
         {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-purple-900/20 to-slate-900" />
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/30 via-purple-600/25 to-slate-900/80" />
 
         {/* Service info – secure recovery */}
         <div className="relative z-10 flex items-center justify-center h-full px-12">
-          <div className="backdrop-blur-md bg-white/10 p-8 rounded-2xl border border-white/20 max-w-md">
+          <div className="backdrop-blur-md bg-white/15 p-8 rounded-2xl border border-white/30 shadow-xl max-w-md">
             <div className="flex items-start gap-3 mb-5">
-              <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+              <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-white/25 flex items-center justify-center">
                 <FaShieldAlt className="w-6 h-6 text-white" aria-hidden />
               </div>
               <h3 className="text-xl font-semibold text-white pt-2">
@@ -285,33 +285,33 @@ function ForgotPasswordPageContent() {
             </div>
 
             <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-cyan-500/30 flex items-center justify-center mt-0.5">
+              <div className="flex items-center gap-3">
+                <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-cyan-500/40 flex items-center justify-center">
                   <FaEnvelope className="w-4 h-4 text-cyan-300" aria-hidden />
                 </div>
-                <p className="text-white/90 leading-relaxed text-sm">
+                <p className="text-white/95 leading-relaxed text-sm">
                   We send a <span className="text-cyan-300 font-medium">one-time reset link</span> to your email.
                 </p>
               </div>
-              <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-amber-500/30 flex items-center justify-center mt-0.5">
+              <div className="flex items-center gap-3">
+                <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-amber-500/40 flex items-center justify-center">
                   <FaSync className="w-4 h-4 text-amber-200" aria-hidden />
                 </div>
-                <p className="text-white/90 leading-relaxed text-sm">
+                <p className="text-white/95 leading-relaxed text-sm">
                   Your automations <span className="text-amber-200/95 font-medium">keep running</span>—reset your password and pick up right where you left off in your <span className="text-blue-200 font-medium">LogicDM dashboard</span>.
                 </p>
               </div>
-              <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-blue-500/30 flex items-center justify-center mt-0.5">
+              <div className="flex items-center gap-3">
+                <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-blue-500/40 flex items-center justify-center">
                   <FaChartLine className="w-4 h-4 text-blue-200" aria-hidden />
                 </div>
-                <p className="text-white/90 leading-relaxed text-sm">
+                <p className="text-white/95 leading-relaxed text-sm">
                   <span className="text-white font-medium">LogicDM</span> uses <span className="text-emerald-300/90 font-medium">industry-standard security</span> so only you can access your account and Instagram DM automations.
                 </p>
               </div>
             </div>
 
-            <div className="mt-5 pt-4 border-t border-white/20 flex items-center justify-center gap-2">
+            <div className="mt-5 pt-4 border-t border-white/30 flex items-center justify-center gap-2">
               <FaLock className="w-4 h-4 text-emerald-400/90" aria-hidden />
               <span className="text-xs text-white/60">Your data stays secure with us</span>
             </div>
