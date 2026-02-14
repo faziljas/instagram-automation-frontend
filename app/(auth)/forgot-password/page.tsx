@@ -261,13 +261,18 @@ function ForgotPasswordPageContent() {
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-purple-900/20 to-slate-900" />
 
-        {/* Quote Card */}
+        {/* Service info – secure recovery */}
         <div className="relative z-10 flex items-center justify-center h-full px-12">
           <div className="backdrop-blur-md bg-white/10 p-8 rounded-2xl border border-white/20 max-w-md">
-            <p className="text-2xl font-semibold text-white leading-relaxed mb-4">
-              "Automating my DMs saved me 20 hours a week."
+            <h3 className="text-xl font-semibold text-white mb-3">
+              Secure account recovery
+            </h3>
+            <p className="text-white/90 leading-relaxed mb-4">
+              We send a one-time reset link to your email. Your automations keep running—reset your password and pick up right where you left off in your LogicDM dashboard.
             </p>
-            <p className="text-lg text-white/80">— Creator Name</p>
+            <p className="text-sm text-white/70">
+              LogicDM uses industry-standard security so only you can access your account and Instagram DM automations.
+            </p>
           </div>
         </div>
       </div>
