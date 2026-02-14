@@ -33,29 +33,20 @@ export default function Logo({ className = '', size = 'md', variant = 'light' }:
     WebkitTextFillColor: 'transparent',
     backgroundClip: 'text',
   };
-  // Dot mask for "i" – match logic color context (dark bg = light dot, light bg = dark dot)
-  const dotMaskColor = variant === 'light' ? '#0f172a' : '#000';
 
   return (
     <div className={`flex items-center ${className}`}>
       <div className={`font-bold ${sizeClasses[size]} flex items-center leading-none`}>
-        {/* "Logic" – black */}
+        {/* "Logic" – use dotless "ı" so only the chat bubble appears as the dot */}
         <span className={logicColor}>Log</span>
         <span className={`relative inline-block ${logicColor}`}>
-          i
-          {/* Round speech bubble (BsChatFill) – absolute over the "i" dot, tail pointing down towards stem */}
+          ı
+          {/* Chat bubble only – no dot mask */}
           <BsChatFill
             className={`absolute left-1/2 ${iconSizeClasses[size]} ${bubbleColorClass} pointer-events-none z-[2]`}
             style={{
               top: '-0.6em',
               transform: 'translateX(-50%) rotate(12deg)',
-            }}
-          />
-          {/* Mask the original "i" dot */}
-          <span
-            className="absolute left-1/2 top-0 h-[0.35em] w-[0.35em] -translate-x-1/2 rounded-full z-[1]"
-            style={{
-              backgroundColor: dotMaskColor,
             }}
           />
         </span>
