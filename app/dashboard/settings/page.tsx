@@ -46,7 +46,7 @@ interface SubscriptionSummary {
 
 interface Invoice {
   id: number;
-  amount: number; // minor units (e.g. cents)
+  amount: number; // major units (e.g. 11.81 for SGD 11.81)
   currency: string;
   status: string;
   invoice_url?: string | null;
@@ -119,15 +119,13 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
     });
   };
 
-  const formatAmount = (amountMinor: number, currency: string) => {
-    const divisor = 100; // Dodo sends minor units
-    const value = amountMinor / divisor;
+  const formatAmount = (amount: number, currency: string) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: currency || 'USD',
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
-    }).format(value);
+    }).format(amount);
   };
 
   const renewalText = currentPeriodEnd
