@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { FaBolt, FaRocket, FaSync, FaUserFriends, FaLock } from 'react-icons/fa';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { getCanonicalBase } from '@/lib/canonical';
@@ -36,6 +37,7 @@ function RegisterPageContent() {
   });
   const [errors, setErrors] = useState<Partial<Record<keyof RegisterFormData, string>>>({});
   const [error, setError] = useState<string | null>(null);
+  const [isSignupSuccess, setIsSignupSuccess] = useState(false);
 
   useEffect(() => {
     // Check if Supabase is configured
@@ -182,9 +184,8 @@ function RegisterPageContent() {
       } else if (data.user && !data.session) {
         // New user created but waiting for email confirmation
         setError(null);
-        // Show success message - email confirmation sent
-        alert('Account created successfully! Please check your email to confirm your account before signing in.');
-        router.push('/login');
+        setIsSignupSuccess(true);
+        setIsLoading(false);
       } else {
         // No user returned - this shouldn't happen but handle it
         setError('Failed to create account. Please try again.');
@@ -261,6 +262,40 @@ function RegisterPageContent() {
             </p>
           </div>
 
+          {isSignupSuccess ? (
+            <>
+              {/* Success Message - same style as forgot password */}
+              <div className="rounded-md bg-green-50 p-6 border border-green-200">
+                <div className="flex items-start">
+                  <div className="flex-shrink-0">
+                    <svg className="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <h3 className="text-sm font-medium text-green-800 mb-2">
+                      Check your email
+                    </h3>
+                    <p className="text-sm text-green-700">
+                      We've sent a confirmation link to <strong>{formData.email}</strong>.
+                      Please check your inbox and follow the instructions to confirm your account before signing in.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Back to Login */}
+              <div className="mt-6 text-center">
+                <Link
+                  href="/login"
+                  className="text-sm font-medium text-blue-600 hover:text-blue-500"
+                >
+                  ← Back to login
+                </Link>
+              </div>
+            </>
+          ) : (
+            <>
           {/* Error Message */}
           {error && (
             <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
@@ -408,6 +443,8 @@ function RegisterPageContent() {
               Sign in
             </a>
           </div>
+            </>
+          )}
         </div>
       </div>
 
