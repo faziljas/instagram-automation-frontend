@@ -253,22 +253,31 @@ function ForgotPasswordPageContent() {
         </div>
       </div>
 
-      {/* Right Column - Visual Area (SS2: deep indigo/purple + subtle grid) */}
-      <div className="hidden lg:flex lg:w-[55%] bg-[#504889] relative overflow-hidden">
-        {/* Subtle grid – slightly lighter lines like SS2 */}
-        <div
-          className="absolute inset-0 opacity-20"
-          style={{
-            backgroundImage: `
-              linear-gradient(to right, rgba(94,86,153,0.4) 1px, transparent 1px),
-              linear-gradient(to bottom, rgba(94,86,153,0.4) 1px, transparent 1px)
-            `,
-            backgroundSize: '40px 40px',
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#504889]/20 to-[#27273F]/40" />
+      {/* Right Column - Visual Area (same as register/login) */}
+      <div className="hidden lg:flex lg:w-[55%] bg-slate-900 relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div
+            className="w-full h-full"
+            style={{
+              backgroundImage: `
+                linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,255,255,0.1) 1px, transparent 1px)
+              `,
+              backgroundSize: '50px 50px',
+            }}
+          />
+        </div>
 
-        {/* Service info – secure recovery (glassmorphism card) */}
+        {/* Animated Gradient Blobs (same as register) */}
+        <div className="absolute top-20 left-20 w-72 h-72 bg-gradient-to-br from-purple-500/40 via-pink-500/40 to-red-500/40 rounded-full blur-3xl opacity-50 animate-pulse" style={{ animationDuration: '4s' }} />
+        <div className="absolute bottom-20 right-20 w-96 h-96 bg-gradient-to-br from-blue-500/30 via-cyan-500/30 to-teal-500/30 rounded-full blur-3xl opacity-50 animate-pulse" style={{ animationDuration: '5s', animationDelay: '1s' }} />
+        <div className="absolute top-1/2 right-1/4 w-64 h-64 bg-gradient-to-br from-yellow-500/30 via-orange-500/30 to-pink-500/30 rounded-full blur-3xl opacity-40 animate-pulse" style={{ animationDuration: '6s', animationDelay: '2s' }} />
+
+        {/* Gradient Overlay (same as register) */}
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/30 via-purple-900/20 to-slate-900" />
+
+        {/* Service info – secure recovery card */}
         <div className="relative z-10 flex items-center justify-center h-full px-12">
           <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-xl max-w-md">
             <div className="flex items-start gap-3 mb-5">
