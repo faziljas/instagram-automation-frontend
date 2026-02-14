@@ -285,13 +285,21 @@ function LoginPageContent() {
 
               <div className="space-y-4">
                 <button
-                  onClick={() => setViewState('signup')}
+                  onClick={() => {
+                    setError(null);
+                    setInfoMessage(null);
+                    setViewState('signup');
+                  }}
                   className="w-full h-12 bg-gradient-to-r from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700 text-white rounded-md font-semibold text-base transition-all shadow-sm"
                 >
                   Get Started
                 </button>
                 <button
-                  onClick={() => setViewState('login')}
+                  onClick={() => {
+                    setError(null);
+                    setInfoMessage(null);
+                    setViewState('login');
+                  }}
                   className="w-full h-12 text-slate-700 hover:text-slate-900 font-medium text-base transition-colors"
                 >
                   Already have an account? Sign in
@@ -447,7 +455,11 @@ function LoginPageContent() {
               <div className="text-center text-sm text-gray-600">
                 Already have an account?{' '}
                 <button
-                  onClick={() => setViewState('login')}
+                  onClick={() => {
+                    setError(null);
+                    setInfoMessage(null);
+                    setViewState('login');
+                  }}
                   className="font-medium text-blue-600 hover:text-blue-500"
                 >
                   Sign in
@@ -574,7 +586,11 @@ function LoginPageContent() {
               <div className="text-center text-sm text-gray-600">
                 Don't have an account?{' '}
                 <button
-                  onClick={() => setViewState('signup')}
+                  onClick={() => {
+                    setError(null);
+                    setInfoMessage(null);
+                    setViewState('signup');
+                  }}
                   className="font-medium text-blue-600 hover:text-blue-500"
                 >
                   Sign up
