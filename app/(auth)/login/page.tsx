@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { HiShieldCheck } from 'react-icons/hi';
@@ -769,6 +769,23 @@ function LoginPageContent() {
   );
 }
 
+function LoginPageFallback() {
+  return (
+    <div className="min-h-screen w-full flex flex-col lg:flex-row">
+      <div className="w-full lg:w-[45%] bg-white flex flex-col justify-center items-center px-8 lg:px-24 min-h-screen">
+        <div className="w-full max-w-md mx-auto flex justify-center">
+          <div className="w-8 h-8 border-2 border-gray-300 border-t-gray-900 rounded-full animate-spin" />
+        </div>
+      </div>
+      <div className="hidden lg:flex lg:w-[55%] bg-slate-900 min-h-screen" />
+    </div>
+  );
+}
+
 export default function LoginPage() {
-  return <LoginPageContent />;
+  return (
+    <Suspense fallback={<LoginPageFallback />}>
+      <LoginPageContent />
+    </Suspense>
+  );
 }
