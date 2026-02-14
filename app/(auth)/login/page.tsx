@@ -158,11 +158,12 @@ function LoginPageContent() {
 
       const { get } = await import('@/utils/api');
 
-      // Reject disposable/temporary email addresses before sign-up (same as /register)
+      // Reject disposable/temporary email addresses before sign-up (required: do not proceed on any failure)
       try {
         await get(`/auth/validate-email?email=${encodeURIComponent(normalizedEmail)}`);
       } catch (validateErr: any) {
-        const message = validateErr?.response?.data?.detail ?? validateErr?.message ?? 'Temporary or disposable email addresses are not allowed. Please use a permanent email address.';
+        const detail = validateErr?.response?.data?.detail;
+        const message = detail ?? validateErr?.message ?? 'Temporary or disposable email addresses are not allowed. Please use a permanent email address.';
         setError(Array.isArray(message) ? message[0] : message);
         setIsLoading(false);
         return;
