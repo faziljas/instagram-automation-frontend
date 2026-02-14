@@ -156,9 +156,31 @@ function LoginPageContent() {
     try {
       const normalizedEmail = formData.email.trim().toLowerCase();
 
-      // Block if user already has an account in LogicDM (email or Google)
       const { get } = await import('@/utils/api');
-      const backendCheck = await get(`/auth/check-email/${encodeURIComponent(normalizedEmail)}`).catch(() => null);
+
+      // Reject disposable/temporary email addresses before sign-up (same as /register)
+      try {
+        await get(`/auth/validate-email?email=${encodeURIComponent(normalizedEmail)}`);
+      } catch (validateErr: any) {
+        const message = validateErr?.response?.data?.detail ?? validateErr?.message ?? 'Temporary or disposable email addresses are not allowed. Please use a permanent email address.';
+        setError(Array.isArray(message) ? message[0] : message);
+        setIsLoading(false);
+        return;
+      }
+
+      // Block if user already has an account in LogicDM (email or Google)
+      let backendCheck: { exists?: boolean } | null = null;
+      try {
+        backendCheck = await get(`/auth/check-email/${encodeURIComponent(normalizedEmail)}`);
+      } catch (checkErr: any) {
+        const detail = checkErr?.response?.data?.detail;
+        if (detail) {
+          setError(Array.isArray(detail) ? detail[0] : detail);
+          setIsLoading(false);
+          return;
+        }
+        backendCheck = null;
+      }
       if (backendCheck?.exists) {
         setError('This email is already registered. Please log in instead.');
         setIsLoading(false);
