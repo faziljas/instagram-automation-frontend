@@ -335,9 +335,17 @@ function LoginPageContent() {
                     {error.includes('already registered') ? (
                       <>
                         This email is already registered. Please{' '}
-                        <Link href="/login" className="font-medium underline hover:opacity-90" style={{ color: '#1877F2' }}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setError(null);
+                            setViewState('login');
+                          }}
+                          className="font-medium underline hover:opacity-90 bg-transparent border-0 p-0 cursor-pointer inline"
+                          style={{ color: '#1877F2' }}
+                        >
                           log in
-                        </Link>{' '}
+                        </button>{' '}
                         instead.
                       </>
                     ) : (
@@ -498,9 +506,17 @@ function LoginPageContent() {
                     {error.includes('already registered') ? (
                       <>
                         This email is already registered. Please{' '}
-                        <Link href="/login" className="font-medium underline hover:opacity-90" style={{ color: '#1877F2' }}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setError(null);
+                            setViewState('login');
+                          }}
+                          className="font-medium underline hover:opacity-90 bg-transparent border-0 p-0 cursor-pointer inline"
+                          style={{ color: '#1877F2' }}
+                        >
                           log in
-                        </Link>{' '}
+                        </button>{' '}
                         instead.
                       </>
                     ) : (
