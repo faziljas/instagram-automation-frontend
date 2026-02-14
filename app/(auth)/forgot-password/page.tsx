@@ -284,10 +284,10 @@ function ForgotPasswordPageContent() {
               </h3>
             </div>
             <p className="text-white/90 leading-relaxed mb-4">
-              We send a one-time reset link to your email. Your automations keep running—reset your password and pick up right where you left off in your LogicDM dashboard.
+              We send a <span className="text-cyan-300 font-medium">one-time reset link</span> to your email. Your automations <span className="text-amber-200/95 font-medium">keep running</span>—reset your password and pick up right where you left off in your <span className="text-blue-200 font-medium">LogicDM dashboard</span>.
             </p>
-            <p className="text-sm text-white/70">
-              LogicDM uses industry-standard security so only you can access your account and Instagram DM automations.
+            <p className="text-sm text-white/70 leading-relaxed">
+              <span className="text-white font-medium">LogicDM</span> uses <span className="text-emerald-300/90 font-medium">industry-standard security</span> so only you can access your account and Instagram DM automations.
             </p>
           </div>
         </div>
