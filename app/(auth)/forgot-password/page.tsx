@@ -253,20 +253,20 @@ function ForgotPasswordPageContent() {
         </div>
       </div>
 
-      {/* Right Column - Visual Area (SS1: deep purple-blue + subtle grid for consistency) */}
-      <div className="hidden lg:flex lg:w-[55%] bg-[#4A3C7D] relative overflow-hidden">
-        {/* Subtle grid – lighter purple lines like SS1 */}
+      {/* Right Column - Visual Area (SS2: deep indigo/purple + subtle grid) */}
+      <div className="hidden lg:flex lg:w-[55%] bg-[#504889] relative overflow-hidden">
+        {/* Subtle grid – slightly lighter lines like SS2 */}
         <div
-          className="absolute inset-0 opacity-25"
+          className="absolute inset-0 opacity-20"
           style={{
             backgroundImage: `
-              linear-gradient(to right, rgba(255,255,255,0.12) 1px, transparent 1px),
-              linear-gradient(to bottom, rgba(255,255,255,0.12) 1px, transparent 1px)
+              linear-gradient(to right, rgba(94,86,153,0.4) 1px, transparent 1px),
+              linear-gradient(to bottom, rgba(94,86,153,0.4) 1px, transparent 1px)
             `,
             backgroundSize: '40px 40px',
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#4A3C7D]/30 to-[#2C2640]/50" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#504889]/20 to-[#27273F]/40" />
 
         {/* Service info – secure recovery (glassmorphism card) */}
         <div className="relative z-10 flex items-center justify-center h-full px-12">
