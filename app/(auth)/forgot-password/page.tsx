@@ -8,7 +8,7 @@ import { supabase } from '@/lib/supabase';
 import { getCanonicalBase } from '@/lib/canonical';
 import { get } from '@/utils/api';
 import Logo from '@/components/Logo';
-import { FaKey, FaShieldAlt } from 'react-icons/fa';
+import { FaKey, FaShieldAlt, FaEnvelope, FaSync, FaChartLine, FaLock } from 'react-icons/fa';
 
 // Zod validation schema
 const forgotPasswordSchema = z.object({
@@ -275,7 +275,7 @@ function ForgotPasswordPageContent() {
         {/* Service info – secure recovery */}
         <div className="relative z-10 flex items-center justify-center h-full px-12">
           <div className="backdrop-blur-md bg-white/10 p-8 rounded-2xl border border-white/20 max-w-md">
-            <div className="flex items-start gap-3 mb-4">
+            <div className="flex items-start gap-3 mb-5">
               <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
                 <FaShieldAlt className="w-6 h-6 text-white" aria-hidden />
               </div>
@@ -283,12 +283,38 @@ function ForgotPasswordPageContent() {
                 Secure account recovery
               </h3>
             </div>
-            <p className="text-white/90 leading-relaxed mb-4">
-              We send a <span className="text-cyan-300 font-medium">one-time reset link</span> to your email. Your automations <span className="text-amber-200/95 font-medium">keep running</span>—reset your password and pick up right where you left off in your <span className="text-blue-200 font-medium">LogicDM dashboard</span>.
-            </p>
-            <p className="text-sm text-white/70 leading-relaxed">
-              <span className="text-white font-medium">LogicDM</span> uses <span className="text-emerald-300/90 font-medium">industry-standard security</span> so only you can access your account and Instagram DM automations.
-            </p>
+
+            <div className="space-y-4">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-cyan-500/30 flex items-center justify-center mt-0.5">
+                  <FaEnvelope className="w-4 h-4 text-cyan-300" aria-hidden />
+                </div>
+                <p className="text-white/90 leading-relaxed text-sm">
+                  We send a <span className="text-cyan-300 font-medium">one-time reset link</span> to your email.
+                </p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-amber-500/30 flex items-center justify-center mt-0.5">
+                  <FaSync className="w-4 h-4 text-amber-200" aria-hidden />
+                </div>
+                <p className="text-white/90 leading-relaxed text-sm">
+                  Your automations <span className="text-amber-200/95 font-medium">keep running</span>—reset your password and pick up right where you left off in your <span className="text-blue-200 font-medium">LogicDM dashboard</span>.
+                </p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-blue-500/30 flex items-center justify-center mt-0.5">
+                  <FaChartLine className="w-4 h-4 text-blue-200" aria-hidden />
+                </div>
+                <p className="text-white/90 leading-relaxed text-sm">
+                  <span className="text-white font-medium">LogicDM</span> uses <span className="text-emerald-300/90 font-medium">industry-standard security</span> so only you can access your account and Instagram DM automations.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-5 pt-4 border-t border-white/20 flex items-center justify-center gap-2">
+              <FaLock className="w-4 h-4 text-emerald-400/90" aria-hidden />
+              <span className="text-xs text-white/60">Your data stays secure with us</span>
+            </div>
           </div>
         </div>
       </div>
