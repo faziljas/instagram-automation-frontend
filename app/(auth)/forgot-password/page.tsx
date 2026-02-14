@@ -270,12 +270,12 @@ function ForgotPasswordPageContent() {
 
         {/* Service info – secure recovery (glassmorphism card) */}
         <div className="relative z-10 flex items-center justify-center h-full px-12">
-          <div className="backdrop-blur-xl bg-purple-400/15 p-8 rounded-2xl border border-white/25 shadow-2xl max-w-md">
+          <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-xl max-w-md">
             <div className="flex items-start gap-3 mb-5">
               <div className="flex-shrink-0 w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center shadow-lg">
                 <FaShieldAlt className="w-6 h-6 text-white" aria-hidden />
               </div>
-              <h3 className="text-xl font-semibold text-white pt-2">
+              <h3 className="text-xl font-semibold text-gray-900 pt-2">
                 Secure account recovery
               </h3>
             </div>
@@ -285,33 +285,33 @@ function ForgotPasswordPageContent() {
                 <div className="flex-shrink-0 w-9 h-9 rounded-full bg-blue-500 flex items-center justify-center shadow-md">
                   <FaEnvelope className="w-4 h-4 text-white" aria-hidden />
                 </div>
-                <p className="text-white/95 leading-relaxed text-sm">
-                  We send a <span className="text-cyan-300 font-medium">one-time reset link</span> to your email.
+                <p className="text-gray-600 leading-relaxed text-sm">
+                  We send a <span className="text-blue-600 font-medium">one-time reset link</span> to your email.
                 </p>
               </div>
               <div className="flex items-center gap-3">
                 <div className="flex-shrink-0 w-9 h-9 rounded-full bg-amber-500 flex items-center justify-center shadow-md">
                   <FaSync className="w-4 h-4 text-white" aria-hidden />
                 </div>
-                <p className="text-white/95 leading-relaxed text-sm">
-                  Your automations <span className="text-amber-200/95 font-medium">keep running</span>—reset your password and pick up right where you left off in your <span className="text-blue-200 font-medium">LogicDM dashboard</span>.
+                <p className="text-gray-600 leading-relaxed text-sm">
+                  Your automations <span className="text-amber-600 font-medium">keep running</span>—reset your password and pick up right where you left off in your <span className="text-blue-600 font-medium">LogicDM dashboard</span>.
                 </p>
               </div>
               <div className="flex items-center gap-3">
                 <div className="flex-shrink-0 w-9 h-9 rounded-full bg-emerald-500 flex items-center justify-center shadow-md">
                   <FaChartLine className="w-4 h-4 text-white" aria-hidden />
                 </div>
-                <p className="text-white/95 leading-relaxed text-sm">
-                  <span className="text-white font-medium">LogicDM</span> uses <span className="text-emerald-300/90 font-medium">industry-standard security</span> so only you can access your account and Instagram DM automations.
+                <p className="text-gray-600 leading-relaxed text-sm">
+                  <span className="text-gray-900 font-medium">LogicDM</span> uses <span className="text-emerald-600 font-medium">industry-standard security</span> so only you can access your account and Instagram DM automations.
                 </p>
               </div>
             </div>
 
-            <div className="mt-5 pt-4 border-t border-white/25 flex items-center justify-center gap-2">
+            <div className="mt-5 pt-4 border-t border-gray-200 flex items-center justify-center gap-2">
               <div className="flex-shrink-0 w-7 h-7 rounded-full bg-emerald-500 flex items-center justify-center">
                 <FaLock className="w-3 h-3 text-white" aria-hidden />
               </div>
-              <span className="text-xs text-white/70">Your data stays secure with us</span>
+              <span className="text-xs text-gray-500">Your data stays secure with us</span>
             </div>
           </div>
         </div>
