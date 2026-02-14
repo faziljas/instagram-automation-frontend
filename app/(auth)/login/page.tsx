@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { HiShieldCheck } from 'react-icons/hi';
 import { FaInstagram, FaBolt, FaRocket, FaEnvelope, FaChartLine, FaPaperPlane, FaCheckCircle } from 'react-icons/fa';
@@ -28,6 +28,7 @@ type ViewState = 'welcome' | 'signup' | 'login';
 
 function LoginPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { isAuthenticated, fetchUser } = useAuth();
   const [viewState, setViewState] = useState<ViewState>('welcome');
   const [showConfigError, setShowConfigError] = useState(false);
@@ -61,6 +62,19 @@ function LoginPageContent() {
       router.push('/dashboard');
     }
   }, [isAuthenticated, router]);
+
+  // Show error when redirected after Google signup with already-registered email
+  useEffect(() => {
+    const err = searchParams.get('error');
+    if (err === 'already_registered') {
+      setError('This email is already registered. Please log in instead.');
+      setViewState('login');
+      // Clear the query param from URL without full navigation
+      if (typeof window !== 'undefined') {
+        window.history.replaceState({}, '', '/login');
+      }
+    }
+  }, [searchParams]);
 
   const handleGoogleAuth = async (isSignup: boolean = false) => {
     setIsGoogleLoading(true);
@@ -141,7 +155,16 @@ function LoginPageContent() {
 
     try {
       const normalizedEmail = formData.email.trim().toLowerCase();
-      
+
+      // Block if user already has an account in LogicDM (email or Google)
+      const { get } = await import('@/utils/api');
+      const backendCheck = await get(`/auth/check-email/${encodeURIComponent(normalizedEmail)}`).catch(() => null);
+      if (backendCheck?.exists) {
+        setError('This email is already registered. Please log in instead.');
+        setIsLoading(false);
+        return;
+      }
+
       const { data, error } = await supabase.auth.signUp({
         email: normalizedEmail,
         password: formData.password,

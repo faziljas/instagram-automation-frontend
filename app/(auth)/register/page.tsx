@@ -109,9 +109,17 @@ function RegisterPageContent() {
 
     try {
       // Normalize email to lowercase before sending to Supabase
-      // This prevents case-sensitivity issues (Supabase has a bug where emails are case-sensitive)
       const normalizedEmail = formData.email.trim().toLowerCase();
-      
+
+      // Block if user already has an account in LogicDM (email or Google)
+      const { get } = await import('@/utils/api');
+      const backendCheck = await get(`/auth/check-email/${encodeURIComponent(normalizedEmail)}`).catch(() => null);
+      if (backendCheck?.exists) {
+        setError('This email is already registered. Please log in instead.');
+        setIsLoading(false);
+        return;
+      }
+
       const { data, error } = await supabase.auth.signUp({
         email: normalizedEmail,
         password: formData.password,

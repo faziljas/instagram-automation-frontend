@@ -45,9 +45,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         first_name: firstName,
         last_name: lastName,
       });
-    } catch (error) {
+    } catch (error: any) {
+      const message = error?.message ?? '';
+      if (message.includes('already registered') || message.includes('Please log in instead')) {
+        // User signed up with Google but this email already has an account (email or other). Block and redirect.
+        await supabase.auth.signOut();
+        if (typeof window !== 'undefined') {
+          window.location.href = '/login?error=already_registered';
+        }
+        throw error; // So fetchUser stops and does not call get('/users/me')
+      }
       console.error('Failed to sync user to backend:', error);
-      // Don't throw - allow user to continue even if sync fails
+      // Don't throw - allow user to continue even if sync fails for other reasons
     }
   };
 
