@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase';
 import { getCanonicalBase } from '@/lib/canonical';
 import { get } from '@/utils/api';
 import Logo from '@/components/Logo';
+import { FaKey, FaShieldAlt } from 'react-icons/fa';
 
 // Zod validation schema
 const forgotPasswordSchema = z.object({
@@ -228,13 +229,23 @@ function ForgotPasswordPageContent() {
 
         {/* Form Content */}
         <div className="w-full max-w-md mx-auto">
-          {/* Header */}
+          {/* Header with visual icon */}
           <div className="mb-8">
-            <h2 className="text-2xl font-semibold tracking-tight text-gray-900">
-              Forgot your password?
-            </h2>
-            <p className="mt-2 text-sm text-gray-500 mb-8">
-              No worries! Enter your email address and we'll send you a link to reset your password.
+            <div className="flex items-center gap-4 mb-6">
+              <div className="flex-shrink-0 w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg ring-4 ring-indigo-100">
+                <FaKey className="w-8 h-8 text-white" aria-hidden />
+              </div>
+              <div>
+                <h2 className="text-2xl font-semibold tracking-tight text-gray-900">
+                  Forgot your password?
+                </h2>
+                <p className="mt-1 text-sm text-gray-500">
+                  No worries! Enter your email and we'll send you a reset link.
+                </p>
+              </div>
+            </div>
+            <p className="text-sm text-gray-500 mb-8">
+              Enter your email address below to receive a one-time link to reset your password.
             </p>
           </div>
 
@@ -264,9 +275,14 @@ function ForgotPasswordPageContent() {
         {/* Service info – secure recovery */}
         <div className="relative z-10 flex items-center justify-center h-full px-12">
           <div className="backdrop-blur-md bg-white/10 p-8 rounded-2xl border border-white/20 max-w-md">
-            <h3 className="text-xl font-semibold text-white mb-3">
-              Secure account recovery
-            </h3>
+            <div className="flex items-start gap-3 mb-4">
+              <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+                <FaShieldAlt className="w-6 h-6 text-white" aria-hidden />
+              </div>
+              <h3 className="text-xl font-semibold text-white pt-2">
+                Secure account recovery
+              </h3>
+            </div>
             <p className="text-white/90 leading-relaxed mb-4">
               We send a one-time reset link to your email. Your automations keep running—reset your password and pick up right where you left off in your LogicDM dashboard.
             </p>
