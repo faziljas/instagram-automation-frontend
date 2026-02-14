@@ -307,7 +307,19 @@ function RegisterPageContent() {
           {/* Error Message */}
           {error && (
             <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
-              <p className="text-sm text-red-600">{error}</p>
+              <p className="text-sm text-red-600">
+                {error.includes('already registered') ? (
+                  <>
+                    This email is already registered. Please{' '}
+                    <Link href="/login" className="font-medium underline hover:opacity-90" style={{ color: '#1877F2' }}>
+                      log in
+                    </Link>{' '}
+                    instead.
+                  </>
+                ) : (
+                  error
+                )}
+              </p>
             </div>
           )}
 
