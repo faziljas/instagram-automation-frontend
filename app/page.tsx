@@ -35,6 +35,9 @@ export const metadata: Metadata = {
     title: 'LogicDM - Instagram Automation & Marketing Made Easy',
     description: 'Automate your Instagram DMs and engagement with powerful automation rules. Start free today.',
   },
+  alternates: {
+    canonical: `${getCanonicalBase()}/`,
+  },
 };
 
 const siteUrl = getCanonicalBase();
