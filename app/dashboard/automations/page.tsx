@@ -528,11 +528,19 @@ export default function AutomationsPage() {
       // Followers flow: enable pre-DM engagement
       ruleConfig.enable_pre_dm_engagement = preDmFlowType === 'followers';
       ruleConfig.ask_to_follow = preDmFlowType === 'followers';
+      // Email/Phone flows: ensure backend runs pre-DM first (ask_to_follow true so process_pre_dm_actions is called)
+      if (preDmFlowType === 'email') {
+        ruleConfig.ask_to_follow = true;
+        ruleConfig.ask_for_email = true;
+      } else if (preDmFlowType === 'phone') {
+        ruleConfig.ask_to_follow = true;
+        ruleConfig.ask_for_email = false;
+      }
       ruleConfig.simple_flow_phone_message = (config.simpleFlowPhoneMessage || '').trim() || '';
       ruleConfig.simple_flow_phone_question = (config.simpleFlowPhoneQuestion || '').trim() || '';
       ruleConfig.phone_invalid_retry_message = (config.phoneInvalidRetryMessage || '').trim() || '';
     } else {
-      // Backward compatibility: use old individual checkboxes
+      // Backward compatibility: use old individual checkboxes, or simple flow flags so pre-DM runs first
       if (config.askToFollow !== undefined) {
         ruleConfig.ask_to_follow = config.askToFollow;
         ruleConfig.ask_to_follow_message = config.askToFollowMessage || '';
@@ -542,6 +550,23 @@ export default function AutomationsPage() {
         ruleConfig.ask_for_email_message = config.askForEmailMessage || '';
         ruleConfig.lead_magnet_link = config.leadMagnetLink || '';
         ruleConfig.email_retry_message = config.emailRetryMessage || '';
+      }
+      // If Email/Phone flow is set (simpleDmFlow/simpleDmFlowPhone), ensure backend runs pre-DM
+      if (config.simpleDmFlow) {
+        ruleConfig.simple_dm_flow = true;
+        ruleConfig.simple_dm_flow_phone = false;
+        ruleConfig.ask_to_follow = true;
+        ruleConfig.ask_for_email = true;
+        ruleConfig.simple_flow_message = (config.simpleFlowMessage || '').trim() || '';
+        ruleConfig.simple_flow_email_question = (config.simpleFlowEmailQuestion || '').trim() || '';
+      } else if (config.simpleDmFlowPhone) {
+        ruleConfig.simple_dm_flow = false;
+        ruleConfig.simple_dm_flow_phone = true;
+        ruleConfig.ask_to_follow = true;
+        ruleConfig.ask_for_email = false;
+        ruleConfig.simple_flow_phone_message = (config.simpleFlowPhoneMessage || '').trim() || '';
+        ruleConfig.simple_flow_phone_question = (config.simpleFlowPhoneQuestion || '').trim() || '';
+        ruleConfig.phone_invalid_retry_message = (config.phoneInvalidRetryMessage || '').trim() || '';
       }
     }
     
