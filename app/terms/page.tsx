@@ -39,16 +39,6 @@ export default function TermsPage() {
             </p>
           </section>
 
-          <section className="mb-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">Business Information</h2>
-            <ul className="list-none text-gray-700 leading-relaxed space-y-2">
-              <li><strong className="font-semibold text-gray-900">Legal Entity:</strong> LOGIC DM (Sole Proprietorship)</li>
-              <li><strong className="font-semibold text-gray-900">Registration Number:</strong> UDYAM-TN-02-0448339</li>
-              <li><strong className="font-semibold text-gray-900">Registered Address:</strong> 18/15, Nainiappan Garden 3rd Lane, Chennai, TN, India</li>
-              <li><strong className="font-semibold text-gray-900">Support Phone:</strong> +91-9791046914</li>
-            </ul>
-          </section>
-
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Acceptance of Terms</h2>
             <p className="text-gray-700 leading-relaxed mb-4">
