@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { XMarkIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
+import React, { useEffect, useState, useRef } from 'react';
+import { XMarkIcon, InformationCircleIcon, ArrowUpTrayIcon } from '@heroicons/react/24/outline';
 import MobilePreview from './MobilePreview';
+import api from '@/utils/api';
 
 interface MediaItem {
   id: string;
@@ -135,6 +136,9 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
   });
 
   const [isSaving, setIsSaving] = useState(false);
+  const [mediaUploading, setMediaUploading] = useState(false);
+  const [mediaUploadError, setMediaUploadError] = useState<string | null>(null);
+  const mediaFileInputRef = useRef<HTMLInputElement>(null);
   const [activeTab, setActiveTab] = useState<'simple' | 'lead'>('simple');
   const [currentKeyword, setCurrentKeyword] = useState('');
   const [showPreviewMobile, setShowPreviewMobile] = useState(false);
@@ -931,18 +935,67 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                       <option value="card">Card</option>
                     </select>
                     {config.mediaType && config.mediaType !== 'none' && (
-                      <input
-                        type="url"
-                        value={config.mediaUrl || ''}
-                        onChange={(e) =>
-                          setConfig({
-                            ...config,
-                            mediaUrl: e.target.value,
-                          })
-                        }
-                        className="w-full h-10 px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all"
-                        placeholder={`Enter ${config.mediaType} URL (e.g., https://example.com/file.${config.mediaType === 'pdf' ? 'pdf' : config.mediaType === 'video' ? 'mp4' : config.mediaType === 'image' ? 'jpg' : 'link'})`}
-                      />
+                      <div className="space-y-2">
+                        {['video', 'image', 'card'].includes(config.mediaType) && (
+                          <div>
+                            <input
+                              ref={mediaFileInputRef}
+                              type="file"
+                              accept={config.mediaType === 'video' ? 'video/*' : 'image/*'}
+                              className="hidden"
+                              onChange={async (e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                setMediaUploadError(null);
+                                setMediaUploading(true);
+                                try {
+                                  const formData = new FormData();
+                                  formData.append('file', file);
+                                  const { data } = await api.post<{ url: string }>('/api/upload/media', formData, {
+                                    headers: { 'Content-Type': 'multipart/form-data' },
+                                  });
+                                  if (data?.url) {
+                                    setConfig({ ...config, mediaUrl: data.url });
+                                  } else {
+                                    setMediaUploadError('Upload failed. Use URL instead.');
+                                  }
+                                } catch (err: unknown) {
+                                  const message = err && typeof err === 'object' && 'response' in err
+                                    ? (err as { response?: { data?: { detail?: string } } }).response?.data?.detail
+                                    : err instanceof Error ? err.message : 'Upload failed. Use URL instead.';
+                                  setMediaUploadError(String(message || 'Upload failed. Use URL instead.'));
+                                } finally {
+                                  setMediaUploading(false);
+                                  e.target.value = '';
+                                }
+                              }}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => mediaFileInputRef.current?.click()}
+                              disabled={mediaUploading}
+                              className="flex items-center gap-2 w-full justify-center px-3 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 disabled:opacity-50 transition-all"
+                            >
+                              <ArrowUpTrayIcon className="h-4 w-4" />
+                              {mediaUploading ? 'Uploading…' : 'Upload file'}
+                            </button>
+                            {mediaUploadError && (
+                              <p className="text-xs text-amber-600 mt-1">{mediaUploadError}</p>
+                            )}
+                            <p className="text-xs text-gray-500 mt-1">Or enter URL below</p>
+                          </div>
+                        )}
+                        <input
+                          type="url"
+                          value={config.mediaUrl || ''}
+                          onChange={(e) => {
+                            setMediaUploadError(null);
+                            setConfig({ ...config, mediaUrl: e.target.value });
+                          }}
+                          className="w-full h-10 px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all"
+                          placeholder={`Enter ${config.mediaType} URL (e.g., https://example.com/file.${config.mediaType === 'pdf' ? 'pdf' : config.mediaType === 'video' ? 'mp4' : config.mediaType === 'image' ? 'jpg' : 'link'})`}
+                        />
+                      </div>
                     )}
                   </div>
 
