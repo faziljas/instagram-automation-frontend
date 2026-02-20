@@ -511,12 +511,22 @@ export default function AutomationsPage() {
       ruleConfig.ask_for_email_message = config.askForEmailMessage || '';
       ruleConfig.lead_magnet_link = config.leadMagnetLink || '';
       ruleConfig.email_retry_message = config.emailRetryMessage || '';
+      // Map preDmFlowType to backend fields
+      const preDmFlowType = config.preDmFlowType || (
+        config.simpleDmFlow ? 'email' :
+        config.simpleDmFlowPhone ? 'phone' :
+        (config.enablePreDmEngagement || config.askToFollow) ? 'followers' :
+        'none'
+      );
       // Simple flow: one message + re-ask email until valid (Lead Capture)
-      ruleConfig.simple_dm_flow = !!config.simpleDmFlow;
+      ruleConfig.simple_dm_flow = preDmFlowType === 'email';
       ruleConfig.simple_flow_message = (config.simpleFlowMessage || '').trim() || '';
       ruleConfig.simple_flow_email_question = (config.simpleFlowEmailQuestion || '').trim() || '';
       // Simple flow (Phone): follow + phone, re-ask until valid
-      ruleConfig.simple_dm_flow_phone = !!config.simpleDmFlowPhone;
+      ruleConfig.simple_dm_flow_phone = preDmFlowType === 'phone';
+      // Followers flow: enable pre-DM engagement
+      ruleConfig.enable_pre_dm_engagement = preDmFlowType === 'followers';
+      ruleConfig.ask_to_follow = preDmFlowType === 'followers';
       ruleConfig.simple_flow_phone_message = (config.simpleFlowPhoneMessage || '').trim() || '';
       ruleConfig.simple_flow_phone_question = (config.simpleFlowPhoneQuestion || '').trim() || '';
       ruleConfig.phone_invalid_retry_message = (config.phoneInvalidRetryMessage || '').trim() || '';

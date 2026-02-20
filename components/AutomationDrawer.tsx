@@ -27,8 +27,10 @@ interface AutomationConfig {
   simpleCommentReplies: string[];
   leadCommentReplies: string[];
 
-  // Pre‑DM (Simplified MVP: Single toggle controls both)
-  enablePreDmEngagement?: boolean; // NEW: Single toggle for MVP simplification
+  // Pre‑DM Flow Type: 'email' | 'phone' | 'followers' | 'none'
+  preDmFlowType?: 'email' | 'phone' | 'followers' | 'none';
+  // Legacy fields (kept for backward compatibility)
+  enablePreDmEngagement?: boolean; // Deprecated: use preDmFlowType instead
   askToFollow?: boolean; // Backward compatibility
   askToFollowMessage?: string;
   askForEmail?: boolean; // Backward compatibility
@@ -95,8 +97,10 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
     simpleCommentReplies: ['Thanks! Please see DMs.', 'Sent you a message! Check it out!', 'Nice! Check your DMs!'],
     leadCommentReplies: ['Thanks! Please see DMs.', 'Sent you a message! Check it out!', 'Nice! Check your DMs!'],
 
-    // Pre‑DM (Simplified MVP: Single toggle controls both)
-    enablePreDmEngagement: false, // NEW: Single toggle
+    // Pre‑DM Flow Type
+    preDmFlowType: 'none', // 'email' | 'phone' | 'followers' | 'none'
+    // Legacy fields (kept for backward compatibility)
+    enablePreDmEngagement: false, // Deprecated: use preDmFlowType instead
     askToFollow: false, // Backward compatibility
     askToFollowMessage:
       "Hey! Would you mind following me? I share great content! 🙌",
@@ -175,7 +179,14 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
           ? initialConfig.leadCommentReplies
           : ['Thanks! Please see DMs.', 'Sent you a message! Check it out!', 'Nice! Check your DMs!'],
 
-        // NEW MVP: Check enablePreDmEngagement first, fallback to old checkboxes for backward compatibility
+        // Pre-DM Flow Type: determine from existing config or default to 'none'
+        preDmFlowType: initialConfig.preDmFlowType || (
+          initialConfig.simpleDmFlow ? 'email' :
+          initialConfig.simpleDmFlowPhone ? 'phone' :
+          (initialConfig.enablePreDmEngagement || initialConfig.askToFollow) ? 'followers' :
+          'none'
+        ),
+        // Legacy fields (kept for backward compatibility)
         enablePreDmEngagement: initialConfig.enablePreDmEngagement !== undefined 
           ? initialConfig.enablePreDmEngagement 
           : (initialConfig.askToFollow || initialConfig.askForEmail || false),
@@ -640,111 +651,131 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                     </div>
 
                     <div className="p-4 border border-gray-200 rounded-lg bg-gray-50">
-                      {/* Toggle */}
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex-1">
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Pre‑DM Engagement Message
-                          </label>
-                          <p className="text-xs text-gray-500">
-                            Send follow request and email collection before the primary DM.
-                          </p>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const isEnabled = config.enablePreDmEngagement ?? false;
-                            setConfig({
-                              ...config,
-                              enablePreDmEngagement: !isEnabled,
-                              // When enabled, automatically enable both follow and email
-                              askToFollow: !isEnabled,
-                              askForEmail: !isEnabled,
-                            });
-                          }}
-                          className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:ring-offset-2 ${
-                            config.enablePreDmEngagement ?? false
-                              ? 'bg-blue-600'
-                              : 'bg-gray-200'
-                          }`}
-                        >
-                          <span
-                            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
-                              config.enablePreDmEngagement ?? false
-                                ? 'translate-x-5'
-                                : 'translate-x-0'
-                            }`}
+                      {/* Radio buttons for Pre-DM Flow Type */}
+                      <div className="space-y-3">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Select Pre-DM Flow Type
+                        </label>
+                        
+                        {/* Email Option */}
+                        <label className="flex items-start p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                          <input
+                            type="radio"
+                            name="preDmFlowType"
+                            value="email"
+                            checked={(config.preDmFlowType ?? 'none') === 'email'}
+                            onChange={() => {
+                              setConfig({
+                                ...config,
+                                preDmFlowType: 'email',
+                                simpleDmFlow: true,
+                                simpleDmFlowPhone: false,
+                                enablePreDmEngagement: false,
+                                askToFollow: false,
+                                askForEmail: false,
+                              });
+                            }}
+                            className="mt-0.5 h-4 w-4 text-blue-600 focus:ring-blue-500"
                           />
-                        </button>
+                          <div className="ml-3 flex-1">
+                            <div className="text-sm font-medium text-gray-700">Email</div>
+                            <div className="text-xs text-gray-500">
+                              One message (follow + email), then keep asking for email until valid. No buttons.
+                            </div>
+                          </div>
+                        </label>
+
+                        {/* Phone Option */}
+                        <label className="flex items-start p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                          <input
+                            type="radio"
+                            name="preDmFlowType"
+                            value="phone"
+                            checked={(config.preDmFlowType ?? 'none') === 'phone'}
+                            onChange={() => {
+                              setConfig({
+                                ...config,
+                                preDmFlowType: 'phone',
+                                simpleDmFlowPhone: true,
+                                simpleDmFlow: false,
+                                enablePreDmEngagement: false,
+                                askToFollow: false,
+                                askForEmail: false,
+                              });
+                            }}
+                            className="mt-0.5 h-4 w-4 text-blue-600 focus:ring-blue-500"
+                          />
+                          <div className="ml-3 flex-1">
+                            <div className="text-sm font-medium text-gray-700">Phone</div>
+                            <div className="text-xs text-gray-500">
+                              One message (follow + phone), then keep asking for phone until valid. No buttons.
+                            </div>
+                          </div>
+                        </label>
+
+                        {/* Followers Option */}
+                        <label className="flex items-start p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                          <input
+                            type="radio"
+                            name="preDmFlowType"
+                            value="followers"
+                            checked={(config.preDmFlowType ?? 'none') === 'followers'}
+                            onChange={() => {
+                              setConfig({
+                                ...config,
+                                preDmFlowType: 'followers',
+                                enablePreDmEngagement: true,
+                                askToFollow: true,
+                                askForEmail: false,
+                                simpleDmFlow: false,
+                                simpleDmFlowPhone: false,
+                              });
+                            }}
+                            className="mt-0.5 h-4 w-4 text-blue-600 focus:ring-blue-500"
+                          />
+                          <div className="ml-3 flex-1">
+                            <div className="text-sm font-medium text-gray-700">Followers</div>
+                            <div className="text-xs text-gray-500">
+                              Send follow request with buttons. After confirmation, proceed to primary DM.
+                            </div>
+                          </div>
+                        </label>
+
+                        {/* None Option */}
+                        <label className="flex items-start p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                          <input
+                            type="radio"
+                            name="preDmFlowType"
+                            value="none"
+                            checked={(config.preDmFlowType ?? 'none') === 'none'}
+                            onChange={() => {
+                              setConfig({
+                                ...config,
+                                preDmFlowType: 'none',
+                                enablePreDmEngagement: false,
+                                askToFollow: false,
+                                askForEmail: false,
+                                simpleDmFlow: false,
+                                simpleDmFlowPhone: false,
+                              });
+                            }}
+                            className="mt-0.5 h-4 w-4 text-blue-600 focus:ring-blue-500"
+                          />
+                          <div className="ml-3 flex-1">
+                            <div className="text-sm font-medium text-gray-700">None</div>
+                            <div className="text-xs text-gray-500">
+                              Skip pre-DM engagement. Send primary DM directly.
+                            </div>
+                          </div>
+                        </label>
                       </div>
 
-                      {(config.enablePreDmEngagement ?? false) && (
+                      {/* Show fields based on selected option */}
+                      {(config.preDmFlowType === 'email' || config.preDmFlowType === 'phone' || config.preDmFlowType === 'followers') && (
                         <div className="space-y-4 mt-4 pt-4 border-t border-gray-200">
-                          {/* Simple flow: one message + re-ask email until valid (Lead Capture style) */}
-                          <div className="flex items-center justify-between py-2">
-                            <div className="flex-1">
-                              <label className="block text-sm font-medium text-gray-700 mb-0.5">
-                                Use simple flow (Lead Capture)
-                              </label>
-                              <p className="text-xs text-gray-500">
-                                One message (follow + email), then keep asking for email until valid. No buttons.
-                              </p>
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                const next = !(config.simpleDmFlow ?? false);
-                                setConfig({
-                                  ...config,
-                                  simpleDmFlow: next,
-                                  simpleDmFlowPhone: next ? false : (config.simpleDmFlowPhone ?? false),
-                                });
-                              }}
-                              className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:ring-offset-2 ${
-                                config.simpleDmFlow ?? false ? 'bg-blue-600' : 'bg-gray-200'
-                              }`}
-                            >
-                              <span
-                                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
-                                  config.simpleDmFlow ?? false ? 'translate-x-5' : 'translate-x-0'
-                                }`}
-                              />
-                            </button>
-                          </div>
 
-                          {/* Simple flow (Phone): follow + phone, then re-ask until valid */}
-                          <div className="flex items-center justify-between py-2">
-                            <div className="flex-1">
-                              <label className="block text-sm font-medium text-gray-700 mb-0.5">
-                                Use simple flow (Phone)
-                              </label>
-                              <p className="text-xs text-gray-500">
-                                One message (follow + phone), then keep asking for phone until valid. No buttons.
-                              </p>
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                const next = !(config.simpleDmFlowPhone ?? false);
-                                setConfig({
-                                  ...config,
-                                  simpleDmFlowPhone: next,
-                                  simpleDmFlow: next ? false : (config.simpleDmFlow ?? false),
-                                });
-                              }}
-                              className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:ring-offset-2 ${
-                                config.simpleDmFlowPhone ?? false ? 'bg-blue-600' : 'bg-gray-200'
-                              }`}
-                            >
-                              <span
-                                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
-                                  config.simpleDmFlowPhone ?? false ? 'translate-x-5' : 'translate-x-0'
-                                }`}
-                              />
-                            </button>
-                          </div>
-
-                          {(config.simpleDmFlow ?? false) ? (
+                          {/* Email Flow Fields */}
+                          {config.preDmFlowType === 'email' && (
                             <>
                               <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
@@ -789,7 +820,10 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                                 />
                               </div>
                             </>
-                          ) : (config.simpleDmFlowPhone ?? false) ? (
+                          )}
+
+                          {/* Phone Flow Fields */}
+                          {config.preDmFlowType === 'phone' && (
                             <>
                               <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
@@ -834,29 +868,33 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                                 />
                               </div>
                             </>
-                          ) : (
-                            <>
-                          {/* Follow Request - Standard flow */}
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                              Follow Request Message
-                            </label>
-                            <textarea
-                              value={config.askToFollowMessage || ''}
-                              onChange={(e) =>
-                                setConfig({
-                                  ...config,
-                                  askToFollowMessage: e.target.value,
-                                })
-                              }
-                              rows={3}
-                              className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none"
-                              placeholder="Hey! Would you mind following me? I share great content! 🙌"
-                            />
-                          </div>
+                          )}
 
-                          {/* Email Request - Standard flow - Only show if email collection is enabled AND Pre-DM Engagement is OFF AND phone flow is NOT enabled */}
-                          {(config.simpleDmFlow || (config.askForEmail && !config.enablePreDmEngagement && !config.simpleDmFlowPhone)) && (
+                          {/* Followers Flow Fields */}
+                          {config.preDmFlowType === 'followers' && (
+                            <>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                  Follow Request Message
+                                </label>
+                                <textarea
+                                  value={config.askToFollowMessage || ''}
+                                  onChange={(e) =>
+                                    setConfig({
+                                      ...config,
+                                      askToFollowMessage: e.target.value,
+                                    })
+                                  }
+                                  rows={3}
+                                  className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none"
+                                  placeholder="Hey! Would you mind following me? I share great content! 🙌"
+                                />
+                              </div>
+                            </>
+                          )}
+
+                          {/* Email Request - Standard flow - Only show if email flow is selected */}
+                          {config.preDmFlowType === 'email' && (
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-1.5">
                                 Email Request Message
@@ -930,8 +968,6 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                                 </div>
                               </div>
                             </div>
-                          )}
-                            </>
                           )}
                         </div>
                       )}
