@@ -16,10 +16,10 @@ export default function PricingPage() {
   const { execute: createCheckoutSession, loading: checkoutLoading } = usePost();
   const [billingCycle, setBillingCycle] = useState<BillingCycle>('monthly');
 
-  // Calculate prices with yearly discount (20% off)
+  // Monthly = $9; Yearly = $7/mo = $84/year (7 × 12)
   const monthlyPrice = 9;
-  const yearlyPrice = Math.round(monthlyPrice * 12 * 0.8); // 20% discount
-  const monthlyYearlyPrice = Math.round(yearlyPrice / 12); // Per month when paid yearly
+  const monthlyYearlyPrice = 7;
+  const yearlyPrice = monthlyYearlyPrice * 12; // 84
 
   const handleGetStarted = () => {
     if (session) {
