@@ -714,6 +714,20 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                                   placeholder="What's your email? Reply here and I'll send you the guide! 📧"
                                 />
                               </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                  When they type random text (invalid email)
+                                </label>
+                                <textarea
+                                  value={config.emailRetryMessage || ''}
+                                  onChange={(e) =>
+                                    setConfig({ ...config, emailRetryMessage: e.target.value })
+                                  }
+                                  rows={2}
+                                  className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none"
+                                  placeholder="That doesn't look like a valid email. Please share your correct email so I can send you the guide! 📧"
+                                />
+                              </div>
                             </>
                           ) : (
                             <>
