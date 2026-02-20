@@ -95,7 +95,14 @@ export default function AnalyticsPage() {
   const totalPages = Math.max(1, Math.ceil(totalLeads / leadsPageSize));
   const recentLeads = allLeads.slice((leadsPage - 1) * leadsPageSize, leadsPage * leadsPageSize);
 
-  // Phone-only leads for "Recent phone leads" section
+  // Email-only leads for "Lead capture (Email)" section
+  const emailLeads = useMemo(() => allLeads.filter((l) => l.email != null && l.email.trim() !== ''), [allLeads]);
+  const [emailLeadsPage, setEmailLeadsPage] = useState(1);
+  const emailLeadsPageSize = 50;
+  const emailLeadsTotalPages = Math.max(1, Math.ceil(emailLeads.length / emailLeadsPageSize));
+  const recentEmailLeads = emailLeads.slice((emailLeadsPage - 1) * emailLeadsPageSize, emailLeadsPage * emailLeadsPageSize);
+
+  // Phone-only leads for "Lead capture (Phone)" section
   const phoneLeads = useMemo(() => allLeads.filter((l) => l.phone != null && l.phone.trim() !== ''), [allLeads]);
   const [phoneLeadsPage, setPhoneLeadsPage] = useState(1);
   const phoneLeadsPageSize = 50;
@@ -105,6 +112,10 @@ export default function AnalyticsPage() {
   useEffect(() => {
     if (totalPages > 0 && leadsPage > totalPages) setLeadsPage(totalPages);
   }, [totalPages, leadsPage]);
+
+  useEffect(() => {
+    if (emailLeadsTotalPages > 0 && emailLeadsPage > emailLeadsTotalPages) setEmailLeadsPage(emailLeadsTotalPages);
+  }, [emailLeadsTotalPages, emailLeadsPage]);
 
   useEffect(() => {
     if (phoneLeadsTotalPages > 0 && phoneLeadsPage > phoneLeadsTotalPages) setPhoneLeadsPage(phoneLeadsTotalPages);
@@ -473,10 +484,58 @@ export default function AnalyticsPage() {
         </ul>
       </Card>
 
-      {/* Recent phone leads */}
+      {/* Lead capture (Email) */}
       <Card className="mb-8 rounded-2xl border-2 border-gray-200 shadow-xl">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-          <h2 className="text-xl font-bold text-gray-900">Recent phone leads</h2>
+          <h2 className="text-xl font-bold text-gray-900">Lead capture (Email)</h2>
+          {emailLeads.length > 0 && (
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="text-sm text-gray-500">
+                Page {emailLeadsPage} of {emailLeadsTotalPages} · {emailLeads.length.toLocaleString()} total
+              </span>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setEmailLeadsPage((p) => Math.max(1, p - 1))}
+                  disabled={emailLeadsPage <= 1}
+                  className="px-3 py-1.5 text-sm font-semibold rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Previous
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEmailLeadsPage((p) => Math.min(emailLeadsTotalPages, p + 1))}
+                  disabled={emailLeadsPage >= emailLeadsTotalPages}
+                  className="px-3 py-1.5 text-sm font-semibold rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+        <ul className="space-y-2 max-h-[320px] overflow-y-auto">
+          {recentEmailLeads.length === 0 ? (
+            <li className="text-sm text-gray-500">No email leads yet. They appear here when captured via simple flow (Lead Capture) or standard email flow.</li>
+          ) : (
+            recentEmailLeads.map((lead) => (
+              <li key={lead.id} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+                <span className="text-sm font-medium text-gray-900 truncate mr-2">
+                  {lead.email}
+                </span>
+                <span className="text-xs text-gray-400 flex-shrink-0">
+                  {new Date(lead.captured_at).toLocaleDateString()}
+                </span>
+              </li>
+            ))
+          )}
+        </ul>
+      </Card>
+
+      {/* Lead capture (Phone) */}
+      <Card className="mb-8 rounded-2xl border-2 border-gray-200 shadow-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <h2 className="text-xl font-bold text-gray-900">Lead capture (Phone)</h2>
           {phoneLeads.length > 0 && (
             <div className="flex flex-wrap items-center gap-3">
               <span className="text-sm text-gray-500">
@@ -505,7 +564,7 @@ export default function AnalyticsPage() {
         </div>
         <ul className="space-y-2 max-h-[320px] overflow-y-auto">
           {recentPhoneLeads.length === 0 ? (
-            <li className="text-sm text-gray-500">No phone leads yet. They appear here when captured via simple flow (Phone).</li>
+            <li className="text-sm text-gray-500">No phone leads yet. They appear here when captured via simple flow (Phone) or standard phone flow.</li>
           ) : (
             recentPhoneLeads.map((lead) => (
               <li key={lead.id} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
