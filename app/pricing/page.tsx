@@ -5,10 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { usePost } from '@/hooks/useApi';
-import {
-  CheckIcon,
-  ShieldCheckIcon,
-} from '@heroicons/react/24/solid';
+import { CheckIcon } from '@heroicons/react/24/solid';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 
 type BillingCycle = 'monthly' | 'yearly';
@@ -209,12 +206,6 @@ export default function PricingPage() {
               <p className="text-xs text-gray-500 text-center mb-4">
                 Secure payments powered by Dodo Payments. International cards accepted.
               </p>
-
-              {/* Guarantee */}
-              <div className="flex items-center justify-center gap-2 text-xs text-gray-600 mb-6">
-                <ShieldCheckIcon className="h-4 w-4 text-green-600" />
-                <span className="font-medium">30-Day Money-Back Guarantee</span>
-              </div>
 
               {/* Features List */}
               <div className="space-y-2">
