@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Pricing Plans - Instagram Automation',
-  description: 'Start free with 1,000 DMs per month. Upgrade to Pro for unlimited automation. Simple, transparent pricing with no hidden fees. 30-day money-back guarantee.',
+  description: 'Start free with 1,000 DMs per month. Upgrade to Pro for unlimited automation. Simple, transparent pricing with no hidden fees. 7-day money-back guarantee for initial purchases.',
   keywords: ['Instagram automation pricing', 'Instagram DM pricing', 'Instagram marketing cost', 'free Instagram automation', 'Instagram growth pricing'],
   openGraph: {
     title: 'Pricing Plans - LogicDM Instagram Automation',

@@ -275,7 +275,7 @@ export default function PricingPage() {
               <div className="mt-4 text-gray-600">
                 <p>
                   Absolutely! You can cancel your subscription instantly at any time from your dashboard. 
-                  No questions asked, no hidden fees. Plus, we offer a 30-day money-back guarantee.
+                  No questions asked, no hidden fees. We offer a 7-day money-back guarantee for initial purchases.
                 </p>
               </div>
             </details>
