@@ -512,12 +512,12 @@ export default function AutomationsPage() {
       ruleConfig.ask_for_email_message = config.askForEmailMessage || '';
       ruleConfig.lead_magnet_link = config.leadMagnetLink || '';
       ruleConfig.email_retry_message = config.emailRetryMessage || '';
-      // Map preDmFlowType to backend fields
+      // Map preDmFlowType to backend fields (default to 'email' if not set)
       const preDmFlowType = config.preDmFlowType || (
         config.simpleDmFlow ? 'email' :
         config.simpleDmFlowPhone ? 'phone' :
         (config.enablePreDmEngagement || config.askToFollow) ? 'followers' :
-        undefined
+        'email'
       );
       // Simple flow: one message + re-ask email until valid (Lead Capture)
       ruleConfig.simple_dm_flow = preDmFlowType === 'email';

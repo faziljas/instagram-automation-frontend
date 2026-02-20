@@ -27,7 +27,7 @@ interface AutomationConfig {
   simpleCommentReplies: string[];
   leadCommentReplies: string[];
 
-  // Pre‑DM Flow Type: 'email' | 'phone' | 'followers' | undefined (no pre-DM flow)
+  // Pre‑DM Flow Type: 'email' | 'phone' | 'followers' (defaults to 'email')
   preDmFlowType?: 'email' | 'phone' | 'followers';
   // Legacy fields (kept for backward compatibility)
   enablePreDmEngagement?: boolean; // Deprecated: use preDmFlowType instead
@@ -98,8 +98,8 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
     simpleCommentReplies: ['Thanks! Please see DMs.', 'Sent you a message! Check it out!', 'Nice! Check your DMs!'],
     leadCommentReplies: ['Thanks! Please see DMs.', 'Sent you a message! Check it out!', 'Nice! Check your DMs!'],
 
-    // Pre‑DM Flow Type (undefined = no pre-DM flow, just send primary DM directly)
-    preDmFlowType: undefined,
+    // Pre‑DM Flow Type (default to email)
+    preDmFlowType: 'email',
     // Legacy fields (kept for backward compatibility)
     enablePreDmEngagement: false, // Deprecated: use preDmFlowType instead
     askToFollow: false, // Backward compatibility
@@ -181,12 +181,12 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
           ? initialConfig.leadCommentReplies
           : ['Thanks! Please see DMs.', 'Sent you a message! Check it out!', 'Nice! Check your DMs!'],
 
-        // Pre-DM Flow Type: determine from existing config or undefined (no pre-DM flow)
+        // Pre-DM Flow Type: determine from existing config or default to 'email'
         preDmFlowType: initialConfig.preDmFlowType || (
           initialConfig.simpleDmFlow ? 'email' :
           initialConfig.simpleDmFlowPhone ? 'phone' :
           (initialConfig.enablePreDmEngagement || initialConfig.askToFollow) ? 'followers' :
-          undefined
+          'email'
         ),
         // Legacy fields (kept for backward compatibility)
         enablePreDmEngagement: initialConfig.enablePreDmEngagement !== undefined 
@@ -746,7 +746,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                       </div>
 
                       {/* Show fields based on selected option */}
-                      {config.preDmFlowType && config.preDmFlowType !== 'none' && (
+                      {config.preDmFlowType && (
                         <div className="space-y-4 mt-4 pt-4 border-t border-gray-200">
 
                           {/* Email Flow Fields - Simplified */}
