@@ -290,6 +290,9 @@ export default function HomePage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Feature Card 1 */}
           <div className="bg-white border border-gray-100 p-8 rounded-2xl shadow-sm hover:shadow-md transition-all">
+            <div className="bg-blue-50 p-3 rounded-lg w-fit mb-4">
+              <ChatBubbleLeftRightIcon className="h-6 w-6 text-blue-600" />
+            </div>
             <h3 className="text-2xl font-bold text-gray-900 mb-2">1,000 Free DMs</h3>
             <p className="text-gray-600">
               Get started with 1,000 auto-replies per month completely free. No credit card required.
@@ -298,6 +301,9 @@ export default function HomePage() {
 
           {/* Feature Card 2 */}
           <div className="bg-white border border-gray-100 p-8 rounded-2xl shadow-sm hover:shadow-md transition-all">
+            <div className="bg-purple-50 p-3 rounded-lg w-fit mb-4">
+              <BoltIcon className="h-6 w-6 text-purple-600" />
+            </div>
             <h3 className="text-2xl font-bold text-gray-900 mb-2">Unlimited Rules</h3>
             <p className="text-gray-600">
               Create as many automation rules as you need. Automate everything from DMs to story replies.
@@ -306,39 +312,13 @@ export default function HomePage() {
 
           {/* Feature Card 3 */}
           <div className="bg-white border border-gray-100 p-8 rounded-2xl shadow-sm hover:shadow-md transition-all">
+            <div className="bg-green-50 p-3 rounded-lg w-fit mb-4">
+              <ShieldCheckIcon className="h-6 w-6 text-green-600" />
+            </div>
             <h3 className="text-2xl font-bold text-gray-900 mb-2">100% Safe</h3>
             <p className="text-gray-600">
               Built on Instagram&apos;s official API. Fully compliant with Instagram&apos;s terms of service.
             </p>
-          </div>
-        </div>
-
-        {/* Meta / Instagram official API trust + key benefits */}
-        <div className="mt-12 p-8 bg-gradient-to-br from-gray-50 to-slate-50 rounded-2xl border border-gray-100 shadow-sm">
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
-            {/* Meta approval */}
-            <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
-              <img
-                src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Meta_Platforms_Inc._logo_%282019%29.svg/120px-Meta_Platforms_Inc._logo_%282019%29.svg.png"
-                alt="Meta"
-                className="h-8 w-auto object-contain opacity-90"
-                width={120}
-                height={32}
-              />
-              <div className="text-center sm:text-left">
-                <p className="text-gray-800 font-semibold">Officially approved by Meta</p>
-                <p className="text-gray-600 text-sm">Built on Instagram&apos;s official API</p>
-              </div>
-            </div>
-            {/* Stylish benefit highlights */}
-            <div className="flex flex-wrap items-center justify-center gap-3">
-              <span className="inline-flex items-center px-4 py-2 rounded-full bg-blue-500/10 text-blue-700 font-medium text-sm border border-blue-200/60">
-                1,000 Free DMs
-              </span>
-              <span className="inline-flex items-center px-4 py-2 rounded-full bg-indigo-500/10 text-indigo-700 font-medium text-sm border border-indigo-200/60">
-                Unlimited Rules
-              </span>
-            </div>
           </div>
         </div>
       </div>
