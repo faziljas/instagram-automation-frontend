@@ -40,6 +40,11 @@ interface AutomationConfig {
   simpleDmFlow?: boolean;
   simpleFlowMessage?: string;
   simpleFlowEmailQuestion?: string;
+  // Simple flow (Phone): follow + phone ask, then re-ask until valid phone
+  simpleDmFlowPhone?: boolean;
+  simpleFlowPhoneMessage?: string;
+  simpleFlowPhoneQuestion?: string;
+  phoneInvalidRetryMessage?: string;
 
   // Primary DM
   dmType: 'text' | 'text_button';
@@ -103,6 +108,10 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
     simpleDmFlow: false,
     simpleFlowMessage: "Follow me to get the guide 👇 Reply with your email and I'll send it! 📧",
     simpleFlowEmailQuestion: "What's your email? Reply here and I'll send you the guide! 📧",
+    simpleDmFlowPhone: false,
+    simpleFlowPhoneMessage: "Follow me to get the guide 👇 Reply with your phone number and I'll send it! 📱",
+    simpleFlowPhoneQuestion: "What's your phone number? Reply here and I'll send you the guide! 📱",
+    phoneInvalidRetryMessage: "That doesn't look like a valid phone number. 🤔 Please share your correct number so I can send you the guide! 📱",
 
     // Primary DM
     dmType: 'text',
@@ -180,6 +189,16 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
         simpleFlowEmailQuestion:
           initialConfig.simpleFlowEmailQuestion ||
           "What's your email? Reply here and I'll send you the guide! 📧",
+        simpleDmFlowPhone: initialConfig.simpleDmFlowPhone ?? false,
+        simpleFlowPhoneMessage:
+          initialConfig.simpleFlowPhoneMessage ||
+          "Follow me to get the guide 👇 Reply with your phone number and I'll send it! 📱",
+        simpleFlowPhoneQuestion:
+          initialConfig.simpleFlowPhoneQuestion ||
+          "What's your phone number? Reply here and I'll send you the guide! 📱",
+        phoneInvalidRetryMessage:
+          initialConfig.phoneInvalidRetryMessage ||
+          "That doesn't look like a valid phone number. 🤔 Please share your correct number so I can send you the guide! 📱",
         emailSuccessMessage:
           initialConfig.emailSuccessMessage ||
           "Got it! Check your inbox (and maybe spam/promotions) in about 2 minutes. 🎁",
@@ -666,12 +685,14 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                             </div>
                             <button
                               type="button"
-                              onClick={() =>
+                              onClick={() => {
+                                const next = !(config.simpleDmFlow ?? false);
                                 setConfig({
                                   ...config,
-                                  simpleDmFlow: !(config.simpleDmFlow ?? false),
-                                })
-                              }
+                                  simpleDmFlow: next,
+                                  simpleDmFlowPhone: next ? false : (config.simpleDmFlowPhone ?? false),
+                                });
+                              }}
                               className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:ring-offset-2 ${
                                 config.simpleDmFlow ?? false ? 'bg-blue-600' : 'bg-gray-200'
                               }`}
@@ -679,6 +700,38 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                               <span
                                 className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
                                   config.simpleDmFlow ?? false ? 'translate-x-5' : 'translate-x-0'
+                                }`}
+                              />
+                            </button>
+                          </div>
+
+                          {/* Simple flow (Phone): follow + phone, then re-ask until valid */}
+                          <div className="flex items-center justify-between py-2">
+                            <div className="flex-1">
+                              <label className="block text-sm font-medium text-gray-700 mb-0.5">
+                                Use simple flow (Phone)
+                              </label>
+                              <p className="text-xs text-gray-500">
+                                One message (follow + phone), then keep asking for phone until valid. No buttons.
+                              </p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const next = !(config.simpleDmFlowPhone ?? false);
+                                setConfig({
+                                  ...config,
+                                  simpleDmFlowPhone: next,
+                                  simpleDmFlow: next ? false : (config.simpleDmFlow ?? false),
+                                });
+                              }}
+                              className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:ring-offset-2 ${
+                                config.simpleDmFlowPhone ?? false ? 'bg-blue-600' : 'bg-gray-200'
+                              }`}
+                            >
+                              <span
+                                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
+                                  config.simpleDmFlowPhone ?? false ? 'translate-x-5' : 'translate-x-0'
                                 }`}
                               />
                             </button>
@@ -726,6 +779,51 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                                   rows={2}
                                   className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none"
                                   placeholder="That doesn't look like a valid email. Please share your correct email so I can send you the guide! 📧"
+                                />
+                              </div>
+                            </>
+                          ) : (config.simpleDmFlowPhone ?? false) ? (
+                            <>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                  First message (follow + ask for phone)
+                                </label>
+                                <textarea
+                                  value={config.simpleFlowPhoneMessage || ''}
+                                  onChange={(e) =>
+                                    setConfig({ ...config, simpleFlowPhoneMessage: e.target.value })
+                                  }
+                                  rows={3}
+                                  className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none"
+                                  placeholder="Follow me to get the guide 👇 Reply with your phone number and I'll send it! 📱"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                  Phone question (re-sent until they reply with a valid number)
+                                </label>
+                                <textarea
+                                  value={config.simpleFlowPhoneQuestion || ''}
+                                  onChange={(e) =>
+                                    setConfig({ ...config, simpleFlowPhoneQuestion: e.target.value })
+                                  }
+                                  rows={2}
+                                  className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none"
+                                  placeholder="What's your phone number? Reply here and I'll send you the guide! 📱"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                  When they type random text (invalid phone)
+                                </label>
+                                <textarea
+                                  value={config.phoneInvalidRetryMessage || ''}
+                                  onChange={(e) =>
+                                    setConfig({ ...config, phoneInvalidRetryMessage: e.target.value })
+                                  }
+                                  rows={2}
+                                  className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none"
+                                  placeholder="That doesn't look like a valid phone number. Please share your correct number so I can send you the guide! 📱"
                                 />
                               </div>
                             </>

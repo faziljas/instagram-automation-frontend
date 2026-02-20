@@ -515,6 +515,11 @@ export default function AutomationsPage() {
       ruleConfig.simple_dm_flow = !!config.simpleDmFlow;
       ruleConfig.simple_flow_message = (config.simpleFlowMessage || '').trim() || '';
       ruleConfig.simple_flow_email_question = (config.simpleFlowEmailQuestion || '').trim() || '';
+      // Simple flow (Phone): follow + phone, re-ask until valid
+      ruleConfig.simple_dm_flow_phone = !!config.simpleDmFlowPhone;
+      ruleConfig.simple_flow_phone_message = (config.simpleFlowPhoneMessage || '').trim() || '';
+      ruleConfig.simple_flow_phone_question = (config.simpleFlowPhoneQuestion || '').trim() || '';
+      ruleConfig.phone_invalid_retry_message = (config.phoneInvalidRetryMessage || '').trim() || '';
     } else {
       // Backward compatibility: use old individual checkboxes
       if (config.askToFollow !== undefined) {
@@ -1474,6 +1479,16 @@ export default function AutomationsPage() {
                 simpleFlowEmailQuestion:
                   cfg.simple_flow_email_question ||
                   "What's your email? Reply here and I'll send you the guide! 📧",
+                simpleDmFlowPhone: cfg.simple_dm_flow_phone ?? false,
+                simpleFlowPhoneMessage:
+                  cfg.simple_flow_phone_message ||
+                  "Follow me to get the guide 👇 Reply with your phone number and I'll send it! 📱",
+                simpleFlowPhoneQuestion:
+                  cfg.simple_flow_phone_question ||
+                  "What's your phone number? Reply here and I'll send you the guide! 📱",
+                phoneInvalidRetryMessage:
+                  cfg.phone_invalid_retry_message ||
+                  "That doesn't look like a valid phone number. 🤔 Please share your correct number so I can send you the guide! 📱",
               };
             }
             return undefined;
