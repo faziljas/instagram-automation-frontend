@@ -313,18 +313,32 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Meta / Instagram official API trust */}
-        <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 p-6 bg-gray-50 rounded-2xl border border-gray-100">
-          <img
-            src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Meta_Platforms_Inc._logo_%282019%29.svg/120px-Meta_Platforms_Inc._logo_%282019%29.svg.png"
-            alt="Meta"
-            className="h-8 w-auto object-contain opacity-90"
-            width={120}
-            height={32}
-          />
-          <div className="text-center sm:text-left">
-            <p className="text-gray-800 font-semibold">Officially approved by Meta</p>
-            <p className="text-gray-600 text-sm">Built on Instagram&apos;s official API</p>
+        {/* Meta / Instagram official API trust + key benefits */}
+        <div className="mt-12 p-8 bg-gradient-to-br from-gray-50 to-slate-50 rounded-2xl border border-gray-100 shadow-sm">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
+            {/* Meta approval */}
+            <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Meta_Platforms_Inc._logo_%282019%29.svg/120px-Meta_Platforms_Inc._logo_%282019%29.svg.png"
+                alt="Meta"
+                className="h-8 w-auto object-contain opacity-90"
+                width={120}
+                height={32}
+              />
+              <div className="text-center sm:text-left">
+                <p className="text-gray-800 font-semibold">Officially approved by Meta</p>
+                <p className="text-gray-600 text-sm">Built on Instagram&apos;s official API</p>
+              </div>
+            </div>
+            {/* Stylish benefit highlights */}
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <span className="inline-flex items-center px-4 py-2 rounded-full bg-blue-500/10 text-blue-700 font-medium text-sm border border-blue-200/60">
+                1,000 Free DMs
+              </span>
+              <span className="inline-flex items-center px-4 py-2 rounded-full bg-indigo-500/10 text-indigo-700 font-medium text-sm border border-indigo-200/60">
+                Unlimited Rules
+              </span>
+            </div>
           </div>
         </div>
       </div>
