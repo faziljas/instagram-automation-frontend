@@ -778,82 +778,44 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
 
                           {/* Email Flow Fields - Simplified */}
                           {config.preDmFlowType === 'email' && (
-                            <>
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                                  First message (follow + ask for email)
-                                </label>
-                                <textarea
-                                  value={config.simpleFlowMessage || ''}
-                                  onChange={(e) =>
-                                    setConfig({ ...config, simpleFlowMessage: e.target.value })
-                                  }
-                                  rows={3}
-                                  className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none"
-                                  placeholder="Follow me to get the guide 👇 Reply with your email and I'll send it! 📧"
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                                  What will you share with them? (PDF/Link/Document)
-                                </label>
-                                <input
-                                  type="url"
-                                  value={config.leadMagnetLink || ''}
-                                  onChange={(e) =>
-                                    setConfig({
-                                      ...config,
-                                      leadMagnetLink: e.target.value,
-                                    })
-                                  }
-                                  className="w-full h-10 px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all"
-                                  placeholder="https://your-site.com/download/guide.pdf"
-                                />
-                                <p className="text-xs text-gray-500 mt-1">
-                                  Backend will handle email validation and retry messages automatically
-                                </p>
-                              </div>
-                            </>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                First message (follow + ask for email)
+                              </label>
+                              <textarea
+                                value={config.simpleFlowMessage || ''}
+                                onChange={(e) =>
+                                  setConfig({ ...config, simpleFlowMessage: e.target.value })
+                                }
+                                rows={3}
+                                className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none"
+                                placeholder="Follow me to get the guide 👇 Reply with your email and I'll send it! 📧"
+                              />
+                              <p className="text-xs text-gray-500 mt-1">
+                                Backend will handle email validation and retry messages automatically. Use Media Type below to specify what to share.
+                              </p>
+                            </div>
                           )}
 
                           {/* Phone Flow Fields - Simplified */}
                           {config.preDmFlowType === 'phone' && (
-                            <>
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                                  First message (follow + ask for phone)
-                                </label>
-                                <textarea
-                                  value={config.simpleFlowPhoneMessage || ''}
-                                  onChange={(e) =>
-                                    setConfig({ ...config, simpleFlowPhoneMessage: e.target.value })
-                                  }
-                                  rows={3}
-                                  className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none"
-                                  placeholder="Follow me to get the guide 👇 Reply with your phone number and I'll send it! 📱"
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                                  What will you share with them? (PDF/Link/Document)
-                                </label>
-                                <input
-                                  type="url"
-                                  value={config.leadMagnetLink || ''}
-                                  onChange={(e) =>
-                                    setConfig({
-                                      ...config,
-                                      leadMagnetLink: e.target.value,
-                                    })
-                                  }
-                                  className="w-full h-10 px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all"
-                                  placeholder="https://your-site.com/download/guide.pdf"
-                                />
-                                <p className="text-xs text-gray-500 mt-1">
-                                  Backend will handle phone validation and retry messages automatically
-                                </p>
-                              </div>
-                            </>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                First message (follow + ask for phone)
+                              </label>
+                              <textarea
+                                value={config.simpleFlowPhoneMessage || ''}
+                                onChange={(e) =>
+                                  setConfig({ ...config, simpleFlowPhoneMessage: e.target.value })
+                                }
+                                rows={3}
+                                className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none"
+                                placeholder="Follow me to get the guide 👇 Reply with your phone number and I'll send it! 📱"
+                              />
+                              <p className="text-xs text-gray-500 mt-1">
+                                Backend will handle phone validation and retry messages automatically. Use Media Type below to specify what to share.
+                              </p>
+                            </div>
                           )}
 
                           {/* Followers Flow Fields - Simplified */}
