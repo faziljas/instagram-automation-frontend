@@ -27,8 +27,8 @@ interface AutomationConfig {
   simpleCommentReplies: string[];
   leadCommentReplies: string[];
 
-  // Pre‑DM Flow Type: 'email' | 'phone' | 'followers' | 'none'
-  preDmFlowType?: 'email' | 'phone' | 'followers' | 'none';
+  // Pre‑DM Flow Type: 'email' | 'phone' | 'followers' | undefined (no pre-DM flow)
+  preDmFlowType?: 'email' | 'phone' | 'followers';
   // Legacy fields (kept for backward compatibility)
   enablePreDmEngagement?: boolean; // Deprecated: use preDmFlowType instead
   askToFollow?: boolean; // Backward compatibility
@@ -98,8 +98,8 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
     simpleCommentReplies: ['Thanks! Please see DMs.', 'Sent you a message! Check it out!', 'Nice! Check your DMs!'],
     leadCommentReplies: ['Thanks! Please see DMs.', 'Sent you a message! Check it out!', 'Nice! Check your DMs!'],
 
-    // Pre‑DM Flow Type
-    preDmFlowType: 'none', // 'email' | 'phone' | 'followers' | 'none'
+    // Pre‑DM Flow Type (undefined = no pre-DM flow, just send primary DM directly)
+    preDmFlowType: undefined,
     // Legacy fields (kept for backward compatibility)
     enablePreDmEngagement: false, // Deprecated: use preDmFlowType instead
     askToFollow: false, // Backward compatibility
@@ -181,12 +181,12 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
           ? initialConfig.leadCommentReplies
           : ['Thanks! Please see DMs.', 'Sent you a message! Check it out!', 'Nice! Check your DMs!'],
 
-        // Pre-DM Flow Type: determine from existing config or default to 'none'
+        // Pre-DM Flow Type: determine from existing config or undefined (no pre-DM flow)
         preDmFlowType: initialConfig.preDmFlowType || (
           initialConfig.simpleDmFlow ? 'email' :
           initialConfig.simpleDmFlowPhone ? 'phone' :
           (initialConfig.enablePreDmEngagement || initialConfig.askToFollow) ? 'followers' :
-          'none'
+          undefined
         ),
         // Legacy fields (kept for backward compatibility)
         enablePreDmEngagement: initialConfig.enablePreDmEngagement !== undefined 
@@ -665,7 +665,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                             type="radio"
                             name="preDmFlowType"
                             value="email"
-                            checked={(config.preDmFlowType ?? 'none') === 'email'}
+                            checked={config.preDmFlowType === 'email'}
                             onChange={() => {
                               setConfig({
                                 ...config,
@@ -693,7 +693,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                             type="radio"
                             name="preDmFlowType"
                             value="phone"
-                            checked={(config.preDmFlowType ?? 'none') === 'phone'}
+                            checked={config.preDmFlowType === 'phone'}
                             onChange={() => {
                               setConfig({
                                 ...config,
@@ -721,7 +721,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                             type="radio"
                             name="preDmFlowType"
                             value="followers"
-                            checked={(config.preDmFlowType ?? 'none') === 'followers'}
+                            checked={config.preDmFlowType === 'followers'}
                             onChange={() => {
                               setConfig({
                                 ...config,
@@ -743,37 +743,10 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                           </div>
                         </label>
 
-                        {/* None Option */}
-                        <label className="flex items-start p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                          <input
-                            type="radio"
-                            name="preDmFlowType"
-                            value="none"
-                            checked={(config.preDmFlowType ?? 'none') === 'none'}
-                            onChange={() => {
-                              setConfig({
-                                ...config,
-                                preDmFlowType: 'none',
-                                enablePreDmEngagement: false,
-                                askToFollow: false,
-                                askForEmail: false,
-                                simpleDmFlow: false,
-                                simpleDmFlowPhone: false,
-                              });
-                            }}
-                            className="mt-0.5 h-4 w-4 text-blue-600 focus:ring-blue-500"
-                          />
-                          <div className="ml-3 flex-1">
-                            <div className="text-sm font-medium text-gray-700">None</div>
-                            <div className="text-xs text-gray-500">
-                              Skip pre-DM engagement. Send primary DM directly.
-                            </div>
-                          </div>
-                        </label>
                       </div>
 
                       {/* Show fields based on selected option */}
-                      {(config.preDmFlowType === 'email' || config.preDmFlowType === 'phone' || config.preDmFlowType === 'followers') && (
+                      {config.preDmFlowType && config.preDmFlowType !== 'none' && (
                         <div className="space-y-4 mt-4 pt-4 border-t border-gray-200">
 
                           {/* Email Flow Fields - Simplified */}

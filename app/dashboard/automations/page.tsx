@@ -517,7 +517,7 @@ export default function AutomationsPage() {
         config.simpleDmFlow ? 'email' :
         config.simpleDmFlowPhone ? 'phone' :
         (config.enablePreDmEngagement || config.askToFollow) ? 'followers' :
-        'none'
+        undefined
       );
       // Simple flow: one message + re-ask email until valid (Lead Capture)
       ruleConfig.simple_dm_flow = preDmFlowType === 'email';
