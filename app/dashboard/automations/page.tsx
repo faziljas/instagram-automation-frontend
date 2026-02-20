@@ -511,6 +511,10 @@ export default function AutomationsPage() {
       ruleConfig.ask_for_email_message = config.askForEmailMessage || '';
       ruleConfig.lead_magnet_link = config.leadMagnetLink || '';
       ruleConfig.email_retry_message = config.emailRetryMessage || '';
+      // Simple flow: one message + re-ask email until valid (Lead Capture)
+      ruleConfig.simple_dm_flow = !!config.simpleDmFlow;
+      ruleConfig.simple_flow_message = (config.simpleFlowMessage || '').trim() || '';
+      ruleConfig.simple_flow_email_question = (config.simpleFlowEmailQuestion || '').trim() || '';
     } else {
       // Backward compatibility: use old individual checkboxes
       if (config.askToFollow !== undefined) {
@@ -1463,6 +1467,13 @@ export default function AutomationsPage() {
                 emailRetryMessage:
                   cfg.email_retry_message ||
                   "Hmm, that doesn't look like a valid email address. 🤔\n\nPlease type it again so I can send you the guide! 📧",
+                simpleDmFlow: cfg.simple_dm_flow ?? false,
+                simpleFlowMessage:
+                  cfg.simple_flow_message ||
+                  "Follow me to get the guide 👇 Reply with your email and I'll send it! 📧",
+                simpleFlowEmailQuestion:
+                  cfg.simple_flow_email_question ||
+                  "What's your email? Reply here and I'll send you the guide! 📧",
               };
             }
             return undefined;

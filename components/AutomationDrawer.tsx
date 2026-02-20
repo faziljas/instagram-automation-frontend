@@ -36,6 +36,10 @@ interface AutomationConfig {
   emailSuccessMessage?: string;
   leadMagnetLink?: string;
   emailRetryMessage?: string;
+  // Simple flow: one message (follow + email ask), then re-ask same email question until valid
+  simpleDmFlow?: boolean;
+  simpleFlowMessage?: string;
+  simpleFlowEmailQuestion?: string;
 
   // Primary DM
   dmType: 'text' | 'text_button';
@@ -96,6 +100,9 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
     leadMagnetLink: '',
     emailRetryMessage:
       "Hmm, that doesn't look like a valid email address. 🤔\n\nPlease type it again so I can send you the guide! 📧",
+    simpleDmFlow: false,
+    simpleFlowMessage: "Follow me to get the guide 👇 Reply with your email and I'll send it! 📧",
+    simpleFlowEmailQuestion: "What's your email? Reply here and I'll send you the guide! 📧",
 
     // Primary DM
     dmType: 'text',
@@ -166,6 +173,13 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
         askForEmailMessage:
           initialConfig.askForEmailMessage ||
           "Awesome! 🚀 I have the PDF ready for you.\n\nWhere should I send it? Drop your best email below and I'll fire it over instantly. 👇",
+        simpleDmFlow: initialConfig.simpleDmFlow ?? false,
+        simpleFlowMessage:
+          initialConfig.simpleFlowMessage ||
+          "Follow me to get the guide 👇 Reply with your email and I'll send it! 📧",
+        simpleFlowEmailQuestion:
+          initialConfig.simpleFlowEmailQuestion ||
+          "What's your email? Reply here and I'll send you the guide! 📧",
         emailSuccessMessage:
           initialConfig.emailSuccessMessage ||
           "Got it! Check your inbox (and maybe spam/promotions) in about 2 minutes. 🎁",
@@ -640,7 +654,70 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
 
                       {(config.enablePreDmEngagement ?? false) && (
                         <div className="space-y-4 mt-4 pt-4 border-t border-gray-200">
-                          {/* Follow Request - Always shown when toggle is enabled */}
+                          {/* Simple flow: one message + re-ask email until valid (Lead Capture style) */}
+                          <div className="flex items-center justify-between py-2">
+                            <div className="flex-1">
+                              <label className="block text-sm font-medium text-gray-700 mb-0.5">
+                                Use simple flow (Lead Capture)
+                              </label>
+                              <p className="text-xs text-gray-500">
+                                One message (follow + email), then keep asking for email until valid. No buttons.
+                              </p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setConfig({
+                                  ...config,
+                                  simpleDmFlow: !(config.simpleDmFlow ?? false),
+                                })
+                              }
+                              className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:ring-offset-2 ${
+                                config.simpleDmFlow ?? false ? 'bg-blue-600' : 'bg-gray-200'
+                              }`}
+                            >
+                              <span
+                                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
+                                  config.simpleDmFlow ?? false ? 'translate-x-5' : 'translate-x-0'
+                                }`}
+                              />
+                            </button>
+                          </div>
+
+                          {(config.simpleDmFlow ?? false) ? (
+                            <>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                  First message (follow + ask for email)
+                                </label>
+                                <textarea
+                                  value={config.simpleFlowMessage || ''}
+                                  onChange={(e) =>
+                                    setConfig({ ...config, simpleFlowMessage: e.target.value })
+                                  }
+                                  rows={3}
+                                  className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none"
+                                  placeholder="Follow me to get the guide 👇 Reply with your email and I'll send it! 📧"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                  Email question (re-sent until they reply with a valid email)
+                                </label>
+                                <textarea
+                                  value={config.simpleFlowEmailQuestion || ''}
+                                  onChange={(e) =>
+                                    setConfig({ ...config, simpleFlowEmailQuestion: e.target.value })
+                                  }
+                                  rows={2}
+                                  className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none"
+                                  placeholder="What's your email? Reply here and I'll send you the guide! 📧"
+                                />
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                          {/* Follow Request - Standard flow */}
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1.5">
                               Follow Request Message
@@ -659,7 +736,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                             />
                           </div>
 
-                          {/* Email Request - Always shown when toggle is enabled */}
+                          {/* Email Request - Standard flow */}
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1.5">
                               Email Request Message
@@ -733,6 +810,8 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                               </div>
                             </div>
                           </div>
+                            </>
+                          )}
                         </div>
                       )}
                     </div>
