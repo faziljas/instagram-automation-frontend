@@ -95,9 +95,20 @@ export default function AnalyticsPage() {
   const totalPages = Math.max(1, Math.ceil(totalLeads / leadsPageSize));
   const recentLeads = allLeads.slice((leadsPage - 1) * leadsPageSize, leadsPage * leadsPageSize);
 
+  // Phone-only leads for "Recent phone leads" section
+  const phoneLeads = useMemo(() => allLeads.filter((l) => l.phone != null && l.phone.trim() !== ''), [allLeads]);
+  const [phoneLeadsPage, setPhoneLeadsPage] = useState(1);
+  const phoneLeadsPageSize = 50;
+  const phoneLeadsTotalPages = Math.max(1, Math.ceil(phoneLeads.length / phoneLeadsPageSize));
+  const recentPhoneLeads = phoneLeads.slice((phoneLeadsPage - 1) * phoneLeadsPageSize, phoneLeadsPage * phoneLeadsPageSize);
+
   useEffect(() => {
     if (totalPages > 0 && leadsPage > totalPages) setLeadsPage(totalPages);
   }, [totalPages, leadsPage]);
+
+  useEffect(() => {
+    if (phoneLeadsTotalPages > 0 && phoneLeadsPage > phoneLeadsTotalPages) setPhoneLeadsPage(phoneLeadsTotalPages);
+  }, [phoneLeadsTotalPages, phoneLeadsPage]);
 
   const stats = [
     {
@@ -114,7 +125,7 @@ export default function AnalyticsPage() {
       icon: EnvelopeIcon,
       color: 'text-green-600',
       bgColor: 'bg-green-50',
-      description: 'Emails captured (verify in Recent leads below)',
+      description: 'Email & phone leads (see Recent leads / Recent phone leads below)',
     },
     {
       name: 'Followers Gained via AutoDM',
@@ -399,7 +410,7 @@ export default function AnalyticsPage() {
       {/* Recent leads */}
       <Card className="mb-8 rounded-2xl border-2 border-gray-200 shadow-xl">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-          <h2 className="text-xl font-bold text-gray-900">Recent Email leads</h2>
+          <h2 className="text-xl font-bold text-gray-900">Recent leads</h2>
           {totalLeads > 0 && (
             <div className="flex flex-wrap items-center gap-3">
               <label className="text-sm text-gray-600 flex items-center gap-2">
@@ -452,6 +463,54 @@ export default function AnalyticsPage() {
               <li key={lead.id} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
                 <span className="text-sm font-medium text-gray-900 truncate mr-2">
                   {lead.email || lead.phone || lead.name || `Lead #${lead.id}`}
+                </span>
+                <span className="text-xs text-gray-400 flex-shrink-0">
+                  {new Date(lead.captured_at).toLocaleDateString()}
+                </span>
+              </li>
+            ))
+          )}
+        </ul>
+      </Card>
+
+      {/* Recent phone leads */}
+      <Card className="mb-8 rounded-2xl border-2 border-gray-200 shadow-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <h2 className="text-xl font-bold text-gray-900">Recent phone leads</h2>
+          {phoneLeads.length > 0 && (
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="text-sm text-gray-500">
+                Page {phoneLeadsPage} of {phoneLeadsTotalPages} · {phoneLeads.length.toLocaleString()} total
+              </span>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setPhoneLeadsPage((p) => Math.max(1, p - 1))}
+                  disabled={phoneLeadsPage <= 1}
+                  className="px-3 py-1.5 text-sm font-semibold rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Previous
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPhoneLeadsPage((p) => Math.min(phoneLeadsTotalPages, p + 1))}
+                  disabled={phoneLeadsPage >= phoneLeadsTotalPages}
+                  className="px-3 py-1.5 text-sm font-semibold rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+        <ul className="space-y-2 max-h-[320px] overflow-y-auto">
+          {recentPhoneLeads.length === 0 ? (
+            <li className="text-sm text-gray-500">No phone leads yet. They appear here when captured via simple flow (Phone).</li>
+          ) : (
+            recentPhoneLeads.map((lead) => (
+              <li key={lead.id} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+                <span className="text-sm font-medium text-gray-900 truncate mr-2">
+                  {lead.phone}
                 </span>
                 <span className="text-xs text-gray-400 flex-shrink-0">
                   {new Date(lead.captured_at).toLocaleDateString()}
