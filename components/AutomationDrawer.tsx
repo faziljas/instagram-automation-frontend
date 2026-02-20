@@ -33,6 +33,7 @@ interface AutomationConfig {
   enablePreDmEngagement?: boolean; // Deprecated: use preDmFlowType instead
   askToFollow?: boolean; // Backward compatibility
   askToFollowMessage?: string;
+  followRecheckMessage?: string; // Message for "Are you followed?" question
   askForEmail?: boolean; // Backward compatibility
   askForEmailMessage?: string;
   emailSuccessMessage?: string;
@@ -104,6 +105,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
     askToFollow: false, // Backward compatibility
     askToFollowMessage:
       "Hey! Would you mind following me? I share great content! 🙌",
+    followRecheckMessage: "Are you followed?",
     askForEmail: false, // Backward compatibility
     askForEmailMessage:
       "Awesome! 🚀 I have the PDF ready for you.\n\nWhere should I send it? Drop your best email below and I'll fire it over instantly. 👇",
@@ -875,7 +877,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                             <>
                               <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                                  Follow Request Message
+                                  First message (follow request)
                                 </label>
                                 <textarea
                                   value={config.askToFollowMessage || ''}
@@ -888,6 +890,40 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                                   rows={3}
                                   className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none"
                                   placeholder="Hey! Would you mind following me? I share great content! 🙌"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                  Follow confirmation question (re-sent until they confirm)
+                                </label>
+                                <textarea
+                                  value={config.followRecheckMessage || ''}
+                                  onChange={(e) =>
+                                    setConfig({
+                                      ...config,
+                                      followRecheckMessage: e.target.value,
+                                    })
+                                  }
+                                  rows={2}
+                                  className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none"
+                                  placeholder="Are you followed?"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                  When they type random text (unclear response)
+                                </label>
+                                <textarea
+                                  value={config.followRecheckMessage || ''}
+                                  onChange={(e) =>
+                                    setConfig({
+                                      ...config,
+                                      followRecheckMessage: e.target.value,
+                                    })
+                                  }
+                                  rows={2}
+                                  className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none"
+                                  placeholder="Are you followed? Please reply with Yes or No."
                                 />
                               </div>
                             </>

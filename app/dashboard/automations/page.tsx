@@ -508,6 +508,7 @@ export default function AutomationsPage() {
       ruleConfig.ask_to_follow = config.enablePreDmEngagement;
       ruleConfig.ask_for_email = config.enablePreDmEngagement;
       ruleConfig.ask_to_follow_message = config.askToFollowMessage || '';
+      ruleConfig.follow_recheck_message = config.followRecheckMessage || '';
       ruleConfig.ask_for_email_message = config.askForEmailMessage || '';
       ruleConfig.lead_magnet_link = config.leadMagnetLink || '';
       ruleConfig.email_retry_message = config.emailRetryMessage || '';
@@ -1481,6 +1482,7 @@ export default function AutomationsPage() {
                 askToFollowMessage:
                   cfg.ask_to_follow_message ||
                   'Hey! Would you mind following me? I share great content! 🙌',
+                followRecheckMessage: cfg.follow_recheck_message || 'Are you followed?',
                 askForEmail: cfg.ask_for_email || false, // Backward compatibility
                 askForEmailMessage:
                   cfg.ask_for_email_message ||
