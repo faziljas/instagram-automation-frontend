@@ -525,16 +525,19 @@ export default function AutomationsPage() {
       ruleConfig.simple_flow_email_question = (config.simpleFlowEmailQuestion || '').trim() || '';
       // Simple flow (Phone): follow + phone, re-ask until valid
       ruleConfig.simple_dm_flow_phone = preDmFlowType === 'phone';
-      // Followers flow: enable pre-DM engagement
+      // Followers flow: enable pre-DM engagement, follow only (no email)
       ruleConfig.enable_pre_dm_engagement = preDmFlowType === 'followers';
       ruleConfig.ask_to_follow = preDmFlowType === 'followers';
-      // Email/Phone flows: ensure backend runs pre-DM first (ask_to_follow true so process_pre_dm_actions is called)
+      // Email/Phone/Followers: ensure backend runs pre-DM first
       if (preDmFlowType === 'email') {
         ruleConfig.ask_to_follow = true;
         ruleConfig.ask_for_email = true;
       } else if (preDmFlowType === 'phone') {
         ruleConfig.ask_to_follow = true;
         ruleConfig.ask_for_email = false;
+      } else if (preDmFlowType === 'followers') {
+        ruleConfig.ask_to_follow = true;
+        ruleConfig.ask_for_email = false;  // Followers-only: first question (follow) then primary DM
       }
       ruleConfig.simple_flow_phone_message = (config.simpleFlowPhoneMessage || '').trim() || '';
       ruleConfig.simple_flow_phone_question = (config.simpleFlowPhoneQuestion || '').trim() || '';
