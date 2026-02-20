@@ -341,7 +341,6 @@ export default function MobilePreview({
                           )}
                           <p className="text-sm whitespace-pre-line">
                             {sampleDM}
-                            {config.askToFollow && '\n\n🙏 If you ever unfollow, I may have to pause sending free guides and resources. Staying followed helps me keep this running for you. ❤️'}
                           </p>
                           {config.dmType === 'text_button' && config.buttons.length > 0 && (
                             <div className="mt-2 space-y-1">
@@ -437,7 +436,6 @@ export default function MobilePreview({
                           )}
                           <p className="text-sm whitespace-pre-line">
                             {sampleDM}
-                            {config.askToFollow && '\n\n🙏 If you ever unfollow, I may have to pause sending free guides and resources. Staying followed helps me keep this running for you. ❤️'}
                           </p>
                           {config.dmType === 'text_button' && config.buttons.length > 0 && (
                             <div className="mt-2 space-y-1">
@@ -564,7 +562,6 @@ export default function MobilePreview({
                           )}
                           <p className="text-sm whitespace-pre-line">
                             {sampleDM}
-                            {config.askToFollow && isLeadMode && '\n\n🙏 If you ever unfollow, I may have to pause sending free guides and resources. Staying followed helps me keep this running for you. ❤️'}
                           </p>
                           {config.dmType === 'text_button' && config.buttons.length > 0 && (
                             <div className="mt-2 space-y-1">
