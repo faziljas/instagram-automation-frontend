@@ -53,6 +53,9 @@ interface AutomationConfig {
   leadDmMessages: string[];
   buttons: { text: string; url: string }[];
   delayMinutes: number;
+  // Media attachments for Primary DM
+  mediaType?: 'none' | 'link' | 'doc' | 'pdf' | 'video' | 'image' | 'card';
+  mediaUrl?: string;
 
   // Legacy lead‑capture fields (kept optional so old data still loads)
   isLeadCapture?: boolean;
@@ -120,6 +123,8 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
     leadDmMessages: ['Thanks for your interest! Check out our latest updates.', 'Hey! We have something special for you. Check it out!', 'Awesome! We sent you a message with more details.'],
     buttons: [{ text: 'Click me', url: '' }],
     delayMinutes: 0,
+    mediaType: 'none',
+    mediaUrl: '',
     isLeadCapture: false,
   });
 
@@ -228,6 +233,8 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
         buttons:
           initialConfig.buttons || [{ text: 'Click me', url: '' }],
         delayMinutes: initialConfig.delayMinutes || 0,
+        mediaType: initialConfig.mediaType || 'none',
+        mediaUrl: initialConfig.mediaUrl || '',
         // Include isLeadCapture flag so MobilePreview can use it
         isLeadCapture: initialConfig.isLeadCapture || false,
       });
@@ -848,80 +855,82 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                             />
                           </div>
 
-                          {/* Email Request - Standard flow */}
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                              Email Request Message
-                            </label>
-                            <div className="space-y-3">
-                              <textarea
-                                value={config.askForEmailMessage || ''}
-                                onChange={(e) =>
-                                  setConfig({
-                                    ...config,
-                                    askForEmailMessage: e.target.value,
-                                  })
-                                }
-                                rows={3}
-                                className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none"
-                                placeholder="Awesome! 🚀 I have the PDF ready for you.\n\nWhere should I send it? Drop your best email below and I'll fire it over instantly. 👇"
-                              />
-
-                              <div>
-                                <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                                  PDF/Link to Share (Optional)
-                                </label>
-                                <input
-                                  type="url"
-                                  value={config.leadMagnetLink || ''}
-                                  onChange={(e) =>
-                                    setConfig({
-                                      ...config,
-                                      leadMagnetLink: e.target.value,
-                                    })
-                                  }
-                                  className="w-full h-10 px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all"
-                                  placeholder="https://your-site.com/download/guide.pdf"
-                                />
-                              </div>
-
-                              <div>
-                                <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                                  Email Success Message
-                                </label>
+                          {/* Email Request - Standard flow - Only show if email collection is enabled */}
+                          {(config.askForEmail || config.enablePreDmEngagement) && (
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                Email Request Message
+                              </label>
+                              <div className="space-y-3">
                                 <textarea
-                                  value={config.emailSuccessMessage || ''}
+                                  value={config.askForEmailMessage || ''}
                                   onChange={(e) =>
                                     setConfig({
                                       ...config,
-                                      emailSuccessMessage: e.target.value,
+                                      askForEmailMessage: e.target.value,
                                     })
                                   }
                                   rows={3}
                                   className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none"
-                                  placeholder="Got it! Check your inbox in about 2 minutes. 🎁"
+                                  placeholder="Awesome! 🚀 I have the PDF ready for you.\n\nWhere should I send it? Drop your best email below and I'll fire it over instantly. 👇"
                                 />
-                              </div>
 
-                              <div>
-                                <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                                  Invalid Email Retry Message
-                                </label>
-                                <textarea
-                                  value={config.emailRetryMessage || ''}
-                                  onChange={(e) =>
-                                    setConfig({
-                                      ...config,
-                                      emailRetryMessage: e.target.value,
-                                    })
-                                  }
-                                  rows={3}
-                                  className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none"
-                                  placeholder="Hmm, that doesn't look like a valid email. Please type it again! 📧"
-                                />
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-700 mb-1.5">
+                                    PDF/Link to Share (Optional)
+                                  </label>
+                                  <input
+                                    type="url"
+                                    value={config.leadMagnetLink || ''}
+                                    onChange={(e) =>
+                                      setConfig({
+                                        ...config,
+                                        leadMagnetLink: e.target.value,
+                                      })
+                                    }
+                                    className="w-full h-10 px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all"
+                                    placeholder="https://your-site.com/download/guide.pdf"
+                                  />
+                                </div>
+
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-700 mb-1.5">
+                                    Email Success Message
+                                  </label>
+                                  <textarea
+                                    value={config.emailSuccessMessage || ''}
+                                    onChange={(e) =>
+                                      setConfig({
+                                        ...config,
+                                        emailSuccessMessage: e.target.value,
+                                      })
+                                    }
+                                    rows={3}
+                                    className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none"
+                                    placeholder="Got it! Check your inbox in about 2 minutes. 🎁"
+                                  />
+                                </div>
+
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-700 mb-1.5">
+                                    Invalid Email Retry Message
+                                  </label>
+                                  <textarea
+                                    value={config.emailRetryMessage || ''}
+                                    onChange={(e) =>
+                                      setConfig({
+                                        ...config,
+                                        emailRetryMessage: e.target.value,
+                                      })
+                                    }
+                                    rows={3}
+                                    className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none"
+                                    placeholder="Hmm, that doesn't look like a valid email. Please type it again! 📧"
+                                  />
+                                </div>
                               </div>
                             </div>
-                          </div>
+                          )}
                             </>
                           )}
                         </div>
@@ -1011,6 +1020,48 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                         );
                       })}
                     </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Media Attachment (Optional)
+                    </label>
+                    <p className="text-xs text-gray-500 mb-2">
+                      Attach a link, document, PDF, video, image, or card to your primary DM
+                    </p>
+                    <select
+                      value={config.mediaType || 'none'}
+                      onChange={(e) =>
+                        setConfig({
+                          ...config,
+                          mediaType: e.target.value as 'none' | 'link' | 'doc' | 'pdf' | 'video' | 'image' | 'card',
+                          mediaUrl: e.target.value === 'none' ? '' : (config.mediaUrl || ''),
+                        })
+                      }
+                      className="w-full h-10 px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all mb-3"
+                    >
+                      <option value="none">No Media</option>
+                      <option value="link">Link/URL</option>
+                      <option value="doc">Document</option>
+                      <option value="pdf">PDF</option>
+                      <option value="video">Video</option>
+                      <option value="image">Image</option>
+                      <option value="card">Card</option>
+                    </select>
+                    {config.mediaType && config.mediaType !== 'none' && (
+                      <input
+                        type="url"
+                        value={config.mediaUrl || ''}
+                        onChange={(e) =>
+                          setConfig({
+                            ...config,
+                            mediaUrl: e.target.value,
+                          })
+                        }
+                        className="w-full h-10 px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all"
+                        placeholder={`Enter ${config.mediaType} URL (e.g., https://example.com/file.${config.mediaType === 'pdf' ? 'pdf' : config.mediaType === 'video' ? 'mp4' : config.mediaType === 'image' ? 'jpg' : 'link'})`}
+                      />
+                    )}
                   </div>
 
                   <div>
