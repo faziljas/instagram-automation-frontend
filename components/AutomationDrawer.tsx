@@ -855,8 +855,8 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                             />
                           </div>
 
-                          {/* Email Request - Standard flow - Only show if email collection is enabled AND phone flow is NOT enabled */}
-                          {(config.simpleDmFlow || ((config.askForEmail || config.enablePreDmEngagement) && !config.simpleDmFlowPhone)) && (
+                          {/* Email Request - Standard flow - Only show if email collection is enabled AND Pre-DM Engagement is OFF AND phone flow is NOT enabled */}
+                          {(config.simpleDmFlow || (config.askForEmail && !config.enablePreDmEngagement && !config.simpleDmFlowPhone)) && (
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-1.5">
                                 Email Request Message
