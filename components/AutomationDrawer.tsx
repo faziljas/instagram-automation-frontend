@@ -936,12 +936,20 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                     </select>
                     {config.mediaType && config.mediaType !== 'none' && (
                       <div className="space-y-2">
-                        {['video', 'image', 'card'].includes(config.mediaType) && (
+                        {['video', 'image', 'card', 'doc', 'pdf'].includes(config.mediaType) && (
                           <div>
                             <input
                               ref={mediaFileInputRef}
                               type="file"
-                              accept={config.mediaType === 'video' ? 'video/*' : 'image/*'}
+                              accept={
+                                config.mediaType === 'video'
+                                  ? 'video/*'
+                                  : config.mediaType === 'pdf'
+                                    ? 'application/pdf,.pdf'
+                                    : config.mediaType === 'doc'
+                                      ? 'application/pdf,.pdf,application/msword,.doc,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.docx,text/plain,.txt'
+                                      : 'image/*'
+                              }
                               className="hidden"
                               onChange={async (e) => {
                                 const file = e.target.files?.[0];
