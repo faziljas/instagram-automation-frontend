@@ -30,6 +30,7 @@ interface AutomationConfig {
   leadCommentReplies?: string[];
 
   // Pre-DM Actions
+  enablePreDmEngagement?: boolean;
   askToFollow?: boolean;
   askToFollowMessage?: string;
   askForEmail?: boolean;
@@ -37,6 +38,15 @@ interface AutomationConfig {
   emailSuccessMessage?: string;
   emailRetryMessage?: string;
   leadMagnetLink?: string;
+  // Simple flow (email): one message, then re-ask email until valid
+  simpleDmFlow?: boolean;
+  simpleFlowMessage?: string;
+  simpleFlowEmailQuestion?: string;
+  // Simple flow (phone): one message, then re-ask phone until valid
+  simpleDmFlowPhone?: boolean;
+  simpleFlowPhoneMessage?: string;
+  simpleFlowPhoneQuestion?: string;
+  phoneInvalidRetryMessage?: string;
 
   // Primary DM
   dmType: 'text' | 'text_button' | 'lead_capture';
@@ -152,6 +162,12 @@ export default function MobilePreview({
   const sampleDM =
     activeDmMessages && activeDmMessages.length > 0 ? activeDmMessages[0] : '';
 
+  // Pre-DM engagement: show DM preview when lead flow has content (standard or simple)
+  const preDmEngagementOn = config.enablePreDmEngagement ?? (config.askToFollow || config.askForEmail);
+  const simpleFlowEmailOn = !!(config.simpleDmFlow && (config.simpleFlowMessage || config.simpleFlowEmailQuestion));
+  const simpleFlowPhoneOn = !!(config.simpleDmFlowPhone && (config.simpleFlowPhoneMessage || config.simpleFlowPhoneQuestion));
+  const showDmPreviewButton = (activeDmMessages && activeDmMessages.length > 0) || (isLeadMode && preDmEngagementOn && (simpleFlowEmailOn || simpleFlowPhoneOn || (config.askToFollow || config.askForEmail)));
+
   return (
     <div className="flex justify-center">
       {/* iPhone Frame */}
@@ -229,7 +245,7 @@ export default function MobilePreview({
               )}
 
               {/* DM Preview Button */}
-              {activeDmMessages && activeDmMessages.length > 0 && (
+              {showDmPreviewButton && (
                 <div className="px-4 py-3 border-t border-gray-200">
                   <button
                     onClick={() => setShowDM(!showDM)}
@@ -242,108 +258,157 @@ export default function MobilePreview({
             </div>
 
               {/* DM Chat Preview */}
-            {showDM && activeDmMessages && activeDmMessages.length > 0 && (
+            {showDM && showDmPreviewButton && (
               <div className="mt-4 border-t-4 border-gray-200 pt-4">
                 <div className="px-4 py-2 bg-gray-100">
                   <p className="text-xs font-semibold text-gray-700">Direct Message</p>
                 </div>
                 <div className="px-4 py-3 space-y-3">
-                  {/* 1) Initial DM message
-                       - Lead Capture: bot sends a short greeting (left, gray)
-                       - Simple Reply: no separate initial bubble */}
-                  {isLeadMode && (
-                    <div className="flex justify-start">
-                      <div className="max-w-[70%] bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm px-4 py-2">
-                        <p className="text-sm">Hi! 👋</p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* 2) Bot sends follow message with IG link + Follow Me button (Lead Capture only) */}
-                  {isLeadMode && config.askToFollow && config.askToFollowMessage && (
+                  {/* ——— Simple flow (Phone): one message (follow + phone) → user phone → primary DM ——— */}
+                  {simpleFlowPhoneOn ? (
                     <>
                       <div className="flex justify-start">
                         <div className="max-w-[70%] bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm px-4 py-2">
                           <p className="text-sm whitespace-pre-line">
-                            {config.askToFollowMessage}
+                            {config.simpleFlowPhoneMessage || "Follow me to get the guide 👇 Reply with your phone number and I'll send it! 📱"}
                           </p>
-                          <p className="mt-1 text-xs text-blue-600 break-all">
-                            🔗 https://instagram.com/{accountUsername}
-                          </p>
-                          <div className="mt-2">
-                            <button className="w-full text-center text-xs font-semibold text-blue-600 bg-white border border-blue-600 rounded-lg py-2 px-3">
-                              Follow Me 👆
-                            </button>
-                          </div>
                         </div>
                       </div>
-                      {/* 3) User follows and taps Follow Me */}
                       <div className="flex justify-end">
                         <div className="max-w-[70%] bg-blue-500 text-white rounded-2xl rounded-tr-sm px-4 py-2">
-                          <p className="text-sm">✓ Followed</p>
+                          <p className="text-sm">+1 555-123-4567</p>
+                        </div>
+                      </div>
+                      <div className="flex justify-start">
+                        <div className="max-w-[70%] bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm px-4 py-2">
+                          <p className="text-sm whitespace-pre-line">
+                            {sampleDM}
+                            {config.askToFollow && '\n\n🙏 If you ever unfollow, I may have to pause sending free guides and resources. Staying followed helps me keep this running for you. ❤️'}
+                          </p>
+                          {config.dmType === 'text_button' && config.buttons.length > 0 && (
+                            <div className="mt-2 space-y-1">
+                              {config.buttons.filter((b) => b.text.trim() && b.url.trim()).map((button, index) => (
+                                <a key={index} href={button.url} target="_blank" rel="noopener noreferrer" className="block w-full text-center text-xs font-semibold text-blue-600 bg-white border border-blue-600 rounded-lg py-2 px-3">
+                                  {button.text}
+                                </a>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </>
-                  )}
-
-                  {/* 4) Bot sends email question (if enabled - Lead Capture only) */}
-                  {isLeadMode && config.askForEmail && config.askForEmailMessage && (
+                  ) : simpleFlowEmailOn ? (
+                    /* ——— Simple flow (Email): one message (follow + email) → user email → success → primary DM ——— */
                     <>
                       <div className="flex justify-start">
                         <div className="max-w-[70%] bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm px-4 py-2">
-                          <p className="text-sm">{config.askForEmailMessage}</p>
+                          <p className="text-sm whitespace-pre-line">
+                            {config.simpleFlowMessage || "Follow me to get the guide 👇 Reply with your email and I'll send it! 📧"}
+                          </p>
                         </div>
                       </div>
-
-                      {/* 5) User types email */}
                       <div className="flex justify-end">
                         <div className="max-w-[70%] bg-blue-500 text-white rounded-2xl rounded-tr-sm px-4 py-2">
                           <p className="text-sm">john@example.com</p>
                         </div>
                       </div>
-                    </>
-                  )}
-
-                  {/* 6) Optional email success message (only in lead + email flow) */}
-                  {isLeadMode && config.askForEmail && config.emailSuccessMessage && (
-                    <div className="flex justify-start">
-                      <div className="max-w-[70%] bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm px-4 py-2">
-                        <p className="text-sm whitespace-pre-line">
-                          {config.emailSuccessMessage}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* 7) Bot sends primary DM (final offer/message) */}
-                  <div className="flex justify-start">
-                    <div className="max-w-[70%] bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm px-4 py-2">
-                      <p className="text-sm whitespace-pre-line">
-                        {sampleDM}
-                        {config.askToFollow && isLeadMode && (
-                          '\n\n🙏 If you ever unfollow, I may have to pause sending free guides and resources. Staying followed helps me keep this running for you. ❤️'
-                        )}
-                      </p>
-                      {config.dmType === 'text_button' &&
-                        config.buttons.length > 0 && (
-                          <div className="mt-2 space-y-1">
-                            {config.buttons
-                              .filter((b) => b.text.trim() && b.url.trim())
-                              .map((button, index) => (
-                                <a
-                                  key={index}
-                                  href={button.url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="block w-full text-center text-xs font-semibold text-blue-600 bg-white border border-blue-600 rounded-lg py-2 px-3"
-                                >
+                      {config.emailSuccessMessage && (
+                        <div className="flex justify-start">
+                          <div className="max-w-[70%] bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm px-4 py-2">
+                            <p className="text-sm whitespace-pre-line">{config.emailSuccessMessage}</p>
+                          </div>
+                        </div>
+                      )}
+                      <div className="flex justify-start">
+                        <div className="max-w-[70%] bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm px-4 py-2">
+                          <p className="text-sm whitespace-pre-line">
+                            {sampleDM}
+                            {config.askToFollow && '\n\n🙏 If you ever unfollow, I may have to pause sending free guides and resources. Staying followed helps me keep this running for you. ❤️'}
+                          </p>
+                          {config.dmType === 'text_button' && config.buttons.length > 0 && (
+                            <div className="mt-2 space-y-1">
+                              {config.buttons.filter((b) => b.text.trim() && b.url.trim()).map((button, index) => (
+                                <a key={index} href={button.url} target="_blank" rel="noopener noreferrer" className="block w-full text-center text-xs font-semibold text-blue-600 bg-white border border-blue-600 rounded-lg py-2 px-3">
                                   {button.text}
                                 </a>
                               ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    /* ——— Standard Pre-DM: Hi → follow + Follow Me → ✓ Followed → email question → user email → success → primary DM ——— */
+                    <>
+                      {isLeadMode && (
+                        <div className="flex justify-start">
+                          <div className="max-w-[70%] bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm px-4 py-2">
+                            <p className="text-sm">Hi! 👋</p>
                           </div>
-                        )}
-                    </div>
-                  </div>
+                        </div>
+                      )}
+
+                      {isLeadMode && config.askToFollow && config.askToFollowMessage && (
+                        <>
+                          <div className="flex justify-start">
+                            <div className="max-w-[70%] bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm px-4 py-2">
+                              <p className="text-sm whitespace-pre-line">{config.askToFollowMessage}</p>
+                              <p className="mt-1 text-xs text-blue-600 break-all">🔗 https://instagram.com/{accountUsername}</p>
+                              <div className="mt-2">
+                                <button className="w-full text-center text-xs font-semibold text-blue-600 bg-white border border-blue-600 rounded-lg py-2 px-3">Follow Me 👆</button>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex justify-end">
+                            <div className="max-w-[70%] bg-blue-500 text-white rounded-2xl rounded-tr-sm px-4 py-2">
+                              <p className="text-sm">✓ Followed</p>
+                            </div>
+                          </div>
+                        </>
+                      )}
+
+                      {isLeadMode && config.askForEmail && config.askForEmailMessage && (
+                        <>
+                          <div className="flex justify-start">
+                            <div className="max-w-[70%] bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm px-4 py-2">
+                              <p className="text-sm">{config.askForEmailMessage}</p>
+                            </div>
+                          </div>
+                          <div className="flex justify-end">
+                            <div className="max-w-[70%] bg-blue-500 text-white rounded-2xl rounded-tr-sm px-4 py-2">
+                              <p className="text-sm">john@example.com</p>
+                            </div>
+                          </div>
+                        </>
+                      )}
+
+                      {isLeadMode && config.askForEmail && config.emailSuccessMessage && (
+                        <div className="flex justify-start">
+                          <div className="max-w-[70%] bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm px-4 py-2">
+                            <p className="text-sm whitespace-pre-line">{config.emailSuccessMessage}</p>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="flex justify-start">
+                        <div className="max-w-[70%] bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm px-4 py-2">
+                          <p className="text-sm whitespace-pre-line">
+                            {sampleDM}
+                            {config.askToFollow && isLeadMode && '\n\n🙏 If you ever unfollow, I may have to pause sending free guides and resources. Staying followed helps me keep this running for you. ❤️'}
+                          </p>
+                          {config.dmType === 'text_button' && config.buttons.length > 0 && (
+                            <div className="mt-2 space-y-1">
+                              {config.buttons.filter((b) => b.text.trim() && b.url.trim()).map((button, index) => (
+                                <a key={index} href={button.url} target="_blank" rel="noopener noreferrer" className="block w-full text-center text-xs font-semibold text-blue-600 bg-white border border-blue-600 rounded-lg py-2 px-3">
+                                  {button.text}
+                                </a>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             )}
