@@ -141,6 +141,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
   const [mediaUploading, setMediaUploading] = useState(false);
   const [mediaUploadError, setMediaUploadError] = useState<string | null>(null);
   const mediaFileInputRef = useRef<HTMLInputElement>(null);
+  const ignoreBackdropClickRef = useRef(false);
   const [activeTab, setActiveTab] = useState<'simple' | 'lead'>('simple');
   const [currentKeyword, setCurrentKeyword] = useState('');
   const [showPreviewMobile, setShowPreviewMobile] = useState(false);
@@ -356,14 +357,20 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden max-w-full overflow-x-hidden">
-      {/* Backdrop */}
+      {/* Backdrop - ignore clicks right after opening file picker so drawer doesn't close */}
       <div
         className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
-        onClick={onClose}
+        onClick={() => {
+          if (ignoreBackdropClickRef.current) return;
+          onClose();
+        }}
       />
 
-      {/* Drawer */}
-      <div className="fixed right-0 top-0 h-full w-full max-w-full md:max-w-7xl shadow-xl">
+      {/* Drawer - stop propagation so clicks inside (e.g. opening file picker) don't close */}
+      <div
+        className="fixed right-0 top-0 h-full w-full max-w-full md:max-w-7xl shadow-xl"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex flex-col md:flex-row h-full bg-white">
           {/* Left Side: Settings Form */}
           <div className="flex-1 overflow-y-auto border-r-0 md:border-r border-gray-200 max-w-full overflow-x-hidden">
@@ -947,6 +954,11 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                       <option value="image">Image</option>
                       <option value="card">Card</option>
                     </select>
+                    {config.mediaType === 'none' && (
+                      <p className="text-xs text-gray-500 mt-1">
+                        Select a type above (e.g. Image or Document) to upload a file or paste a URL.
+                      </p>
+                    )}
                     {config.mediaType && config.mediaType !== 'none' && (
                       <div className="space-y-2">
                         {['video', 'image', 'card', 'doc', 'pdf'].includes(config.mediaType) && (
@@ -993,7 +1005,13 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                             />
                             <button
                               type="button"
-                              onClick={() => mediaFileInputRef.current?.click()}
+                              onClick={() => {
+                                ignoreBackdropClickRef.current = true;
+                                mediaFileInputRef.current?.click();
+                                setTimeout(() => {
+                                  ignoreBackdropClickRef.current = false;
+                                }, 600);
+                              }}
                               disabled={mediaUploading}
                               className="flex items-center gap-2 w-full justify-center px-3 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 disabled:opacity-50 transition-all"
                             >
