@@ -965,7 +965,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                       <div className="space-y-2">
                         {['video', 'image', 'card', 'doc', 'pdf'].includes(config.mediaType) && (
                           <div>
-                            {/* Same upload pattern as ReportIssueModal: hidden input + label with htmlFor */}
+                            {/* Programmatic click so change event fires reliably in drawer (label + modal can block upload POST) */}
                             <input
                               id="automation-media-file-input"
                               ref={mediaFileInputRef}
@@ -981,10 +981,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                               }
                               className="hidden"
                               disabled={mediaUploading}
-                              onFocus={() => {
-                                ignoreBackdropClickRef.current = true;
-                                setTimeout(() => { ignoreBackdropClickRef.current = false; }, 800);
-                              }}
+                              aria-hidden
                               onChange={async (e) => {
                                 const inputEl = e.currentTarget;
                                 const file = inputEl.files?.[0];
@@ -1019,15 +1016,21 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                                 }
                               }}
                             />
-                            <label
-                              htmlFor="automation-media-file-input"
-                              className={`flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${mediaUploading ? 'opacity-50 pointer-events-none border-gray-300 bg-gray-50' : 'border-gray-300 hover:border-blue-500 hover:bg-blue-50 text-gray-700'}`}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (mediaUploading) return;
+                                ignoreBackdropClickRef.current = true;
+                                setTimeout(() => { ignoreBackdropClickRef.current = false; }, 1000);
+                                mediaFileInputRef.current?.click();
+                              }}
+                              className={`flex items-center justify-center gap-2 w-full px-4 py-3 border-2 border-dashed rounded-lg transition-colors ${mediaUploading ? 'opacity-50 pointer-events-none border-gray-300 bg-gray-50 cursor-not-allowed' : 'border-gray-300 hover:border-blue-500 hover:bg-blue-50 text-gray-700 cursor-pointer'}`}
                             >
                               <ArrowUpTrayIcon className="h-5 w-5 text-gray-400" />
                               <span className="text-sm text-gray-600">
                                 {mediaUploading ? 'Uploading…' : 'Click to attach file (Max 20MB)'}
                               </span>
-                            </label>
+                            </button>
                             {uploadedFileName && (
                               <p className="text-xs text-green-700 font-medium mt-1">
                                 ✓ Uploaded: {uploadedFileName}

@@ -10,9 +10,16 @@ const api: AxiosInstance = axios.create({
   },
 });
 
-// Request interceptor - Inject Supabase JWT token
+// Request interceptor - Inject Supabase JWT token + fix Content-Type for FormData
 api.interceptors.request.use(
   async (config) => {
+    // Let browser set multipart/form-data with boundary for file uploads (do not send application/json)
+    if (typeof FormData !== 'undefined' && config.data instanceof FormData) {
+      if (config.headers && typeof config.headers === 'object' && !Array.isArray(config.headers)) {
+        delete (config.headers as Record<string, unknown>)['Content-Type'];
+      }
+    }
+
     // Get token from Supabase session
     if (typeof window !== 'undefined') {
       try {
