@@ -140,6 +140,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
   const [isSaving, setIsSaving] = useState(false);
   const [mediaUploading, setMediaUploading] = useState(false);
   const [mediaUploadError, setMediaUploadError] = useState<string | null>(null);
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
   const mediaFileInputRef = useRef<HTMLInputElement>(null);
   const ignoreBackdropClickRef = useRef(false);
   const [activeTab, setActiveTab] = useState<'simple' | 'lead'>('simple');
@@ -937,13 +938,14 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                     </p>
                     <select
                       value={config.mediaType || 'none'}
-                      onChange={(e) =>
+                      onChange={(e) => {
+                        setUploadedFileName(null);
                         setConfig({
                           ...config,
                           mediaType: e.target.value as 'none' | 'link' | 'doc' | 'pdf' | 'video' | 'image' | 'card',
                           mediaUrl: e.target.value === 'none' ? '' : (config.mediaUrl || ''),
-                        })
-                      }
+                        });
+                      }}
                       className="w-full h-10 px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all mb-3"
                     >
                       <option value="none">No Media</option>
@@ -984,10 +986,12 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                                 setTimeout(() => { ignoreBackdropClickRef.current = false; }, 800);
                               }}
                               onChange={async (e) => {
-                                const file = e.target.files?.[0];
+                                const inputEl = e.currentTarget;
+                                const file = inputEl.files?.[0];
                                 if (!file) return;
                                 setMediaUploadError(null);
                                 setMediaUploading(true);
+                                setUploadedFileName(null);
                                 try {
                                   const formData = new FormData();
                                   formData.append('file', file);
@@ -995,6 +999,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                                   const data = res.data;
                                   if (data?.url) {
                                     setConfig((prev) => ({ ...prev, mediaUrl: data.url }));
+                                    setUploadedFileName(file.name);
                                   } else {
                                     setMediaUploadError('Upload failed. Use URL instead.');
                                   }
@@ -1010,26 +1015,24 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                                   }
                                 } finally {
                                   setMediaUploading(false);
-                                  e.target.value = '';
+                                  inputEl.value = '';
                                 }
                               }}
                             />
                             <label
                               htmlFor="automation-media-file-input"
                               className={`flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${mediaUploading ? 'opacity-50 pointer-events-none border-gray-300 bg-gray-50' : 'border-gray-300 hover:border-blue-500 hover:bg-blue-50 text-gray-700'}`}
-                              onClick={(e) => {
-                                if (mediaUploading) return;
-                                ignoreBackdropClickRef.current = true;
-                                setTimeout(() => { ignoreBackdropClickRef.current = false; }, 800);
-                                mediaFileInputRef.current?.click();
-                                e.preventDefault();
-                              }}
                             >
                               <ArrowUpTrayIcon className="h-5 w-5 text-gray-400" />
                               <span className="text-sm text-gray-600">
                                 {mediaUploading ? 'Uploading…' : 'Click to attach file (Max 20MB)'}
                               </span>
                             </label>
+                            {uploadedFileName && (
+                              <p className="text-xs text-green-700 font-medium mt-1">
+                                ✓ Uploaded: {uploadedFileName}
+                              </p>
+                            )}
                             {mediaUploadError && (
                               <p className="text-xs text-amber-600 mt-1">{mediaUploadError}</p>
                             )}
@@ -1041,6 +1044,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                           value={config.mediaUrl || ''}
                           onChange={(e) => {
                             setMediaUploadError(null);
+                            setUploadedFileName(null);
                             setConfig({ ...config, mediaUrl: e.target.value });
                           }}
                           className="w-full h-10 px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all"
