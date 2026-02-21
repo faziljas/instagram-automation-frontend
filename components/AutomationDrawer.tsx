@@ -964,6 +964,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                         {['video', 'image', 'card', 'doc', 'pdf'].includes(config.mediaType) && (
                           <div>
                             <input
+                              id="automation-media-file-input"
                               ref={mediaFileInputRef}
                               type="file"
                               accept={
@@ -975,7 +976,8 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                                       ? 'application/pdf,.pdf,application/msword,.doc,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.docx,text/plain,.txt'
                                       : 'image/*'
                               }
-                              className="hidden"
+                              className="sr-only"
+                              aria-hidden
                               onChange={async (e) => {
                                 const file = e.target.files?.[0];
                                 if (!file) return;
@@ -984,40 +986,38 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                                 try {
                                   const formData = new FormData();
                                   formData.append('file', file);
-                                  const { data } = await api.post<{ url: string }>('/api/upload/media', formData, {
-                                    headers: { 'Content-Type': 'multipart/form-data' },
-                                  });
+                                  // Do not set Content-Type: axios must set multipart/form-data with boundary
+                                  const res = await api.post<{ url: string }>('/api/upload/media', formData);
+                                  const data = res.data;
                                   if (data?.url) {
-                                    setConfig({ ...config, mediaUrl: data.url });
+                                    setConfig((prev) => ({ ...prev, mediaUrl: data.url }));
                                   } else {
                                     setMediaUploadError('Upload failed. Use URL instead.');
                                   }
                                 } catch (err: unknown) {
-                                  const message = err && typeof err === 'object' && 'response' in err
-                                    ? (err as { response?: { data?: { detail?: string } } }).response?.data?.detail
-                                    : err instanceof Error ? err.message : 'Upload failed. Use URL instead.';
-                                  setMediaUploadError(String(message || 'Upload failed. Use URL instead.'));
+                                  const ax = err as { response?: { data?: { detail?: string }; status?: number }; message?: string };
+                                  const message = ax?.response?.data?.detail
+                                    ?? (ax?.response?.status === 401 ? 'Please sign in and try again.' : null)
+                                    ?? ax?.message
+                                    ?? 'Upload failed. Check your connection or paste a URL below.';
+                                  setMediaUploadError(String(message));
+                                  if (process.env.NODE_ENV === 'development') {
+                                    console.error('[AutomationDrawer] Media upload failed:', err);
+                                  }
                                 } finally {
                                   setMediaUploading(false);
                                   e.target.value = '';
                                 }
                               }}
                             />
-                            <button
-                              type="button"
-                              onClick={() => {
-                                ignoreBackdropClickRef.current = true;
-                                mediaFileInputRef.current?.click();
-                                setTimeout(() => {
-                                  ignoreBackdropClickRef.current = false;
-                                }, 600);
-                              }}
-                              disabled={mediaUploading}
-                              className="flex items-center gap-2 w-full justify-center px-3 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 disabled:opacity-50 transition-all"
+                            <label
+                              htmlFor="automation-media-file-input"
+                              className={`flex items-center gap-2 w-full justify-center px-3 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 cursor-pointer transition-all ${mediaUploading ? 'opacity-50 pointer-events-none' : ''}`}
+                              onClick={() => { ignoreBackdropClickRef.current = true; setTimeout(() => { ignoreBackdropClickRef.current = false; }, 600); }}
                             >
                               <ArrowUpTrayIcon className="h-4 w-4" />
                               {mediaUploading ? 'Uploading…' : 'Upload file'}
-                            </button>
+                            </label>
                             {mediaUploadError && (
                               <p className="text-xs text-amber-600 mt-1">{mediaUploadError}</p>
                             )}
