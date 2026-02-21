@@ -977,7 +977,6 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                                       : 'image/*'
                               }
                               className="sr-only"
-                              aria-hidden
                               onChange={async (e) => {
                                 const file = e.target.files?.[0];
                                 if (!file) return;
