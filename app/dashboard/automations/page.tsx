@@ -591,14 +591,6 @@ export default function AutomationsPage() {
       );
     }
 
-    // Save media attachment for Primary DM (backward compatible - only if configured)
-    if (config.mediaType !== undefined) {
-      ruleConfig.media_type = config.mediaType;
-    }
-    if (config.mediaUrl !== undefined) {
-      ruleConfig.media_url = config.mediaUrl || '';
-    }
-
     // Mark rule as lead_capture for UX (used by builder + edit screens)
     // Explicitly set is_lead_capture to ensure backend uses correct comment replies
     if (config.isLeadCapture || config.enablePreDmEngagement || config.askToFollow || config.askForEmail) {
@@ -1443,8 +1435,6 @@ export default function AutomationsPage() {
                   : ['Thanks for your interest! Check out our latest updates.', 'Hey! We have something special for you. Check it out!', 'Awesome! We sent you a message with more details.'],
                 buttons: cfg.buttons || [{ text: 'Click me', url: '' }],
                 delayMinutes: cfg.delay_minutes || 0,
-                mediaType: cfg.media_type || 'none',
-                mediaUrl: cfg.media_url || '',
 
                 // Per‑flow stored values:
                 // If this rule is lead‑capture, treat the \"*_lead\" fields as primary

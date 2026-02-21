@@ -55,8 +55,6 @@ interface AutomationConfig {
   leadDmMessages?: string[];
   buttons: Array<{ text: string; url: string }>;
   delayMinutes: number;
-  mediaType?: 'none' | 'link' | 'doc' | 'pdf' | 'video' | 'image' | 'card';
-  mediaUrl?: string;
   isLeadCapture?: boolean;
   preDmFlowType?: 'email' | 'phone' | 'followers';
   leadCaptureFlow?: Array<{
@@ -284,62 +282,6 @@ export default function MobilePreview({
                       </div>
                       <div className="flex justify-start">
                         <div className="max-w-[70%] bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm px-4 py-2">
-                          {/* Media Attachment Preview */}
-                          {config.mediaType && config.mediaType !== 'none' && config.mediaUrl && (
-                            <div className="mb-2">
-                              {config.mediaType === 'image' && (
-                                <img 
-                                  src={config.mediaUrl} 
-                                  alt="Attachment" 
-                                  className="w-full rounded-lg mb-2"
-                                  onError={(e) => {
-                                    const target = e.target as HTMLImageElement;
-                                    target.style.display = 'none';
-                                  }}
-                                />
-                              )}
-                              {config.mediaType === 'video' && (
-                                <div className="bg-black rounded-lg aspect-video flex items-center justify-center mb-2">
-                                  <div className="text-white text-xs">📹 Video Preview</div>
-                                </div>
-                              )}
-                              {(config.mediaType === 'pdf' || config.mediaType === 'doc') && (
-                                <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-2">
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-red-600 text-lg">📄</span>
-                                    <div className="flex-1 min-w-0">
-                                      <p className="text-xs font-semibold text-red-900 truncate">
-                                        {config.mediaType === 'pdf' ? 'PDF Document' : 'Document'}
-                                      </p>
-                                      <p className="text-xs text-red-600 truncate">{config.mediaUrl}</p>
-                                    </div>
-                                  </div>
-                                </div>
-                              )}
-                              {config.mediaType === 'link' && (
-                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2">
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-blue-600 text-lg">🔗</span>
-                                    <div className="flex-1 min-w-0">
-                                      <p className="text-xs font-semibold text-blue-900 truncate">Link</p>
-                                      <p className="text-xs text-blue-600 truncate">{config.mediaUrl}</p>
-                                    </div>
-                                  </div>
-                                </div>
-                              )}
-                              {config.mediaType === 'card' && (
-                                <div className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-3 mb-2">
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-purple-600 text-lg">🎴</span>
-                                    <div className="flex-1 min-w-0">
-                                      <p className="text-xs font-semibold text-purple-900 truncate">Card</p>
-                                      <p className="text-xs text-purple-600 truncate">{config.mediaUrl}</p>
-                                    </div>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          )}
                           <p className="text-sm whitespace-pre-line">
                             {sampleDM}
                           </p>
@@ -379,62 +321,6 @@ export default function MobilePreview({
                       )}
                       <div className="flex justify-start">
                         <div className="max-w-[70%] bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm px-4 py-2">
-                          {/* Media Attachment Preview */}
-                          {config.mediaType && config.mediaType !== 'none' && config.mediaUrl && (
-                            <div className="mb-2">
-                              {config.mediaType === 'image' && (
-                                <img 
-                                  src={config.mediaUrl} 
-                                  alt="Attachment" 
-                                  className="w-full rounded-lg mb-2"
-                                  onError={(e) => {
-                                    const target = e.target as HTMLImageElement;
-                                    target.style.display = 'none';
-                                  }}
-                                />
-                              )}
-                              {config.mediaType === 'video' && (
-                                <div className="bg-black rounded-lg aspect-video flex items-center justify-center mb-2">
-                                  <div className="text-white text-xs">📹 Video Preview</div>
-                                </div>
-                              )}
-                              {(config.mediaType === 'pdf' || config.mediaType === 'doc') && (
-                                <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-2">
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-red-600 text-lg">📄</span>
-                                    <div className="flex-1 min-w-0">
-                                      <p className="text-xs font-semibold text-red-900 truncate">
-                                        {config.mediaType === 'pdf' ? 'PDF Document' : 'Document'}
-                                      </p>
-                                      <p className="text-xs text-red-600 truncate">{config.mediaUrl}</p>
-                                    </div>
-                                  </div>
-                                </div>
-                              )}
-                              {config.mediaType === 'link' && (
-                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2">
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-blue-600 text-lg">🔗</span>
-                                    <div className="flex-1 min-w-0">
-                                      <p className="text-xs font-semibold text-blue-900 truncate">Link</p>
-                                      <p className="text-xs text-blue-600 truncate">{config.mediaUrl}</p>
-                                    </div>
-                                  </div>
-                                </div>
-                              )}
-                              {config.mediaType === 'card' && (
-                                <div className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-3 mb-2">
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-purple-600 text-lg">🎴</span>
-                                    <div className="flex-1 min-w-0">
-                                      <p className="text-xs font-semibold text-purple-900 truncate">Card</p>
-                                      <p className="text-xs text-purple-600 truncate">{config.mediaUrl}</p>
-                                    </div>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          )}
                           <p className="text-sm whitespace-pre-line">
                             {sampleDM}
                           </p>
@@ -520,62 +406,6 @@ export default function MobilePreview({
 
                       <div className="flex justify-start">
                         <div className="max-w-[70%] bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm px-4 py-2">
-                          {/* Media Attachment Preview */}
-                          {config.mediaType && config.mediaType !== 'none' && config.mediaUrl && (
-                            <div className="mb-2">
-                              {config.mediaType === 'image' && (
-                                <img 
-                                  src={config.mediaUrl} 
-                                  alt="Attachment" 
-                                  className="w-full rounded-lg mb-2"
-                                  onError={(e) => {
-                                    const target = e.target as HTMLImageElement;
-                                    target.style.display = 'none';
-                                  }}
-                                />
-                              )}
-                              {config.mediaType === 'video' && (
-                                <div className="bg-black rounded-lg aspect-video flex items-center justify-center mb-2">
-                                  <div className="text-white text-xs">📹 Video Preview</div>
-                                </div>
-                              )}
-                              {(config.mediaType === 'pdf' || config.mediaType === 'doc') && (
-                                <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-2">
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-red-600 text-lg">📄</span>
-                                    <div className="flex-1 min-w-0">
-                                      <p className="text-xs font-semibold text-red-900 truncate">
-                                        {config.mediaType === 'pdf' ? 'PDF Document' : 'Document'}
-                                      </p>
-                                      <p className="text-xs text-red-600 truncate">{config.mediaUrl}</p>
-                                    </div>
-                                  </div>
-                                </div>
-                              )}
-                              {config.mediaType === 'link' && (
-                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2">
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-blue-600 text-lg">🔗</span>
-                                    <div className="flex-1 min-w-0">
-                                      <p className="text-xs font-semibold text-blue-900 truncate">Link</p>
-                                      <p className="text-xs text-blue-600 truncate">{config.mediaUrl}</p>
-                                    </div>
-                                  </div>
-                                </div>
-                              )}
-                              {config.mediaType === 'card' && (
-                                <div className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-3 mb-2">
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-purple-600 text-lg">🎴</span>
-                                    <div className="flex-1 min-w-0">
-                                      <p className="text-xs font-semibold text-purple-900 truncate">Card</p>
-                                      <p className="text-xs text-purple-600 truncate">{config.mediaUrl}</p>
-                                    </div>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          )}
                           <p className="text-sm whitespace-pre-line">
                             {sampleDM}
                           </p>

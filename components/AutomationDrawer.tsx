@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { XMarkIcon, InformationCircleIcon, ArrowUpTrayIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 import MobilePreview from './MobilePreview';
-import api from '@/utils/api';
 
 interface MediaItem {
   id: string;
@@ -58,9 +57,6 @@ interface AutomationConfig {
   leadDmMessages: string[];
   buttons: { text: string; url: string }[];
   delayMinutes: number;
-  // Media attachments for Primary DM
-  mediaType?: 'none' | 'link' | 'doc' | 'pdf' | 'video' | 'image' | 'card';
-  mediaUrl?: string;
 
   // Legacy lead‑capture fields (kept optional so old data still loads)
   isLeadCapture?: boolean;
@@ -132,16 +128,10 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
     leadDmMessages: ['Thanks for your interest! Check out our latest updates.', 'Hey! We have something special for you. Check it out!', 'Awesome! We sent you a message with more details.'],
     buttons: [{ text: 'Click me', url: '' }],
     delayMinutes: 0,
-    mediaType: 'none',
-    mediaUrl: '',
     isLeadCapture: false,
   });
 
   const [isSaving, setIsSaving] = useState(false);
-  const [mediaUploading, setMediaUploading] = useState(false);
-  const [mediaUploadError, setMediaUploadError] = useState<string | null>(null);
-  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
-  const mediaFileInputRef = useRef<HTMLInputElement>(null);
   const ignoreBackdropClickRef = useRef(false);
   const [activeTab, setActiveTab] = useState<'simple' | 'lead'>('simple');
   const [currentKeyword, setCurrentKeyword] = useState('');
@@ -263,8 +253,6 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
         buttons:
           initialConfig.buttons || [{ text: 'Click me', url: '' }],
         delayMinutes: initialConfig.delayMinutes || 0,
-        mediaType: initialConfig.mediaType || 'none',
-        mediaUrl: initialConfig.mediaUrl || '',
         // Include isLeadCapture flag so MobilePreview can use it
         isLeadCapture: initialConfig.isLeadCapture || false,
       });
@@ -927,134 +915,6 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                         );
                       })}
                     </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      Media Attachment (Optional)
-                    </label>
-                    <p className="text-xs text-gray-500 mb-2">
-                      Attach a link, document, PDF, video, image, or card to your primary DM
-                    </p>
-                    <select
-                      value={config.mediaType || 'none'}
-                      onChange={(e) => {
-                        setUploadedFileName(null);
-                        setConfig({
-                          ...config,
-                          mediaType: e.target.value as 'none' | 'link' | 'doc' | 'pdf' | 'video' | 'image' | 'card',
-                          mediaUrl: e.target.value === 'none' ? '' : (config.mediaUrl || ''),
-                        });
-                      }}
-                      className="w-full h-10 px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all mb-3"
-                    >
-                      <option value="none">No Media</option>
-                      <option value="link">Link/URL</option>
-                      <option value="doc">Document</option>
-                      <option value="pdf">PDF</option>
-                      <option value="video">Video</option>
-                      <option value="image">Image</option>
-                      <option value="card">Card</option>
-                    </select>
-                    {config.mediaType === 'none' && (
-                      <p className="text-xs text-gray-500 mt-1">
-                        Select a type above (e.g. Image or Document) to upload a file or paste a URL.
-                      </p>
-                    )}
-                    {config.mediaType && config.mediaType !== 'none' && (
-                      <div className="space-y-2">
-                        {['video', 'image', 'card', 'doc', 'pdf'].includes(config.mediaType) && (
-                          <div>
-                            {/* Programmatic click so change event fires reliably in drawer (label + modal can block upload POST) */}
-                            <input
-                              id="automation-media-file-input"
-                              ref={mediaFileInputRef}
-                              type="file"
-                              accept={
-                                config.mediaType === 'video'
-                                  ? 'video/*'
-                                  : config.mediaType === 'pdf'
-                                    ? 'application/pdf,.pdf'
-                                    : config.mediaType === 'doc'
-                                      ? 'application/pdf,.pdf,application/msword,.doc,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.docx,text/plain,.txt'
-                                      : 'image/*'
-                              }
-                              className="hidden"
-                              disabled={mediaUploading}
-                              aria-hidden
-                              onChange={async (e) => {
-                                const inputEl = e.currentTarget;
-                                const file = inputEl.files?.[0];
-                                if (!file) return;
-                                setMediaUploadError(null);
-                                setMediaUploading(true);
-                                setUploadedFileName(null);
-                                try {
-                                  const formData = new FormData();
-                                  formData.append('file', file);
-                                  const res = await api.post<{ url: string }>('/api/upload/media', formData);
-                                  const data = res.data;
-                                  if (data?.url) {
-                                    setConfig((prev) => ({ ...prev, mediaUrl: data.url }));
-                                    setUploadedFileName(file.name);
-                                  } else {
-                                    setMediaUploadError('Upload failed. Use URL instead.');
-                                  }
-                                } catch (err: unknown) {
-                                  const ax = err as { response?: { data?: { detail?: string }; status?: number }; message?: string };
-                                  const message = ax?.response?.data?.detail
-                                    ?? (ax?.response?.status === 401 ? 'Please sign in and try again.' : null)
-                                    ?? ax?.message
-                                    ?? 'Upload failed. Check your connection or paste a URL below.';
-                                  setMediaUploadError(String(message));
-                                  if (process.env.NODE_ENV === 'development') {
-                                    console.error('[AutomationDrawer] Media upload failed:', err);
-                                  }
-                                } finally {
-                                  setMediaUploading(false);
-                                  inputEl.value = '';
-                                }
-                              }}
-                            />
-                            <button
-                              type="button"
-                              onClick={() => {
-                                if (mediaUploading) return;
-                                ignoreBackdropClickRef.current = true;
-                                setTimeout(() => { ignoreBackdropClickRef.current = false; }, 1000);
-                                mediaFileInputRef.current?.click();
-                              }}
-                              className={`flex items-center justify-center gap-2 w-full px-4 py-3 border-2 border-dashed rounded-lg transition-colors ${mediaUploading ? 'opacity-50 pointer-events-none border-gray-300 bg-gray-50 cursor-not-allowed' : 'border-gray-300 hover:border-blue-500 hover:bg-blue-50 text-gray-700 cursor-pointer'}`}
-                            >
-                              <ArrowUpTrayIcon className="h-5 w-5 text-gray-400" />
-                              <span className="text-sm text-gray-600">
-                                {mediaUploading ? 'Uploading…' : 'Click to attach file (Max 20MB)'}
-                              </span>
-                            </button>
-                            {uploadedFileName && (
-                              <p className="text-xs text-green-700 font-medium mt-1">
-                                ✓ Uploaded: {uploadedFileName}
-                              </p>
-                            )}
-                            {mediaUploadError && (
-                              <p className="text-xs text-amber-600 mt-1">{mediaUploadError}</p>
-                            )}
-                            <p className="text-xs text-gray-500 mt-1">Or enter URL below</p>
-                          </div>
-                        )}
-                        <input
-                          type="url"
-                          value={config.mediaUrl || ''}
-                          onChange={(e) => {
-                            setMediaUploadError(null);
-                            setUploadedFileName(null);
-                            setConfig({ ...config, mediaUrl: e.target.value });
-                          }}
-                          className="w-full h-10 px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all"
-                          placeholder={`Enter ${config.mediaType} URL (e.g., https://example.com/file.${config.mediaType === 'pdf' ? 'pdf' : config.mediaType === 'video' ? 'mp4' : config.mediaType === 'image' ? 'jpg' : 'link'})`}
-                        />
-                      </div>
-                    )}
                   </div>
 
                   <div>
