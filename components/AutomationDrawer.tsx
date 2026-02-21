@@ -34,7 +34,8 @@ interface AutomationConfig {
   enablePreDmEngagement?: boolean; // Deprecated: use preDmFlowType instead
   askToFollow?: boolean; // Backward compatibility
   askToFollowMessage?: string;
-  followRecheckMessage?: string; // Message for "Are you followed?" question
+  followRecheckMessage?: string; // "Are you following me?" (Followers) or "Are you followed?" (Email/Phone)
+  followNoExitMessage?: string; // Followers-only: message when user says No (exit, no primary DM)
   askForEmail?: boolean; // Backward compatibility
   askForEmailMessage?: string;
   emailSuccessMessage?: string;
@@ -107,6 +108,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
     askToFollowMessage:
       "Hey! Would you mind following me? I share great content! 🙌",
     followRecheckMessage: "Are you followed?",
+    followNoExitMessage: "No problem! Comment again anytime when you'd like the guide. 📩",
     askForEmail: false, // Backward compatibility
     askForEmailMessage:
       "Awesome! 🚀 I have the PDF ready for you.\n\nWhere should I send it? Drop your best email below and I'll fire it over instantly. 👇",
@@ -742,7 +744,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                           <div className="ml-3 flex-1">
                             <div className="text-sm font-medium text-gray-700">Followers</div>
                             <div className="text-xs text-gray-500">
-                              Send follow request with buttons. After confirmation, proceed to primary DM.
+                              Follow request + I&apos;m following / Follow me. I&apos;m following → primary DM. Follow me / No → &quot;Are you following me?&quot; (Yes/No). Yes → primary DM. No → exit; comment again to retry.
                             </div>
                           </div>
                         </label>
@@ -795,27 +797,57 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                             </div>
                           )}
 
-                          {/* Followers Flow Fields - Simplified */}
+                          {/* Followers Flow Fields - Same first message; optional recheck/exit messages */}
                           {config.preDmFlowType === 'followers' && (
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                                Follow request message
-                              </label>
-                              <textarea
-                                value={config.askToFollowMessage || ''}
-                                onChange={(e) =>
-                                  setConfig({
-                                    ...config,
-                                    askToFollowMessage: e.target.value,
-                                  })
-                                }
-                                rows={3}
-                                className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none"
-                                placeholder="Hey! Would you mind following me? I share great content! 🙌"
-                              />
-                              <p className="text-xs text-gray-500 mt-1">
-                                Backend will handle follow confirmation and retry messages automatically
-                              </p>
+                            <div className="space-y-3">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                  Follow request message (with I&apos;m following / Follow me)
+                                </label>
+                                <textarea
+                                  value={config.askToFollowMessage || ''}
+                                  onChange={(e) =>
+                                    setConfig({
+                                      ...config,
+                                      askToFollowMessage: e.target.value,
+                                    })
+                                  }
+                                  rows={3}
+                                  className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none"
+                                  placeholder="Hey! Would you mind following me? I share great content! 🙌"
+                                />
+                                <p className="text-xs text-gray-500 mt-1">
+                                  Instructions (type done/followed) and profile link are added automatically. Buttons: I&apos;m following → primary DM; Follow me → &quot;Are you following me?&quot; (Yes/No).
+                                </p>
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                  &quot;Are you following me?&quot; message (optional)
+                                </label>
+                                <input
+                                  type="text"
+                                  value={config.followRecheckMessage ?? ''}
+                                  onChange={(e) =>
+                                    setConfig({ ...config, followRecheckMessage: e.target.value || undefined })
+                                  }
+                                  className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400"
+                                  placeholder="Are you following me?"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                  Message when user says No (optional)
+                                </label>
+                                <input
+                                  type="text"
+                                  value={config.followNoExitMessage ?? ''}
+                                  onChange={(e) =>
+                                    setConfig({ ...config, followNoExitMessage: e.target.value || undefined })
+                                  }
+                                  className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400"
+                                  placeholder={"No problem! Comment again anytime when you'd like the guide. 📩"}
+                                />
+                              </div>
                             </div>
                           )}
 
