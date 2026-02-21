@@ -963,6 +963,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                       <div className="space-y-2">
                         {['video', 'image', 'card', 'doc', 'pdf'].includes(config.mediaType) && (
                           <div>
+                            {/* Same upload pattern as ReportIssueModal: hidden input + label with htmlFor */}
                             <input
                               id="automation-media-file-input"
                               ref={mediaFileInputRef}
@@ -976,7 +977,12 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                                       ? 'application/pdf,.pdf,application/msword,.doc,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.docx,text/plain,.txt'
                                       : 'image/*'
                               }
-                              className="sr-only"
+                              className="hidden"
+                              disabled={mediaUploading}
+                              onFocus={() => {
+                                ignoreBackdropClickRef.current = true;
+                                setTimeout(() => { ignoreBackdropClickRef.current = false; }, 800);
+                              }}
                               onChange={async (e) => {
                                 const file = e.target.files?.[0];
                                 if (!file) return;
@@ -985,7 +991,6 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                                 try {
                                   const formData = new FormData();
                                   formData.append('file', file);
-                                  // Do not set Content-Type: axios must set multipart/form-data with boundary
                                   const res = await api.post<{ url: string }>('/api/upload/media', formData);
                                   const data = res.data;
                                   if (data?.url) {
@@ -1011,11 +1016,19 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                             />
                             <label
                               htmlFor="automation-media-file-input"
-                              className={`flex items-center gap-2 w-full justify-center px-3 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 cursor-pointer transition-all ${mediaUploading ? 'opacity-50 pointer-events-none' : ''}`}
-                              onClick={() => { ignoreBackdropClickRef.current = true; setTimeout(() => { ignoreBackdropClickRef.current = false; }, 600); }}
+                              className={`flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${mediaUploading ? 'opacity-50 pointer-events-none border-gray-300 bg-gray-50' : 'border-gray-300 hover:border-blue-500 hover:bg-blue-50 text-gray-700'}`}
+                              onClick={(e) => {
+                                if (mediaUploading) return;
+                                ignoreBackdropClickRef.current = true;
+                                setTimeout(() => { ignoreBackdropClickRef.current = false; }, 800);
+                                mediaFileInputRef.current?.click();
+                                e.preventDefault();
+                              }}
                             >
-                              <ArrowUpTrayIcon className="h-4 w-4" />
-                              {mediaUploading ? 'Uploading…' : 'Upload file'}
+                              <ArrowUpTrayIcon className="h-5 w-5 text-gray-400" />
+                              <span className="text-sm text-gray-600">
+                                {mediaUploading ? 'Uploading…' : 'Click to attach file (Max 20MB)'}
+                              </span>
                             </label>
                             {mediaUploadError && (
                               <p className="text-xs text-amber-600 mt-1">{mediaUploadError}</p>
