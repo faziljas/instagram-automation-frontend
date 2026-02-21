@@ -8,8 +8,10 @@ import {
   MicrophoneIcon,
   ChevronDownIcon,
   DocumentIcon,
+  ArrowUpTrayIcon,
 } from '@heroicons/react/24/outline';
 import MobilePreview from './MobilePreview';
+import api from '@/utils/api';
 
 export type DmTypeValue = 'text' | 'text_button' | 'image_video' | 'card' | 'voice_message';
 
@@ -160,6 +162,10 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
   const ignoreBackdropClickRef = useRef(false);
   const dmTypeDropdownRef = useRef<HTMLDivElement>(null);
   const [dmTypeDropdownOpen, setDmTypeDropdownOpen] = useState(false);
+  const [uploadingMedia, setUploadingMedia] = useState<'image_video' | 'voice_message' | null>(null);
+  const [uploadError, setUploadError] = useState<{ type: 'image_video' | 'voice_message'; message: string } | null>(null);
+  const imageVideoInputRef = useRef<HTMLInputElement>(null);
+  const voiceMessageInputRef = useRef<HTMLInputElement>(null);
   const [activeTab, setActiveTab] = useState<'simple' | 'lead'>('simple');
   const [currentKeyword, setCurrentKeyword] = useState('');
   const [showPreviewMobile, setShowPreviewMobile] = useState(false);
@@ -306,6 +312,42 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
       return () => document.removeEventListener('mousedown', handleClickOutside);
     }
   }, [dmTypeDropdownOpen]);
+
+  const handleDmMediaUpload = async (
+    type: 'image_video' | 'voice_message',
+    file: File
+  ) => {
+    setUploadError(null);
+    setUploadingMedia(type);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const { data } = await api.post<{ url: string; filename: string }>(
+        '/upload/dm-media',
+        formData
+      );
+      if (type === 'image_video') {
+        setConfig((c) => ({ ...c, dmMediaUrl: data.url }));
+      } else {
+        setConfig((c) => ({ ...c, dmVoiceMessageUrl: data.url }));
+      }
+    } catch (err: unknown) {
+      const message =
+        err && typeof err === 'object' && 'response' in err &&
+        typeof (err as { response?: { data?: { detail?: string } } }).response?.data?.detail === 'string'
+          ? (err as { response: { data: { detail: string } } }).response.data.detail
+          : 'Upload failed. Try again or paste a URL instead.';
+      setUploadError({ type, message });
+    } finally {
+      setUploadingMedia(null);
+      if (type === 'image_video' && imageVideoInputRef.current) {
+        imageVideoInputRef.current.value = '';
+      }
+      if (type === 'voice_message' && voiceMessageInputRef.current) {
+        voiceMessageInputRef.current.value = '';
+      }
+    }
+  };
 
   const handleSave = async () => {
     // Validate trigger keywords - must have at least one keyword
@@ -1018,45 +1060,91 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                     )}
                   </div>
 
-                  {/* Image/Video: require media URL (upload elsewhere and paste URL, or add file upload later) */}
+                  {/* Image/Video: upload file or paste URL */}
                   {config.dmType === 'image_video' && (
-                    <div className="space-y-1.5">
+                    <div className="space-y-3">
                       <label className="block text-sm font-medium text-gray-700">
-                        Image or video URL <span className="text-red-500">*</span>
+                        Image or video <span className="text-red-500">*</span>
                       </label>
-                      <p className="text-xs text-gray-500">
-                        Upload your image or video to a host (e.g. your site or CDN) and paste the public URL here. The automation will send this media in the DM.
-                      </p>
+                      <input
+                        ref={imageVideoInputRef}
+                        type="file"
+                        accept="image/*,video/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) void handleDmMediaUpload('image_video', file);
+                        }}
+                      />
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <button
+                          type="button"
+                          disabled={uploadingMedia === 'image_video'}
+                          onClick={() => imageVideoInputRef.current?.click()}
+                          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-400 rounded-lg hover:bg-gray-50 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 disabled:opacity-50 transition-all"
+                        >
+                          <ArrowUpTrayIcon className="h-5 w-5" />
+                          {uploadingMedia === 'image_video' ? 'Uploading...' : 'Upload file'}
+                        </button>
+                        <span className="text-xs text-gray-500 self-center sm:self-auto">or paste URL below</span>
+                      </div>
                       <input
                         type="url"
                         value={config.dmMediaUrl ?? ''}
-                        onChange={(e) =>
-                          setConfig({ ...config, dmMediaUrl: e.target.value })
-                        }
+                        onChange={(e) => {
+                          setConfig({ ...config, dmMediaUrl: e.target.value });
+                          if (uploadError?.type === 'image_video') setUploadError(null);
+                        }}
                         placeholder="https://..."
                         className="w-full h-10 px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all"
                       />
+                      {uploadError?.type === 'image_video' && uploadingMedia === null && (
+                        <p className="text-sm text-red-600">{uploadError.message}</p>
+                      )}
                     </div>
                   )}
 
-                  {/* Voice message: require audio URL */}
+                  {/* Voice message: upload file or paste URL */}
                   {config.dmType === 'voice_message' && (
-                    <div className="space-y-1.5">
+                    <div className="space-y-3">
                       <label className="block text-sm font-medium text-gray-700">
-                        Voice message (audio) URL <span className="text-red-500">*</span>
+                        Voice message (audio) <span className="text-red-500">*</span>
                       </label>
-                      <p className="text-xs text-gray-500">
-                        Upload your audio file to a host and paste the public URL here. The automation will send this as a voice message in the DM.
-                      </p>
+                      <input
+                        ref={voiceMessageInputRef}
+                        type="file"
+                        accept="audio/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) void handleDmMediaUpload('voice_message', file);
+                        }}
+                      />
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <button
+                          type="button"
+                          disabled={uploadingMedia === 'voice_message'}
+                          onClick={() => voiceMessageInputRef.current?.click()}
+                          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-400 rounded-lg hover:bg-gray-50 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 disabled:opacity-50 transition-all"
+                        >
+                          <ArrowUpTrayIcon className="h-5 w-5" />
+                          {uploadingMedia === 'voice_message' ? 'Uploading...' : 'Upload file'}
+                        </button>
+                        <span className="text-xs text-gray-500 self-center sm:self-auto">or paste URL below</span>
+                      </div>
                       <input
                         type="url"
                         value={config.dmVoiceMessageUrl ?? ''}
-                        onChange={(e) =>
-                          setConfig({ ...config, dmVoiceMessageUrl: e.target.value })
-                        }
+                        onChange={(e) => {
+                          setConfig({ ...config, dmVoiceMessageUrl: e.target.value });
+                          if (uploadError?.type === 'voice_message') setUploadError(null);
+                        }}
                         placeholder="https://..."
                         className="w-full h-10 px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all"
                       />
+                      {uploadError?.type === 'voice_message' && uploadingMedia === null && (
+                        <p className="text-sm text-red-600">{uploadError.message}</p>
+                      )}
                     </div>
                   )}
 
