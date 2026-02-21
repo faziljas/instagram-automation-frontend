@@ -464,8 +464,8 @@ export default function MobilePreview({
                       {((isLeadMode && config.askToFollow) || config.preDmFlowType === 'followers') && (config.askToFollowMessage || config.preDmFlowType === 'followers') && (
                         <>
                           <div className="flex justify-start">
-                            <div className="max-w-[70%] bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm px-4 py-2">
-                              <p className="text-sm whitespace-pre-line">
+                            <div className="max-w-[70%] min-w-0 bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm px-4 py-2 overflow-hidden">
+                              <p className="text-sm whitespace-pre-line break-words">
                                 {config.preDmFlowType === 'followers'
                                   ? `${config.askToFollowMessage || "Hey! Would you mind following me? I share great content! 🙌"}\n\n✅ Once you've followed, type 'done' or 'followed' to continue!\n🔗 Visit my profile: https://www.instagram.com/${accountUsername}\nClick one of the options below:`
                                   : config.askToFollowMessage}

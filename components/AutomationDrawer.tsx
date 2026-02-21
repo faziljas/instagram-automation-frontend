@@ -199,9 +199,18 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
           ? initialConfig.enablePreDmEngagement 
           : (initialConfig.askToFollow || initialConfig.askForEmail || false),
         askToFollow: initialConfig.askToFollow || false, // Backward compatibility
-        askToFollowMessage:
-          initialConfig.askToFollowMessage ||
-          "Hey! Would you mind following me? I share great content! 🙌",
+        askToFollowMessage: (() => {
+          const preDmFlow = initialConfig.preDmFlowType || (
+            initialConfig.simpleDmFlow ? 'email' :
+            initialConfig.simpleDmFlowPhone ? 'phone' :
+            (initialConfig.enablePreDmEngagement || initialConfig.askToFollow) ? 'followers' : 'email'
+          );
+          const base = initialConfig.askToFollowMessage || "Hey! Would you mind following me? I share great content! 🙌";
+          if (preDmFlow === 'followers' && !base.includes("✅ Once you've followed")) {
+            return `${base}\n\n✅ Once you've followed, type 'done' or 'followed' to continue!\n🔗 Visit my profile: https://www.instagram.com/${accountUsername}\nClick one of the options below:`;
+          }
+          return base;
+        })(),
         askForEmail: initialConfig.askForEmail || false, // Backward compatibility
         askForEmailMessage:
           initialConfig.askForEmailMessage ||
@@ -262,7 +271,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
       setActiveTab('simple');
       setKeywordError('');
     }
-  }, [initialConfig, isOpen]);
+  }, [initialConfig, isOpen, accountUsername]);
 
   const handleSave = async () => {
     // Validate trigger keywords - must have at least one keyword
@@ -729,6 +738,10 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                             value="followers"
                             checked={config.preDmFlowType === 'followers'}
                             onChange={() => {
+                              const base = config.askToFollowMessage || "Hey! Would you mind following me? I share great content! 🙌";
+                              const full = base.includes("✅ Once you've followed")
+                                ? base
+                                : `${base}\n\n✅ Once you've followed, type 'done' or 'followed' to continue!\n🔗 Visit my profile: https://www.instagram.com/${accountUsername}\nClick one of the options below:`;
                               setConfig({
                                 ...config,
                                 preDmFlowType: 'followers',
@@ -737,6 +750,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                                 askForEmail: false,
                                 simpleDmFlow: false,
                                 simpleDmFlowPhone: false,
+                                askToFollowMessage: full,
                               });
                             }}
                             className="mt-0.5 h-4 w-4 text-blue-600 focus:ring-blue-500"

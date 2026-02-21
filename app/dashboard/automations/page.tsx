@@ -539,6 +539,11 @@ export default function AutomationsPage() {
       } else if (preDmFlowType === 'followers') {
         ruleConfig.ask_to_follow = true;
         ruleConfig.ask_for_email = false;  // Followers-only: first question (follow) then primary DM
+        // Field stores full message (matches Live Preview); backend expects base only (it appends instructions)
+        const fullMsg = (config.askToFollowMessage || '').trim();
+        const marker = "✅ Once you've followed";
+        const idx = fullMsg.indexOf(marker);
+        ruleConfig.ask_to_follow_message = idx >= 0 ? fullMsg.substring(0, idx).trim() : fullMsg;
       }
       ruleConfig.simple_flow_phone_message = (config.simpleFlowPhoneMessage || '').trim() || '';
       ruleConfig.simple_flow_phone_question = (config.simpleFlowPhoneQuestion || '').trim() || '';
