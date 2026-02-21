@@ -15,6 +15,8 @@ import api from '@/utils/api';
 
 export type DmTypeValue = 'text' | 'text_button' | 'image_video' | 'card' | 'voice_message';
 
+const DM_MEDIA_MAX_SIZE_BYTES = 25 * 1024 * 1024; // 25MB, must match backend
+
 const DM_TYPE_OPTIONS: { value: DmTypeValue; label: string; Icon: React.ComponentType<{ className?: string }> }[] = [
   { value: 'text', label: 'Text only', Icon: DocumentIcon },
   { value: 'text_button', label: 'Text + Button', Icon: DocumentTextIcon },
@@ -161,6 +163,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
   const [isSaving, setIsSaving] = useState(false);
   const ignoreBackdropClickRef = useRef(false);
   const dmTypeDropdownRef = useRef<HTMLDivElement>(null);
+  const prevIsOpenRef = useRef(false);
   const [dmTypeDropdownOpen, setDmTypeDropdownOpen] = useState(false);
   const [uploadingMedia, setUploadingMedia] = useState<'image_video' | 'voice_message' | null>(null);
   const [uploadError, setUploadError] = useState<{ type: 'image_video' | 'voice_message'; message: string } | null>(null);
@@ -171,7 +174,11 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
   const [showPreviewMobile, setShowPreviewMobile] = useState(false);
   const [keywordError, setKeywordError] = useState<string>('');
 
+  // Only apply initialConfig when the drawer opens (not on every parent re-render), so in-drawer changes (e.g. DM type, upload error) are not overwritten
   useEffect(() => {
+    const justOpened = isOpen && !prevIsOpenRef.current;
+    prevIsOpenRef.current = isOpen;
+    if (!justOpened) return;
     if (initialConfig) {
       // Set activeTab first to ensure correct mode is selected before loading config
       if (initialConfig.isLeadCapture) {
@@ -318,6 +325,20 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
     file: File
   ) => {
     setUploadError(null);
+    if (file.size > DM_MEDIA_MAX_SIZE_BYTES) {
+      const maxMB = DM_MEDIA_MAX_SIZE_BYTES / (1024 * 1024);
+      setUploadError({
+        type,
+        message: `File is too large. Maximum size is ${maxMB}MB. Your file is ${(file.size / (1024 * 1024)).toFixed(1)}MB.`,
+      });
+      if (type === 'image_video' && imageVideoInputRef.current) {
+        imageVideoInputRef.current.value = '';
+      }
+      if (type === 'voice_message' && voiceMessageInputRef.current) {
+        voiceMessageInputRef.current.value = '';
+      }
+      return;
+    }
     setUploadingMedia(type);
     try {
       const formData = new FormData();
@@ -1076,6 +1097,9 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                           if (file) void handleDmMediaUpload('image_video', file);
                         }}
                       />
+                      <p className="text-xs text-gray-500">
+                        Max 25MB. Image (JPEG/PNG/GIF/WebP) or video (MP4/MOV/WebM).
+                      </p>
                       <div className="flex flex-col sm:flex-row gap-2">
                         <button
                           type="button"
@@ -1120,6 +1144,9 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                           if (file) void handleDmMediaUpload('voice_message', file);
                         }}
                       />
+                      <p className="text-xs text-gray-500">
+                        Max 25MB. Audio (MP3/M4A/OGG/WAV).
+                      </p>
                       <div className="flex flex-col sm:flex-row gap-2">
                         <button
                           type="button"
