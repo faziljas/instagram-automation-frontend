@@ -75,6 +75,10 @@ interface AutomationConfig {
   simpleDmMessages: string[];
   leadDmMessages: string[];
   buttons: { text: string; url: string }[];
+  /** Public URL for image or video when dmType is image_video (user uploads or pastes URL) */
+  dmMediaUrl?: string;
+  /** Public URL for audio when dmType is voice_message (user uploads or pastes URL) */
+  dmVoiceMessageUrl?: string;
   delayMinutes: number;
 
   // Legacy lead‑capture fields (kept optional so old data still loads)
@@ -146,6 +150,8 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
     simpleDmMessages: ['Thanks for your interest! Check out our latest updates.', 'Hey! We have something special for you. Check it out!', 'Awesome! We sent you a message with more details.'],
     leadDmMessages: ['Thanks for your interest! Check out our latest updates.', 'Hey! We have something special for you. Check it out!', 'Awesome! We sent you a message with more details.'],
     buttons: [{ text: 'Click me', url: '' }],
+    dmMediaUrl: '',
+    dmVoiceMessageUrl: '',
     delayMinutes: 0,
     isLeadCapture: false,
   });
@@ -275,6 +281,8 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
           : ['Thanks for your interest! Check out our latest updates.', 'Hey! We have something special for you. Check it out!', 'Awesome! We sent you a message with more details.'],
         buttons:
           initialConfig.buttons || [{ text: 'Click me', url: '' }],
+        dmMediaUrl: initialConfig.dmMediaUrl ?? '',
+        dmVoiceMessageUrl: initialConfig.dmVoiceMessageUrl ?? '',
         delayMinutes: initialConfig.delayMinutes || 0,
         // Include isLeadCapture flag so MobilePreview can use it
         isLeadCapture: initialConfig.isLeadCapture || false,
@@ -1009,6 +1017,48 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                       </div>
                     )}
                   </div>
+
+                  {/* Image/Video: require media URL (upload elsewhere and paste URL, or add file upload later) */}
+                  {config.dmType === 'image_video' && (
+                    <div className="space-y-1.5">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Image or video URL <span className="text-red-500">*</span>
+                      </label>
+                      <p className="text-xs text-gray-500">
+                        Upload your image or video to a host (e.g. your site or CDN) and paste the public URL here. The automation will send this media in the DM.
+                      </p>
+                      <input
+                        type="url"
+                        value={config.dmMediaUrl ?? ''}
+                        onChange={(e) =>
+                          setConfig({ ...config, dmMediaUrl: e.target.value })
+                        }
+                        placeholder="https://..."
+                        className="w-full h-10 px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all"
+                      />
+                    </div>
+                  )}
+
+                  {/* Voice message: require audio URL */}
+                  {config.dmType === 'voice_message' && (
+                    <div className="space-y-1.5">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Voice message (audio) URL <span className="text-red-500">*</span>
+                      </label>
+                      <p className="text-xs text-gray-500">
+                        Upload your audio file to a host and paste the public URL here. The automation will send this as a voice message in the DM.
+                      </p>
+                      <input
+                        type="url"
+                        value={config.dmVoiceMessageUrl ?? ''}
+                        onChange={(e) =>
+                          setConfig({ ...config, dmVoiceMessageUrl: e.target.value })
+                        }
+                        placeholder="https://..."
+                        className="w-full h-10 px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all"
+                      />
+                    </div>
+                  )}
 
                   {config.dmType === 'text_button' && (
                     <div className="space-y-3">

@@ -590,6 +590,12 @@ export default function AutomationsPage() {
         (b: { text: string; url: string }) => b.text.trim() && b.url.trim(),
       );
     }
+    if (config.dmType === 'image_video' && config.dmMediaUrl?.trim()) {
+      ruleConfig.dm_media_url = config.dmMediaUrl.trim();
+    }
+    if (config.dmType === 'voice_message' && config.dmVoiceMessageUrl?.trim()) {
+      ruleConfig.dm_voice_message_url = config.dmVoiceMessageUrl.trim();
+    }
 
     // Mark rule as lead_capture for UX (used by builder + edit screens)
     // Explicitly set is_lead_capture to ensure backend uses correct comment replies
@@ -1434,6 +1440,8 @@ export default function AutomationsPage() {
                   ? cfg.message_variations.filter(m => m.trim()).slice(0, 3)
                   : ['Thanks for your interest! Check out our latest updates.', 'Hey! We have something special for you. Check it out!', 'Awesome! We sent you a message with more details.'],
                 buttons: cfg.buttons || [{ text: 'Click me', url: '' }],
+                dmMediaUrl: cfg.dm_media_url ?? '',
+                dmVoiceMessageUrl: cfg.dm_voice_message_url ?? '',
                 delayMinutes: cfg.delay_minutes || 0,
 
                 // Per‑flow stored values:
