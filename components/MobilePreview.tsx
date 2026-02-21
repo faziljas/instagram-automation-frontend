@@ -49,7 +49,7 @@ interface AutomationConfig {
   phoneInvalidRetryMessage?: string;
 
   // Primary DM
-  dmType: 'text' | 'text_button' | 'lead_capture';
+  dmType: 'text' | 'text_button' | 'lead_capture' | 'image_video' | 'card' | 'voice_message';
   dmMessages: string[]; // active messages (current mode, for backward compatibility)
   simpleDmMessages?: string[];
   leadDmMessages?: string[];

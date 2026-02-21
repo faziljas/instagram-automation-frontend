@@ -1,6 +1,25 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { XMarkIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
+import {
+  XMarkIcon,
+  InformationCircleIcon,
+  DocumentTextIcon,
+  PhotoIcon,
+  RectangleGroupIcon,
+  MicrophoneIcon,
+  ChevronDownIcon,
+  DocumentIcon,
+} from '@heroicons/react/24/outline';
 import MobilePreview from './MobilePreview';
+
+export type DmTypeValue = 'text' | 'text_button' | 'image_video' | 'card' | 'voice_message';
+
+const DM_TYPE_OPTIONS: { value: DmTypeValue; label: string; Icon: React.ComponentType<{ className?: string }> }[] = [
+  { value: 'text', label: 'Text only', Icon: DocumentIcon },
+  { value: 'text_button', label: 'Text + Button', Icon: DocumentTextIcon },
+  { value: 'image_video', label: 'Image/Video', Icon: PhotoIcon },
+  { value: 'card', label: 'Card', Icon: RectangleGroupIcon },
+  { value: 'voice_message', label: 'Voice message', Icon: MicrophoneIcon },
+];
 
 interface MediaItem {
   id: string;
@@ -51,7 +70,7 @@ interface AutomationConfig {
   phoneInvalidRetryMessage?: string;
 
   // Primary DM
-  dmType: 'text' | 'text_button';
+  dmType: DmTypeValue;
   dmMessages: string[]; // currently-active DM messages sent to backend
   simpleDmMessages: string[];
   leadDmMessages: string[];
@@ -133,6 +152,8 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
 
   const [isSaving, setIsSaving] = useState(false);
   const ignoreBackdropClickRef = useRef(false);
+  const dmTypeDropdownRef = useRef<HTMLDivElement>(null);
+  const [dmTypeDropdownOpen, setDmTypeDropdownOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'simple' | 'lead'>('simple');
   const [currentKeyword, setCurrentKeyword] = useState('');
   const [showPreviewMobile, setShowPreviewMobile] = useState(false);
@@ -232,7 +253,9 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
           initialConfig.emailRetryMessage ||
           "Hmm, that doesn't look like a valid email address. 🤔\n\nPlease type it again so I can send you the guide! 📧",
 
-        dmType: initialConfig.dmType || 'text',
+        dmType: (['text', 'text_button', 'image_video', 'card', 'voice_message'].includes(initialConfig.dmType as string)
+          ? initialConfig.dmType
+          : 'text') as DmTypeValue,
         // Ensure dmMessages has valid content, not just empty strings
         dmMessages: (initialConfig.dmMessages && initialConfig.dmMessages.length > 0 && initialConfig.dmMessages.some(m => m.trim()))
           ? initialConfig.dmMessages
@@ -262,6 +285,19 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
       setKeywordError('');
     }
   }, [initialConfig, isOpen, accountUsername]);
+
+  // Close DM type dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dmTypeDropdownRef.current && !dmTypeDropdownRef.current.contains(event.target as Node)) {
+        setDmTypeDropdownOpen(false);
+      }
+    };
+    if (dmTypeDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [dmTypeDropdownOpen]);
 
   const handleSave = async () => {
     // Validate trigger keywords - must have at least one keyword
@@ -917,23 +953,61 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                     </div>
                   </div>
 
-                  <div>
+                  {/* DM type – SS1-style dropdown with icons */}
+                  <div className="relative" ref={dmTypeDropdownRef}>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      Add Buttons (Optional)
+                      DM type
                     </label>
-                    <select
-                      value={config.dmType}
-                      onChange={(e) =>
-                        setConfig({
-                          ...config,
-                          dmType: e.target.value as 'text' | 'text_button',
-                        })
-                      }
-                      className="w-full h-10 px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all"
+                    <button
+                      type="button"
+                      onClick={() => setDmTypeDropdownOpen((o) => !o)}
+                      className="w-full flex items-center justify-between h-10 px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white text-left transition-all hover:border-gray-500"
                     >
-                      <option value="text">Text Only</option>
-                      <option value="text_button">Text + Buttons</option>
-                    </select>
+                      <span className="flex items-center gap-2">
+                        {(() => {
+                          const opt = DM_TYPE_OPTIONS.find((o) => o.value === config.dmType);
+                          const Icon = opt?.Icon ?? DocumentIcon;
+                          return (
+                            <>
+                              <Icon className="h-5 w-5 text-gray-500 shrink-0" />
+                              {opt?.label ?? 'Text only'}
+                            </>
+                          );
+                        })()}
+                      </span>
+                      <ChevronDownIcon
+                        className={`h-5 w-5 text-gray-400 shrink-0 transition-transform ${dmTypeDropdownOpen ? 'rotate-180' : ''}`}
+                      />
+                    </button>
+                    {dmTypeDropdownOpen && (
+                      <div className="absolute z-20 mt-1 w-full rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
+                        {DM_TYPE_OPTIONS.map((option) => {
+                          const Icon = option.Icon;
+                          const isSelected = config.dmType === option.value;
+                          return (
+                            <button
+                              key={option.value}
+                              type="button"
+                              onClick={() => {
+                                setConfig({
+                                  ...config,
+                                  dmType: option.value,
+                                });
+                                setDmTypeDropdownOpen(false);
+                              }}
+                              className={`w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm transition-colors ${
+                                isSelected
+                                  ? 'bg-blue-50 text-blue-800'
+                                  : 'text-gray-700 hover:bg-gray-50'
+                              }`}
+                            >
+                              <Icon className="h-5 w-5 text-gray-500 shrink-0" />
+                              {option.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
 
                   {config.dmType === 'text_button' && (
@@ -1050,7 +1124,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
             <div className="p-4 md:p-6">
               <MobilePreview
                 media={media}
-                config={config}
+                config={config as React.ComponentProps<typeof MobilePreview>['config']}
                 mode={activeTab}
                 accountUsername={accountUsername}
               />
@@ -1074,7 +1148,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
               <div className="p-4 max-h-[60vh] overflow-y-auto">
                 <MobilePreview
                   media={media}
-                  config={config}
+                  config={config as React.ComponentProps<typeof MobilePreview>['config']}
                   mode={activeTab}
                   accountUsername={accountUsername}
                 />
