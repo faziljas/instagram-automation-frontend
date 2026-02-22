@@ -585,6 +585,11 @@ export default function AutomationsPage() {
       ruleConfig.email_success_message = config.emailSuccessMessage.trim() || '';
     }
 
+    // Persist DM type so backend sends media when type is image_video/voice_message/card
+    if (config.dmType) {
+      ruleConfig.dm_type = config.dmType;
+    }
+
     if (config.dmType === 'text_button') {
       ruleConfig.buttons = config.buttons.filter(
         (b: { text: string; url: string }) => b.text.trim() && b.url.trim(),
