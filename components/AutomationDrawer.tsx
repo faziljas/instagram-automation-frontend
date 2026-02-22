@@ -403,18 +403,18 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
         className="fixed right-0 top-0 h-full w-full max-w-full min-w-0 md:w-[min(100vw,80rem)] shadow-xl overflow-x-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex flex-col md:flex-row h-full w-full min-w-0 bg-white overflow-x-hidden">
+        <div className="flex flex-col md:flex-row h-full w-full min-w-0 bg-slate-50 overflow-x-hidden">
           {/* Left Side: Settings Form - min width uses vw so zoom doesn't cause horizontal overflow */}
-          <div className="flex-1 min-w-[min(280px,45vw)] overflow-y-auto border-r-0 md:border-r border-gray-200 max-w-full overflow-x-hidden">
-            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-100 bg-white px-4 md:px-6 py-3">
-              <h2 className="text-lg font-semibold text-gray-900">
+          <div className="flex-1 min-w-[min(280px,45vw)] overflow-y-auto border-r-0 md:border-r border-slate-200 max-w-full overflow-x-hidden">
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-700 bg-slate-800 px-4 md:px-6 py-3">
+              <h2 className="text-lg font-semibold text-white">
                 Automation Builder
               </h2>
               <div className="flex items-center gap-2">
                 {/* Mobile Preview Toggle */}
                 <button
                   onClick={() => setShowPreviewMobile(!showPreviewMobile)}
-                  className="md:hidden rounded-lg p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+                  className="md:hidden rounded-lg p-2 text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
                   title="Toggle Preview"
                 >
                   <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -424,7 +424,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                 </button>
                 <button
                   onClick={onClose}
-                  className="rounded-lg p-2 text-gray-400 hover:text-gray-500 transition-colors"
+                  className="rounded-lg p-2 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
                 >
                   <XMarkIcon className="h-6 w-6" />
                 </button>
@@ -437,7 +437,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   DM Type
                 </label>
-                <div className="bg-gray-100 p-1 rounded-lg flex gap-1">
+                <div className="bg-slate-200 p-1 rounded-lg flex gap-1">
                   <button
                     type="button"
                     onClick={() => {
@@ -446,8 +446,8 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                     }}
                     className={`flex-1 px-3 py-1.5 rounded-md transition-all text-sm font-medium ${
                       activeTab === 'simple'
-                        ? 'bg-white shadow-sm text-gray-900'
-                        : 'text-gray-500 hover:text-gray-700'
+                        ? 'bg-slate-800 text-white shadow-sm'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     }`}
                   >
                     Simple Reply
@@ -460,8 +460,8 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                     }}
                     className={`flex-1 px-3 py-1.5 rounded-md transition-all text-sm font-medium ${
                       activeTab === 'lead'
-                        ? 'bg-white shadow-sm text-gray-900'
-                        : 'text-gray-500 hover:text-gray-700'
+                        ? 'bg-slate-800 text-white shadow-sm'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     }`}
                   >
                     Lead Capture
@@ -679,7 +679,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
               )}
 
               {/* Primary DM Section (same for both tabs) */}
-              <div className="border-t border-gray-200 pt-4">
+              <div className="border-t border-slate-200 pt-4">
                 <div className="mb-2">
                   <h3 className="text-sm font-semibold text-gray-900 mb-0.5">
                     Then send your primary DM...
@@ -701,7 +701,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                       </p>
                     </div>
 
-                    <div className="p-3 border border-gray-200 rounded-lg bg-gray-50">
+                    <div className="p-3 border border-slate-200 rounded-lg bg-slate-100">
                       {/* Radio buttons for Pre-DM Flow Type */}
                       <div className="space-y-2">
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -709,7 +709,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                         </label>
                         
                         {/* Email Option */}
-                        <label className="flex items-start p-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                        <label className="flex items-start p-2 border border-slate-300 rounded-lg cursor-pointer hover:bg-slate-50 transition-colors">
                           <input
                             type="radio"
                             name="preDmFlowType"
@@ -737,7 +737,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                         </label>
 
                         {/* Phone Option */}
-                        <label className="flex items-start p-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                        <label className="flex items-start p-2 border border-slate-300 rounded-lg cursor-pointer hover:bg-slate-50 transition-colors">
                           <input
                             type="radio"
                             name="preDmFlowType"
@@ -765,7 +765,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                         </label>
 
                         {/* Followers Option */}
-                        <label className="flex items-start p-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                        <label className="flex items-start p-2 border border-slate-300 rounded-lg cursor-pointer hover:bg-slate-50 transition-colors">
                           <input
                             type="radio"
                             name="preDmFlowType"
@@ -801,7 +801,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
 
                       {/* Show fields based on selected option */}
                       {config.preDmFlowType && (
-                        <div className="space-y-3 mt-3 pt-3 border-t border-gray-200">
+                        <div className="space-y-3 mt-3 pt-3 border-t border-slate-200">
 
                           {/* Email Flow Fields - Simplified */}
                           {config.preDmFlowType === 'email' && (
@@ -1091,10 +1091,10 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
               </div>
 
               {/* Save Button */}
-              <div className="sticky bottom-0 bg-white flex flex-col sm:flex-row justify-end gap-2 pt-3 md:pt-4 pb-3 md:pb-4 px-4 md:px-0 border-t border-gray-200 mt-4">
+              <div className="sticky bottom-0 bg-slate-100 flex flex-col sm:flex-row justify-end gap-2 pt-3 md:pt-4 pb-3 md:pb-4 px-4 md:px-0 border-t border-slate-200 mt-4">
                 <button
                   onClick={onClose}
-                  className="px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-700 rounded-lg transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 hover:text-slate-900 rounded-lg transition-colors"
                 >
                   Cancel
                 </button>
@@ -1110,9 +1110,9 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
           </div>
 
           {/* Right Side: Live Preview - min width uses vw so zoom doesn't cause horizontal overflow */}
-          <div className="flex-1 min-w-[min(300px,45vw)] overflow-y-auto bg-gray-50 max-w-full overflow-x-hidden hidden md:block">
-            <div className="sticky top-0 z-10 bg-gray-50 px-4 md:px-6 py-3 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">
+          <div className="flex-1 min-w-[min(300px,45vw)] overflow-y-auto bg-slate-100 max-w-full overflow-x-hidden hidden md:block">
+            <div className="sticky top-0 z-10 bg-slate-200 px-4 md:px-6 py-3 border-b border-slate-300">
+              <h3 className="text-lg font-semibold text-slate-800">
                 Live Preview
               </h3>
             </div>
@@ -1128,14 +1128,14 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
 
           {/* Mobile Preview - Toggleable */}
           {showPreviewMobile && (
-            <div className="md:hidden border-t border-gray-200 bg-gray-50 max-w-full overflow-x-hidden">
-              <div className="sticky top-0 z-10 bg-gray-50 px-4 py-3 border-b border-gray-200 flex items-center justify-between">
-                <h3 className="text-base font-semibold text-gray-900">
+            <div className="md:hidden border-t border-slate-200 bg-slate-100 max-w-full overflow-x-hidden">
+              <div className="sticky top-0 z-10 bg-slate-200 px-4 py-3 border-b border-slate-300 flex items-center justify-between">
+                <h3 className="text-base font-semibold text-slate-800">
                   Live Preview
                 </h3>
                 <button
                   onClick={() => setShowPreviewMobile(false)}
-                  className="rounded-lg p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                  className="rounded-lg p-1 text-slate-500 hover:text-slate-800 transition-colors"
                 >
                   <XMarkIcon className="h-5 w-5" />
                 </button>
