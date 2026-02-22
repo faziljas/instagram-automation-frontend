@@ -182,7 +182,7 @@ export default function AnalyticsPage() {
           />
           {item.permalink ? (
             <a href={item.permalink} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-sm truncate max-w-[200px]">
-              {item.media_type === 'STORY' ? 'View Story' : 'View on Instagram'}
+              View on Instagram
             </a>
           ) : (
             <span className="text-xs text-gray-500 truncate max-w-[180px]" title={item.media_id || 'Preview unavailable'}>
