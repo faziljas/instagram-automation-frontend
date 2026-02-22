@@ -169,6 +169,8 @@ export default function MobilePreview({
   const simpleFlowPhoneOn = !!(config.simpleDmFlowPhone && (config.simpleFlowPhoneMessage || config.simpleFlowPhoneQuestion));
   const showDmPreviewButton = (activeDmMessages && activeDmMessages.length > 0) || (isLeadMode && preDmEngagementOn && (simpleFlowEmailOn || simpleFlowPhoneOn || (config.askToFollow || config.askForEmail)));
 
+  const isStory = media.media_product_type === 'STORY';
+
   return (
     <div className="flex justify-center w-full max-w-full min-w-0">
       {/* iPhone Frame - scales with container when zoomed or narrow so layout doesn't break */}
@@ -203,7 +205,7 @@ export default function MobilePreview({
                 />
               </div>
               
-              {/* Post Info */}
+              {/* Post Info (caption + likes/comments for Post/Reel; Story shows "Reply to story") */}
               <div className="px-4 py-3 space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -213,36 +215,69 @@ export default function MobilePreview({
                     <span className="text-sm font-semibold">@{accountUsername}</span>
                   </div>
                 </div>
-                <p className="text-sm text-gray-900">{media.caption.substring(0, 100)}...</p>
-                <div className="text-xs text-gray-500">
-                  {media.like_count} likes • {media.comments_count} comments
-                </div>
+                {!isStory && (
+                  <>
+                    <p className="text-sm text-gray-900">{media.caption.substring(0, 100)}...</p>
+                    <div className="text-xs text-gray-500">
+                      {media.like_count} likes • {media.comments_count} comments
+                    </div>
+                  </>
+                )}
+                {isStory && (
+                  <div className="text-xs text-gray-500">
+                    Story · Replies come as direct messages
+                  </div>
+                )}
               </div>
 
-              {/* Comment Section Preview */}
-              {activeKeywords && activeKeywords.length > 0 && (
-                <div className="px-4 py-2 border-t border-gray-200 bg-gray-50">
-                  <div className="space-y-2">
-                    <div className="flex items-start gap-2">
-                      <div className="w-6 h-6 rounded-full bg-gray-300 flex-shrink-0" />
-                      <div className="flex-1">
-                        <span className="text-xs font-semibold">user123</span>
-                        <p className="text-xs text-gray-700">{sampleKeyword}</p>
+              {/* For Post/Reel: Comment Section (public comments). For Story: Message reply preview (user sends message, not comment) */}
+              {isStory ? (
+                activeKeywords && activeKeywords.length > 0 && (
+                  <div className="px-4 py-2 border-t border-gray-200 bg-gray-50">
+                    <p className="text-xs font-medium text-gray-500 mb-2">Reply to story (message, not comment):</p>
+                    <div className="space-y-2">
+                      <div className="flex justify-end">
+                        <div className="max-w-[85%] bg-blue-500 text-white rounded-2xl rounded-tr-sm px-3 py-2">
+                          <span className="text-[10px] opacity-90 block">user123</span>
+                          <p className="text-xs">{sampleKeyword}</p>
+                        </div>
                       </div>
+                      {sampleReply && (
+                        <div className="flex justify-start">
+                          <div className="max-w-[85%] bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm px-3 py-2">
+                            <span className="text-[10px] text-gray-500 block">@{accountUsername}</span>
+                            <p className="text-xs">{sampleReply}</p>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                    {sampleReply && (
-                      <div className="flex items-start gap-2 ml-4">
-                        <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-purple-600 to-pink-600 flex-shrink-0 flex items-center justify-center">
-                          <span className="text-white text-[8px] font-bold">IG</span>
-                        </div>
+                  </div>
+                )
+              ) : (
+                activeKeywords && activeKeywords.length > 0 && (
+                  <div className="px-4 py-2 border-t border-gray-200 bg-gray-50">
+                    <div className="space-y-2">
+                      <div className="flex items-start gap-2">
+                        <div className="w-6 h-6 rounded-full bg-gray-300 flex-shrink-0" />
                         <div className="flex-1">
-                          <span className="text-xs font-semibold">@{accountUsername}</span>
-                          <p className="text-xs text-gray-700">{sampleReply}</p>
+                          <span className="text-xs font-semibold">user123</span>
+                          <p className="text-xs text-gray-700">{sampleKeyword}</p>
                         </div>
                       </div>
-                    )}
+                      {sampleReply && (
+                        <div className="flex items-start gap-2 ml-4">
+                          <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-purple-600 to-pink-600 flex-shrink-0 flex items-center justify-center">
+                            <span className="text-white text-[8px] font-bold">IG</span>
+                          </div>
+                          <div className="flex-1">
+                            <span className="text-xs font-semibold">@{accountUsername}</span>
+                            <p className="text-xs text-gray-700">{sampleReply}</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
+                )
               )}
 
               {/* DM Preview Button */}
