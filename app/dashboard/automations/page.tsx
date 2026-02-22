@@ -596,7 +596,13 @@ export default function AutomationsPage() {
       );
     }
     if (config.dmType === 'image_video' && config.dmMediaUrl?.trim()) {
-      ruleConfig.dm_media_url = config.dmMediaUrl.trim();
+      const url = config.dmMediaUrl.trim();
+      ruleConfig.dm_media_url = url;
+      // Lead capture: also persist camelCase/snake_case so backend always finds it (reads dm_media_url, dmMediaUrl, lead_dm_media_url, leadDmMediaUrl)
+      if (config.isLeadCapture || config.enablePreDmEngagement || config.askToFollow || config.askForEmail) {
+        ruleConfig.lead_dm_media_url = url;
+        ruleConfig.leadDmMediaUrl = url;
+      }
     }
     if (config.dmType === 'voice_message' && config.dmVoiceMessageUrl?.trim()) {
       ruleConfig.dm_voice_message_url = config.dmVoiceMessageUrl.trim();
