@@ -9,7 +9,6 @@ import {
   INSTAGRAM_TRIGGER_KEYWORDS_MAX_COUNT,
   INSTAGRAM_TRIGGER_KEYWORD_MAX_LENGTH,
   INSTAGRAM_BUTTON_TEXT_MAX_CHARS,
-  INSTAGRAM_RECOMMENDED_CHARS,
 } from '@/lib/instagramLimits';
 
 interface MediaItem {
@@ -610,9 +609,6 @@ export default function AutomationSetupModal({
                                 />
                                 <span className="text-xs text-gray-500 whitespace-nowrap">
                                   {reply.length}/{INSTAGRAM_PUBLIC_COMMENT_MAX_CHARS}
-                                  {reply.length > INSTAGRAM_RECOMMENDED_CHARS && (
-                                    <span className="text-amber-600 ml-1">· Under {INSTAGRAM_RECOMMENDED_CHARS} recommended</span>
-                                  )}
                                 </span>
                               </div>
                             </div>
@@ -674,9 +670,6 @@ export default function AutomationSetupModal({
                           />
                           <span className="text-xs text-gray-500 whitespace-nowrap pt-2">
                             {message.length}/{INSTAGRAM_DM_MAX_CHARS}
-                            {message.length > INSTAGRAM_RECOMMENDED_CHARS && (
-                              <span className="text-amber-600 ml-1">· Under {INSTAGRAM_RECOMMENDED_CHARS} recommended</span>
-                            )}
                           </span>
                           {config.dmMessages.length > 1 && (
                             <button

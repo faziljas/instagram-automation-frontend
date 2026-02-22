@@ -13,7 +13,7 @@ import {
   INSTAGRAM_TRIGGER_KEYWORDS_MAX_COUNT,
   INSTAGRAM_TRIGGER_KEYWORD_MAX_LENGTH,
   INSTAGRAM_BUTTON_TEXT_MAX_CHARS,
-  INSTAGRAM_RECOMMENDED_CHARS,
+  INSTAGRAM_PRE_DM_MESSAGE_MAX_CHARS,
 } from '@/lib/instagramLimits';
 
 export type DmTypeValue = 'text' | 'text_button';
@@ -641,12 +641,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                               className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none min-h-[60px]"
                               placeholder="Enter reply variation (public comment)"
                             />
-                            <p className="text-xs text-gray-500 mt-0.5">
-                              {reply.length}/{INSTAGRAM_PUBLIC_COMMENT_MAX_CHARS}
-                              {reply.length > INSTAGRAM_RECOMMENDED_CHARS && (
-                                <span className="text-amber-600 ml-1">· Recommended under {INSTAGRAM_RECOMMENDED_CHARS} for best engagement</span>
-                              )}
-                            </p>
+                            <p className="text-xs text-gray-500 mt-0.5">{reply.length}/{INSTAGRAM_PUBLIC_COMMENT_MAX_CHARS}</p>
                           </div>
                           {(activeTab === 'simple'
                             ? config.simpleCommentReplies.length > 3
@@ -817,16 +812,16 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                               </label>
                               <textarea
                                 value={config.simpleFlowMessage || ''}
-                                maxLength={INSTAGRAM_DM_MAX_CHARS}
+                                maxLength={INSTAGRAM_PRE_DM_MESSAGE_MAX_CHARS}
                                 onChange={(e) =>
-                                  setConfig({ ...config, simpleFlowMessage: e.target.value.slice(0, INSTAGRAM_DM_MAX_CHARS) })
+                                  setConfig({ ...config, simpleFlowMessage: e.target.value.slice(0, INSTAGRAM_PRE_DM_MESSAGE_MAX_CHARS) })
                                 }
                                 rows={3}
                                 className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none"
                                 placeholder="Follow me to get the guide 👇 Reply with your email and I'll send it! 📧"
                               />
                               <p className="text-xs text-gray-500 mt-1">
-                                {(config.simpleFlowMessage || '').length}/{INSTAGRAM_DM_MAX_CHARS} · Backend will handle email validation and retry messages automatically.
+                                {(config.simpleFlowMessage || '').length}/{INSTAGRAM_PRE_DM_MESSAGE_MAX_CHARS} · Backend will handle email validation and retry messages automatically.
                               </p>
                             </div>
                           )}
@@ -839,16 +834,16 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                               </label>
                               <textarea
                                 value={config.simpleFlowPhoneMessage || ''}
-                                maxLength={INSTAGRAM_DM_MAX_CHARS}
+                                maxLength={INSTAGRAM_PRE_DM_MESSAGE_MAX_CHARS}
                                 onChange={(e) =>
-                                  setConfig({ ...config, simpleFlowPhoneMessage: e.target.value.slice(0, INSTAGRAM_DM_MAX_CHARS) })
+                                  setConfig({ ...config, simpleFlowPhoneMessage: e.target.value.slice(0, INSTAGRAM_PRE_DM_MESSAGE_MAX_CHARS) })
                                 }
                                 rows={3}
                                 className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none"
                                 placeholder="Follow me to get the guide 👇 Reply with your phone number and I'll send it! 📱"
                               />
                               <p className="text-xs text-gray-500 mt-1">
-                                {(config.simpleFlowPhoneMessage || '').length}/{INSTAGRAM_DM_MAX_CHARS} · Backend will handle phone validation and retry messages automatically.
+                                {(config.simpleFlowPhoneMessage || '').length}/{INSTAGRAM_PRE_DM_MESSAGE_MAX_CHARS} · Backend will handle phone validation and retry messages automatically.
                               </p>
                             </div>
                           )}
@@ -861,18 +856,18 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                               </label>
                               <textarea
                                 value={config.askToFollowMessage || ''}
-                                maxLength={INSTAGRAM_DM_MAX_CHARS}
+                                maxLength={INSTAGRAM_PRE_DM_MESSAGE_MAX_CHARS}
                                 onChange={(e) =>
                                   setConfig({
                                     ...config,
-                                    askToFollowMessage: e.target.value.slice(0, INSTAGRAM_DM_MAX_CHARS),
+                                    askToFollowMessage: e.target.value.slice(0, INSTAGRAM_PRE_DM_MESSAGE_MAX_CHARS),
                                   })
                                 }
                                 rows={5}
                                 className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none"
                                 placeholder={`Hey! Would you mind following me? I share great content! 🙌\n\n✅ Once you've followed, type 'done' or 'followed' to continue!\n🔗 Visit my profile: https://www.instagram.com/${accountUsername}\nClick one of the options below:`}
                               />
-                              <p className="text-xs text-gray-500 mt-1">{(config.askToFollowMessage || '').length}/{INSTAGRAM_DM_MAX_CHARS}</p>
+                              <p className="text-xs text-gray-500 mt-1">{(config.askToFollowMessage || '').length}/{INSTAGRAM_PRE_DM_MESSAGE_MAX_CHARS}</p>
                             </div>
                           )}
 
@@ -920,12 +915,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                               className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none min-h-[60px]"
                               placeholder="Enter DM message variation"
                             />
-                            <p className="text-xs text-gray-500 mt-0.5">
-                              {message.length}/{INSTAGRAM_DM_MAX_CHARS}
-                              {message.length > INSTAGRAM_RECOMMENDED_CHARS && (
-                                <span className="text-amber-600 ml-1">· Recommended under {INSTAGRAM_RECOMMENDED_CHARS}</span>
-                              )}
-                            </p>
+                            <p className="text-xs text-gray-500 mt-0.5">{message.length}/{INSTAGRAM_DM_MAX_CHARS}</p>
                           </div>
                           {(activeTab === 'simple'
                             ? config.simpleDmMessages.length > 3
