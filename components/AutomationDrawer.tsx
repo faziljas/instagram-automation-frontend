@@ -819,9 +819,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                                 className="w-full px-2.5 py-1.5 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-y min-h-[34px] max-h-[80px]"
                                 placeholder="Follow me to get the guide 👇 Reply with your email and I'll send it! 📧"
                               />
-                              <p className="text-xs text-gray-500 mt-1">
-                                {(config.simpleFlowMessage || '').length}/{INSTAGRAM_PRE_DM_MESSAGE_MAX_CHARS} · Backend will handle email validation and retry messages automatically.
-                              </p>
+                              <p className="text-xs text-gray-500 mt-0.5">{(config.simpleFlowMessage || '').length}/{INSTAGRAM_PRE_DM_MESSAGE_MAX_CHARS}</p>
                             </div>
                           )}
 
@@ -841,9 +839,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                                 className="w-full px-2.5 py-1.5 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-y min-h-[34px] max-h-[80px]"
                                 placeholder="Follow me to get the guide 👇 Reply with your phone number and I'll send it! 📱"
                               />
-                              <p className="text-xs text-gray-500 mt-1">
-                                {(config.simpleFlowPhoneMessage || '').length}/{INSTAGRAM_PRE_DM_MESSAGE_MAX_CHARS} · Backend will handle phone validation and retry messages automatically.
-                              </p>
+                              <p className="text-xs text-gray-500 mt-0.5">{(config.simpleFlowPhoneMessage || '').length}/{INSTAGRAM_PRE_DM_MESSAGE_MAX_CHARS}</p>
                             </div>
                           )}
 
