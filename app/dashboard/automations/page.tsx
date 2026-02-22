@@ -1453,7 +1453,7 @@ export default function AutomationsPage() {
                   ? cfg.message_variations.filter(m => m.trim()).slice(0, 3)
                   : ['Thanks for your interest! Check out our latest updates.', 'Hey! We have something special for you. Check it out!', 'Awesome! We sent you a message with more details.'],
                 buttons: cfg.buttons || [{ text: 'Click me', url: '' }],
-                dmMediaUrl: cfg.dm_media_url ?? '',
+                dmMediaUrl: (cfg.dm_media_url || cfg.dmMediaUrl || cfg.lead_dm_media_url || cfg.leadDmMediaUrl) ?? '',
                 dmVoiceMessageUrl: cfg.dm_voice_message_url ?? '',
                 dmCardImageUrl: cfg.dm_card_image_url ?? '',
                 dmCardTitle: cfg.dm_card_title ?? '',
