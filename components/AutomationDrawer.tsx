@@ -398,14 +398,14 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
         }}
       />
 
-      {/* Drawer - stop propagation so clicks inside (e.g. opening file picker) don't close */}
+      {/* Drawer - full viewport width so zoom doesn't leave grey gap; max-w-7xl only on very wide screens */}
       <div
-        className="fixed right-0 top-0 h-full w-full max-w-full md:max-w-7xl shadow-xl"
+        className="fixed right-0 top-0 h-full w-full max-w-full min-w-0 md:w-[min(100vw,80rem)] shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex flex-col md:flex-row h-full bg-white">
-          {/* Left Side: Settings Form */}
-          <div className="flex-1 overflow-y-auto border-r-0 md:border-r border-gray-200 max-w-full overflow-x-hidden">
+        <div className="flex flex-col md:flex-row h-full w-full min-w-0 bg-white">
+          {/* Left Side: Settings Form - min-w-0 so flex can shrink; min width keeps form readable when zoomed */}
+          <div className="flex-1 min-w-0 min-w-[280px] overflow-y-auto border-r-0 md:border-r border-gray-200 max-w-full overflow-x-hidden">
             <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-100 bg-white px-4 md:px-6 py-4">
               <h2 className="text-lg font-semibold text-gray-900">
                 Automation Builder
@@ -1126,8 +1126,8 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
             </div>
           </div>
 
-          {/* Right Side: Live Preview - Desktop */}
-          <div className="flex-1 overflow-y-auto bg-gray-50 max-w-full overflow-x-hidden hidden md:block">
+          {/* Right Side: Live Preview - Desktop; min-w-0 so it shares space; min width keeps preview usable when zoomed */}
+          <div className="flex-1 min-w-0 min-w-[300px] overflow-y-auto bg-gray-50 max-w-full overflow-x-hidden hidden md:block">
             <div className="sticky top-0 z-10 bg-gray-50 px-4 md:px-6 py-4 border-b border-gray-200">
               <h3 className="text-lg font-semibold text-gray-900">
                 Live Preview

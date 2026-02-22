@@ -170,9 +170,9 @@ export default function MobilePreview({
   const showDmPreviewButton = (activeDmMessages && activeDmMessages.length > 0) || (isLeadMode && preDmEngagementOn && (simpleFlowEmailOn || simpleFlowPhoneOn || (config.askToFollow || config.askForEmail)));
 
   return (
-    <div className="flex justify-center">
-      {/* iPhone Frame */}
-      <div className="relative w-[375px] h-[812px] bg-black rounded-[3rem] p-2 shadow-2xl">
+    <div className="flex justify-center w-full max-w-full min-w-0">
+      {/* iPhone Frame - scales with container when zoomed or narrow so layout doesn't break */}
+      <div className="relative w-[375px] max-w-full aspect-[375/812] bg-black rounded-[3rem] p-2 shadow-2xl shrink-0">
         <div className="w-full h-full bg-white rounded-[2.5rem] overflow-hidden">
           {/* Status Bar */}
           <div className="h-11 bg-white flex items-center justify-between px-6 pt-2">
