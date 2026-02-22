@@ -7,6 +7,14 @@ import {
   DocumentIcon,
 } from '@heroicons/react/24/outline';
 import MobilePreview from './MobilePreview';
+import {
+  INSTAGRAM_DM_MAX_CHARS,
+  INSTAGRAM_PUBLIC_COMMENT_MAX_CHARS,
+  INSTAGRAM_TRIGGER_KEYWORDS_MAX_COUNT,
+  INSTAGRAM_TRIGGER_KEYWORD_MAX_LENGTH,
+  INSTAGRAM_BUTTON_TEXT_MAX_CHARS,
+  INSTAGRAM_RECOMMENDED_CHARS,
+} from '@/lib/instagramLimits';
 
 export type DmTypeValue = 'text' | 'text_button';
 
@@ -467,11 +475,14 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                   <label className="block text-sm font-medium text-gray-700">
                     Trigger Keywords <span className="text-red-500">*</span>
                   </label>
+                  <span className="text-xs text-gray-500">
+                    {(activeTab === 'simple' ? config.simpleKeywords.length : config.leadKeywords.length)}/{INSTAGRAM_TRIGGER_KEYWORDS_MAX_COUNT} keywords
+                  </span>
                   <div className="relative group">
                     <InformationCircleIcon className="h-5 w-5 text-blue-500 hover:text-blue-600 cursor-help transition-colors" />
                     <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-64 md:w-72 max-w-[calc(100vw-2rem)] p-3 bg-gray-900 text-white text-xs rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none whitespace-normal">
                       <p className="text-center leading-relaxed">
-                        Add keywords to trigger automation only on matching comments. At least one keyword is required.
+                        Add keywords to trigger automation only on matching comments. At least one keyword is required. Max {INSTAGRAM_TRIGGER_KEYWORDS_MAX_COUNT} keywords, {INSTAGRAM_TRIGGER_KEYWORD_MAX_LENGTH} chars each.
                       </p>
                       {/* Tooltip arrow */}
                       <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
@@ -482,8 +493,9 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                   <input
                     type="text"
                     value={currentKeyword}
+                    maxLength={INSTAGRAM_TRIGGER_KEYWORD_MAX_LENGTH}
                     onChange={(e) => {
-                      setCurrentKeyword(e.target.value);
+                      setCurrentKeyword(e.target.value.slice(0, INSTAGRAM_TRIGGER_KEYWORD_MAX_LENGTH));
                       // Clear error when user starts typing
                       if (keywordError) {
                         setKeywordError('');
@@ -492,17 +504,19 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' && currentKeyword.trim()) {
                         e.preventDefault();
-                        const trimmed = currentKeyword.trim();
+                        const trimmed = currentKeyword.trim().slice(0, INSTAGRAM_TRIGGER_KEYWORD_MAX_LENGTH);
+                        const currentList = activeTab === 'simple' ? config.simpleKeywords : config.leadKeywords;
+                        if (currentList.length >= INSTAGRAM_TRIGGER_KEYWORDS_MAX_COUNT) {
+                          setKeywordError(`Maximum ${INSTAGRAM_TRIGGER_KEYWORDS_MAX_COUNT} keywords allowed.`);
+                          return;
+                        }
                         if (activeTab === 'simple') {
                           if (!config.simpleKeywords.includes(trimmed)) {
                             setConfig({
                               ...config,
                               simpleKeywords: [...config.simpleKeywords, trimmed],
                             });
-                            // Clear error when keyword is added
-                            if (keywordError) {
-                              setKeywordError('');
-                            }
+                            if (keywordError) setKeywordError('');
                           }
                         } else {
                           if (!config.leadKeywords.includes(trimmed)) {
@@ -510,10 +524,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                               ...config,
                               leadKeywords: [...config.leadKeywords, trimmed],
                             });
-                            // Clear error when keyword is added
-                            if (keywordError) {
-                              setKeywordError('');
-                            }
+                            if (keywordError) setKeywordError('');
                           }
                         }
                         setCurrentKeyword('');
@@ -522,7 +533,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                     className={`w-full h-10 px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all ${
                       keywordError ? 'border-red-500' : 'border-gray-400'
                     }`}
-                    placeholder="Type keyword and press Enter to add"
+                    placeholder={`Type keyword (max ${INSTAGRAM_TRIGGER_KEYWORD_MAX_LENGTH} chars) and press Enter`}
                   />
                   {(activeTab === 'simple'
                     ? config.simpleKeywords.length > 0
@@ -608,37 +619,35 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                         const reply = replies[index] || '';
                         return (
                           <div key={index} className="flex flex-col sm:flex-row gap-3">
-                          <textarea
-                            value={reply}
-                            onChange={(e) => {
-                              if (activeTab === 'simple') {
-                                const newReplies = [...config.simpleCommentReplies];
-                                // Ensure array has at least 3 items
-                                while (newReplies.length < 3) {
-                                  newReplies.push('');
+                          <div className="flex-1">
+                            <textarea
+                              value={reply}
+                              maxLength={INSTAGRAM_PUBLIC_COMMENT_MAX_CHARS}
+                              onChange={(e) => {
+                                const val = e.target.value.slice(0, INSTAGRAM_PUBLIC_COMMENT_MAX_CHARS);
+                                if (activeTab === 'simple') {
+                                  const newReplies = [...config.simpleCommentReplies];
+                                  while (newReplies.length < 3) newReplies.push('');
+                                  newReplies[index] = val;
+                                  setConfig({ ...config, simpleCommentReplies: newReplies });
+                                } else {
+                                  const newReplies = [...config.leadCommentReplies];
+                                  while (newReplies.length < 3) newReplies.push('');
+                                  newReplies[index] = val;
+                                  setConfig({ ...config, leadCommentReplies: newReplies });
                                 }
-                                newReplies[index] = e.target.value;
-                                setConfig({
-                                  ...config,
-                                  simpleCommentReplies: newReplies,
-                                });
-                              } else {
-                                const newReplies = [...config.leadCommentReplies];
-                                // Ensure array has at least 3 items
-                                while (newReplies.length < 3) {
-                                  newReplies.push('');
-                                }
-                                newReplies[index] = e.target.value;
-                                setConfig({
-                                  ...config,
-                                  leadCommentReplies: newReplies,
-                                });
-                              }
-                            }}
-                            rows={3}
-                            className="flex-1 px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none min-h-[60px]"
-                            placeholder="Enter reply variation"
-                          />
+                              }}
+                              rows={3}
+                              className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none min-h-[60px]"
+                              placeholder="Enter reply variation (public comment)"
+                            />
+                            <p className="text-xs text-gray-500 mt-0.5">
+                              {reply.length}/{INSTAGRAM_PUBLIC_COMMENT_MAX_CHARS}
+                              {reply.length > INSTAGRAM_RECOMMENDED_CHARS && (
+                                <span className="text-amber-600 ml-1">· Recommended under {INSTAGRAM_RECOMMENDED_CHARS} for best engagement</span>
+                              )}
+                            </p>
+                          </div>
                           {(activeTab === 'simple'
                             ? config.simpleCommentReplies.length > 3
                             : config.leadCommentReplies.length > 3) && (
@@ -808,15 +817,16 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                               </label>
                               <textarea
                                 value={config.simpleFlowMessage || ''}
+                                maxLength={INSTAGRAM_DM_MAX_CHARS}
                                 onChange={(e) =>
-                                  setConfig({ ...config, simpleFlowMessage: e.target.value })
+                                  setConfig({ ...config, simpleFlowMessage: e.target.value.slice(0, INSTAGRAM_DM_MAX_CHARS) })
                                 }
                                 rows={3}
                                 className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none"
                                 placeholder="Follow me to get the guide 👇 Reply with your email and I'll send it! 📧"
                               />
                               <p className="text-xs text-gray-500 mt-1">
-                                Backend will handle email validation and retry messages automatically. Use Media Type below to specify what to share.
+                                {(config.simpleFlowMessage || '').length}/{INSTAGRAM_DM_MAX_CHARS} · Backend will handle email validation and retry messages automatically.
                               </p>
                             </div>
                           )}
@@ -829,15 +839,16 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                               </label>
                               <textarea
                                 value={config.simpleFlowPhoneMessage || ''}
+                                maxLength={INSTAGRAM_DM_MAX_CHARS}
                                 onChange={(e) =>
-                                  setConfig({ ...config, simpleFlowPhoneMessage: e.target.value })
+                                  setConfig({ ...config, simpleFlowPhoneMessage: e.target.value.slice(0, INSTAGRAM_DM_MAX_CHARS) })
                                 }
                                 rows={3}
                                 className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none"
                                 placeholder="Follow me to get the guide 👇 Reply with your phone number and I'll send it! 📱"
                               />
                               <p className="text-xs text-gray-500 mt-1">
-                                Backend will handle phone validation and retry messages automatically. Use Media Type below to specify what to share.
+                                {(config.simpleFlowPhoneMessage || '').length}/{INSTAGRAM_DM_MAX_CHARS} · Backend will handle phone validation and retry messages automatically.
                               </p>
                             </div>
                           )}
@@ -850,16 +861,18 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                               </label>
                               <textarea
                                 value={config.askToFollowMessage || ''}
+                                maxLength={INSTAGRAM_DM_MAX_CHARS}
                                 onChange={(e) =>
                                   setConfig({
                                     ...config,
-                                    askToFollowMessage: e.target.value,
+                                    askToFollowMessage: e.target.value.slice(0, INSTAGRAM_DM_MAX_CHARS),
                                   })
                                 }
                                 rows={5}
                                 className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none"
                                 placeholder={`Hey! Would you mind following me? I share great content! 🙌\n\n✅ Once you've followed, type 'done' or 'followed' to continue!\n🔗 Visit my profile: https://www.instagram.com/${accountUsername}\nClick one of the options below:`}
                               />
+                              <p className="text-xs text-gray-500 mt-1">{(config.askToFollowMessage || '').length}/{INSTAGRAM_DM_MAX_CHARS}</p>
                             </div>
                           )}
 
@@ -874,6 +887,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
                       DM Messages (variations for randomization)
                     </label>
+                    <p className="text-xs text-gray-500 mb-2">Max {INSTAGRAM_DM_MAX_CHARS} characters per message (Instagram DM limit).</p>
                     <div className="space-y-3">
                       {Array.from({ length: 3 }, (_, index) => {
                         const messages = activeTab === 'simple' 
@@ -882,43 +896,37 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                         const message = messages[index] || '';
                         return (
                           <div key={index} className="flex flex-col sm:flex-row gap-3">
-                          <textarea
-                            value={message}
-                            onChange={(e) => {
-                              if (activeTab === 'simple') {
-                                const base = config.simpleDmMessages.length
-                                  ? config.simpleDmMessages
-                                  : [''];
-                                const newMessages = [...base];
-                                // Ensure array has at least 3 items
-                                while (newMessages.length < 3) {
-                                  newMessages.push('');
+                          <div className="flex-1">
+                            <textarea
+                              value={message}
+                              maxLength={INSTAGRAM_DM_MAX_CHARS}
+                              onChange={(e) => {
+                                const val = e.target.value.slice(0, INSTAGRAM_DM_MAX_CHARS);
+                                if (activeTab === 'simple') {
+                                  const base = config.simpleDmMessages.length ? config.simpleDmMessages : [''];
+                                  const newMessages = [...base];
+                                  while (newMessages.length < 3) newMessages.push('');
+                                  newMessages[index] = val;
+                                  setConfig({ ...config, simpleDmMessages: newMessages });
+                                } else {
+                                  const base = config.leadDmMessages.length ? config.leadDmMessages : [''];
+                                  const newMessages = [...base];
+                                  while (newMessages.length < 3) newMessages.push('');
+                                  newMessages[index] = val;
+                                  setConfig({ ...config, leadDmMessages: newMessages });
                                 }
-                                newMessages[index] = e.target.value;
-                                setConfig({
-                                  ...config,
-                                  simpleDmMessages: newMessages,
-                                });
-                              } else {
-                                const base = config.leadDmMessages.length
-                                  ? config.leadDmMessages
-                                  : [''];
-                                const newMessages = [...base];
-                                // Ensure array has at least 3 items
-                                while (newMessages.length < 3) {
-                                  newMessages.push('');
-                                }
-                                newMessages[index] = e.target.value;
-                                setConfig({
-                                  ...config,
-                                  leadDmMessages: newMessages,
-                                });
-                              }
-                            }}
-                            rows={3}
-                            className="flex-1 px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none min-h-[60px]"
-                            placeholder="Enter DM message variation"
-                          />
+                              }}
+                              rows={3}
+                              className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none min-h-[60px]"
+                              placeholder="Enter DM message variation"
+                            />
+                            <p className="text-xs text-gray-500 mt-0.5">
+                              {message.length}/{INSTAGRAM_DM_MAX_CHARS}
+                              {message.length > INSTAGRAM_RECOMMENDED_CHARS && (
+                                <span className="text-amber-600 ml-1">· Recommended under {INSTAGRAM_RECOMMENDED_CHARS}</span>
+                              )}
+                            </p>
+                          </div>
                           {(activeTab === 'simple'
                             ? config.simpleDmMessages.length > 3
                             : config.leadDmMessages.length > 3) && (
@@ -1011,20 +1019,25 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
 
                   {config.dmType === 'text_button' && (
                     <div className="space-y-3">
+                      <p className="text-xs text-gray-500">Button text: max {INSTAGRAM_BUTTON_TEXT_MAX_CHARS} characters (Instagram limit).</p>
                        {config.buttons.map((button, index) => (
                           <div key={index} className="flex gap-3 items-start">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-1">
-                              <input
-                                type="text"
-                                value={button.text}
-                                onChange={(e) => {
-                                  const newButtons = [...config.buttons];
-                                  newButtons[index].text = e.target.value;
-                                  setConfig({ ...config, buttons: newButtons });
-                                }}
-                                placeholder="Button text"
-                                className="h-9 px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all"
-                              />
+                              <div>
+                                <input
+                                  type="text"
+                                  value={button.text}
+                                  maxLength={INSTAGRAM_BUTTON_TEXT_MAX_CHARS}
+                                  onChange={(e) => {
+                                    const newButtons = [...config.buttons];
+                                    newButtons[index].text = e.target.value.slice(0, INSTAGRAM_BUTTON_TEXT_MAX_CHARS);
+                                    setConfig({ ...config, buttons: newButtons });
+                                  }}
+                                  placeholder="Button text"
+                                  className="w-full h-9 px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all"
+                                />
+                                <p className="text-xs text-gray-500 mt-0.5">{button.text.length}/{INSTAGRAM_BUTTON_TEXT_MAX_CHARS}</p>
+                              </div>
                               <input
                                 type="url"
                                 value={button.url}

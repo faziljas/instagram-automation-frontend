@@ -3,6 +3,14 @@
 import { useState, useEffect } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { usePost } from '@/hooks/useApi';
+import {
+  INSTAGRAM_DM_MAX_CHARS,
+  INSTAGRAM_PUBLIC_COMMENT_MAX_CHARS,
+  INSTAGRAM_TRIGGER_KEYWORDS_MAX_COUNT,
+  INSTAGRAM_TRIGGER_KEYWORD_MAX_LENGTH,
+  INSTAGRAM_BUTTON_TEXT_MAX_CHARS,
+  INSTAGRAM_RECOMMENDED_CHARS,
+} from '@/lib/instagramLimits';
 
 interface MediaItem {
   id: string;
@@ -83,15 +91,20 @@ export default function AutomationSetupModal({
 
   // Step 2: Trigger Configuration
   const handleAddKeyword = () => {
-    const keyword = keywordInput.trim().toLowerCase();
+    const raw = keywordInput.trim().toLowerCase();
+    const keyword = raw.slice(0, INSTAGRAM_TRIGGER_KEYWORD_MAX_LENGTH);
     if (keyword.length >= 2 && !config.keywords.includes(keyword)) {
+      if (config.keywords.length >= INSTAGRAM_TRIGGER_KEYWORDS_MAX_COUNT) {
+        setErrors((prev) => ({ ...prev, keywords: `Maximum ${INSTAGRAM_TRIGGER_KEYWORDS_MAX_COUNT} keywords allowed.` }));
+        return;
+      }
       setConfig((prev) => ({
         ...prev,
         keywords: [...prev.keywords, keyword],
       }));
       setKeywordInput('');
-      if (errors.keyword) {
-        setErrors((prev) => ({ ...prev, keyword: '' }));
+      if (errors.keywords) {
+        setErrors((prev) => ({ ...prev, keywords: '' }));
       }
     }
   };
@@ -105,7 +118,7 @@ export default function AutomationSetupModal({
 
   const handleUpdateCommentReply = (index: number, value: string) => {
     const newReplies = [...config.commentReplies];
-    newReplies[index] = value;
+    newReplies[index] = value.slice(0, INSTAGRAM_PUBLIC_COMMENT_MAX_CHARS);
     setConfig((prev) => ({
       ...prev,
       commentReplies: newReplies,
@@ -115,7 +128,7 @@ export default function AutomationSetupModal({
   // Step 3: Action Configuration
   const handleUpdateDmMessage = (index: number, value: string) => {
     const newMessages = [...config.dmMessages];
-    newMessages[index] = value;
+    newMessages[index] = value.slice(0, INSTAGRAM_DM_MAX_CHARS);
     setConfig((prev) => ({
       ...prev,
       dmMessages: newMessages,
@@ -143,7 +156,8 @@ export default function AutomationSetupModal({
 
   const handleUpdateButton = (index: number, field: 'text' | 'url', value: string) => {
     const newButtons = [...config.buttons];
-    newButtons[index] = { ...newButtons[index], [field]: value };
+    const v = field === 'text' ? value.slice(0, INSTAGRAM_BUTTON_TEXT_MAX_CHARS) : value;
+    newButtons[index] = { ...newButtons[index], [field]: v };
     setConfig((prev) => ({
       ...prev,
       buttons: newButtons,
@@ -477,13 +491,17 @@ export default function AutomationSetupModal({
                     <div className="mb-4">
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Trigger Keywords <span className="text-red-500">(required)</span>
+                        <span className="text-xs font-normal text-gray-500 ml-2">
+                          {config.keywords.filter((k) => k.trim().length > 0).length}/{INSTAGRAM_TRIGGER_KEYWORDS_MAX_COUNT} keywords, max {INSTAGRAM_TRIGGER_KEYWORD_MAX_LENGTH} chars each
+                        </span>
                       </label>
                       <div className="flex items-center space-x-2 mb-2">
                         <input
                           type="text"
                           value={keywordInput}
+                          maxLength={INSTAGRAM_TRIGGER_KEYWORD_MAX_LENGTH}
                           onChange={(e) => {
-                            setKeywordInput(e.target.value);
+                            setKeywordInput(e.target.value.slice(0, INSTAGRAM_TRIGGER_KEYWORD_MAX_LENGTH));
                             if (errors.keywords) {
                               setErrors((prev) => ({ ...prev, keywords: '' }));
                             }
@@ -494,7 +512,7 @@ export default function AutomationSetupModal({
                               handleAddKeyword();
                             }
                           }}
-                          placeholder="Type keyword and press Enter to add"
+                          placeholder={`Type keyword (max ${INSTAGRAM_TRIGGER_KEYWORD_MAX_LENGTH} chars) and press Enter`}
                           className={`flex-1 px-4 py-3 border rounded-lg bg-[#F9FAFB] focus:outline-none focus:ring-2 focus:ring-[#3B82F6] focus:border-[#3B82F6] transition-colors ${
                             errors.keywords ? 'border-red-500' : 'border-[#E5E7EB]'
                           }`}
@@ -579,19 +597,22 @@ export default function AutomationSetupModal({
                           {config.commentReplies.map((reply, index) => (
                             <div key={index}>
                               <label className="block text-xs font-medium text-gray-700 mb-1">
-                                Comment response {index + 1}*
+                                Comment response {index + 1}* (public comment, max {INSTAGRAM_PUBLIC_COMMENT_MAX_CHARS} chars)
                               </label>
                               <div className="flex items-center space-x-2">
                                 <textarea
                                   value={reply}
                                   onChange={(e) => handleUpdateCommentReply(index, e.target.value)}
                                   rows={2}
-                                  maxLength={140}
+                                  maxLength={INSTAGRAM_PUBLIC_COMMENT_MAX_CHARS}
                                   className="flex-1 px-4 py-3 border border-[#E5E7EB] rounded-lg bg-[#F9FAFB] focus:outline-none focus:ring-2 focus:ring-[#3B82F6] focus:border-[#3B82F6] resize-y transition-colors"
                                   placeholder="Enter reply text..."
                                 />
                                 <span className="text-xs text-gray-500 whitespace-nowrap">
-                                  {reply.length}/140
+                                  {reply.length}/{INSTAGRAM_PUBLIC_COMMENT_MAX_CHARS}
+                                  {reply.length > INSTAGRAM_RECOMMENDED_CHARS && (
+                                    <span className="text-amber-600 ml-1">· Under {INSTAGRAM_RECOMMENDED_CHARS} recommended</span>
+                                  )}
                                 </span>
                               </div>
                             </div>
@@ -638,7 +659,7 @@ export default function AutomationSetupModal({
 
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      DM content (write multiple variations for randomization)
+                      DM content (write multiple variations for randomization, max {INSTAGRAM_DM_MAX_CHARS} chars each)
                     </label>
                     {config.dmMessages.map((message, index) => (
                       <div key={index} className="mb-3">
@@ -647,12 +668,15 @@ export default function AutomationSetupModal({
                             value={message}
                             onChange={(e) => handleUpdateDmMessage(index, e.target.value)}
                             rows={3}
-                            maxLength={900}
+                            maxLength={INSTAGRAM_DM_MAX_CHARS}
                             className="flex-1 px-4 py-3 border border-[#E5E7EB] rounded-lg bg-[#F9FAFB] focus:outline-none focus:ring-2 focus:ring-[#3B82F6] focus:border-[#3B82F6] resize-y transition-colors"
                             placeholder="Enter DM message..."
                           />
                           <span className="text-xs text-gray-500 whitespace-nowrap pt-2">
-                            {message.length}/900
+                            {message.length}/{INSTAGRAM_DM_MAX_CHARS}
+                            {message.length > INSTAGRAM_RECOMMENDED_CHARS && (
+                              <span className="text-amber-600 ml-1">· Under {INSTAGRAM_RECOMMENDED_CHARS} recommended</span>
+                            )}
                           </span>
                           {config.dmMessages.length > 1 && (
                             <button
@@ -701,10 +725,11 @@ export default function AutomationSetupModal({
                             type="text"
                             value={button.text}
                             onChange={(e) => handleUpdateButton(index, 'text', e.target.value)}
-                            placeholder="Button text (max 60 chars)"
-                            maxLength={60}
+                            placeholder={`Button text (max ${INSTAGRAM_BUTTON_TEXT_MAX_CHARS} chars)`}
+                            maxLength={INSTAGRAM_BUTTON_TEXT_MAX_CHARS}
                             className="w-full mb-2 px-4 py-3 border border-[#E5E7EB] rounded-lg bg-[#F9FAFB] focus:outline-none focus:ring-2 focus:ring-[#3B82F6] focus:border-[#3B82F6] transition-colors"
                           />
+                          <p className="text-xs text-gray-500 -mt-1 mb-2">{button.text.length}/{INSTAGRAM_BUTTON_TEXT_MAX_CHARS}</p>
                           <input
                             type="url"
                             value={button.url}
