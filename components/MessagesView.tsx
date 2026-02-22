@@ -8,6 +8,7 @@ import {
   EyeIcon,
   PaperAirplaneIcon,
   ArrowPathIcon,
+  InformationCircleIcon,
 } from '@heroicons/react/24/outline';
 import { get, post } from '@/utils/api';
 import { useAuth } from '@/hooks/useAuth';
@@ -348,10 +349,14 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
       {/* Header with Stats */}
       <div className="border-b border-gray-200 bg-white p-4 md:p-4">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-4">
-          <div className="w-full md:w-auto">
+          <div className="w-full md:w-auto flex items-center gap-2">
             <h2 className="text-xl md:text-2xl font-bold text-gray-900">Messages</h2>
-            <p className="text-xs md:text-sm text-gray-600">View and reply to Instagram DM conversations</p>
-            <p className="text-xs text-gray-500 mt-0.5">If messages are not showing, click Sync Conversations to refresh from Instagram.</p>
+            <span
+              className="text-gray-400 hover:text-gray-600 cursor-help"
+              title="If messages are not showing, click Sync Conversations to refresh from Instagram."
+            >
+              <InformationCircleIcon className="h-5 w-5" aria-hidden />
+            </span>
           </div>
           <div className="flex items-center space-x-2 flex-shrink-0">
             <button
