@@ -858,11 +858,11 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                                     askToFollowMessage: e.target.value.slice(0, INSTAGRAM_PRE_DM_MESSAGE_MAX_CHARS),
                                   })
                                 }
-                                rows={2}
-                                className="w-full px-2.5 py-1.5 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-y min-h-[52px] max-h-[120px]"
+                                rows={5}
+                                className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-y min-h-[120px] max-h-[200px]"
                                 placeholder={`Hey! Would you mind following me? I share great content! 🙌\n\n✅ Once you've followed, type 'done' or 'followed' to continue!\n🔗 Visit my profile: https://www.instagram.com/${accountUsername}\nClick one of the options below:`}
                               />
-                              <p className="text-xs text-gray-500 mt-1">{(config.askToFollowMessage || '').length}/{INSTAGRAM_PRE_DM_MESSAGE_MAX_CHARS}</p>
+                              <p className="text-xs text-gray-500 mt-0.5">{(config.askToFollowMessage || '').length}/{INSTAGRAM_PRE_DM_MESSAGE_MAX_CHARS}</p>
                             </div>
                           )}
 
