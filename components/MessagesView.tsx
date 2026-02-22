@@ -351,13 +351,14 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
           <div className="w-full md:w-auto">
             <h2 className="text-xl md:text-2xl font-bold text-gray-900">Messages</h2>
             <p className="text-xs md:text-sm text-gray-600">View and reply to Instagram DM conversations</p>
+            <p className="text-xs text-gray-500 mt-0.5">If messages are not showing, click Sync Conversations to refresh from Instagram.</p>
           </div>
           <div className="flex items-center space-x-2 flex-shrink-0">
             <button
               onClick={handleSync}
               disabled={isSyncing}
               className="px-3 md:px-4 py-2 bg-blue-600 text-white text-xs md:text-sm font-medium rounded-md hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed whitespace-nowrap"
-              title="Sync conversations from Instagram"
+              title="If messages are not showing, click to sync conversations from Instagram."
             >
               {isSyncing ? 'Syncing...' : <span className="hidden sm:inline">Sync Conversations</span>}
               {isSyncing ? '' : <span className="sm:hidden">Sync</span>}
@@ -768,9 +769,10 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
         )}
         {!selectedConversation && (
           <div className="hidden md:flex md:flex-1 items-center justify-center text-gray-400">
-            <div className="text-center">
+            <div className="text-center max-w-sm">
               <ChatBubbleLeftRightIcon className="h-16 w-16 mx-auto mb-4" />
               <p className="text-lg">Select a conversation to view messages</p>
+              <p className="text-sm text-gray-400 mt-2">If messages or conversations are not showing, click Sync Conversations at the top to refresh from Instagram.</p>
             </div>
           </div>
         )}
