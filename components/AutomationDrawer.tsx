@@ -3,22 +3,16 @@ import {
   XMarkIcon,
   InformationCircleIcon,
   DocumentTextIcon,
-  PhotoIcon,
-  RectangleGroupIcon,
-  MicrophoneIcon,
   ChevronDownIcon,
   DocumentIcon,
 } from '@heroicons/react/24/outline';
 import MobilePreview from './MobilePreview';
 
-export type DmTypeValue = 'text' | 'text_button' | 'image_video' | 'card' | 'voice_message';
+export type DmTypeValue = 'text' | 'text_button';
 
 const DM_TYPE_OPTIONS: { value: DmTypeValue; label: string; Icon: React.ComponentType<{ className?: string }> }[] = [
   { value: 'text', label: 'Text only', Icon: DocumentIcon },
   { value: 'text_button', label: 'Text + Button', Icon: DocumentTextIcon },
-  { value: 'image_video', label: 'Image/Video', Icon: PhotoIcon },
-  { value: 'card', label: 'Card', Icon: RectangleGroupIcon },
-  { value: 'voice_message', label: 'Voice message', Icon: MicrophoneIcon },
 ];
 
 interface MediaItem {
@@ -69,21 +63,12 @@ interface AutomationConfig {
   simpleFlowPhoneQuestion?: string;
   phoneInvalidRetryMessage?: string;
 
-  // Primary DM
+  // Primary DM (text or text + button only)
   dmType: DmTypeValue;
   dmMessages: string[]; // currently-active DM messages sent to backend
   simpleDmMessages: string[];
   leadDmMessages: string[];
   buttons: { text: string; url: string }[];
-  /** Public URL for image or video when dmType is image_video (user pastes URL) */
-  dmMediaUrl?: string;
-  /** Public URL for audio when dmType is voice_message (user pastes URL) */
-  dmVoiceMessageUrl?: string;
-  /** Card: image public URL, title, subtitle, optional button */
-  dmCardImageUrl?: string;
-  dmCardTitle?: string;
-  dmCardSubtitle?: string;
-  dmCardButton?: { text: string; url: string };
   delayMinutes: number;
 
   // Legacy lead‑capture fields (kept optional so old data still loads)
@@ -155,12 +140,6 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
     simpleDmMessages: ['Thanks for your interest! Check out our latest updates.', 'Hey! We have something special for you. Check it out!', 'Awesome! We sent you a message with more details.'],
     leadDmMessages: ['Thanks for your interest! Check out our latest updates.', 'Hey! We have something special for you. Check it out!', 'Awesome! We sent you a message with more details.'],
     buttons: [{ text: 'Click me', url: '' }],
-    dmMediaUrl: '',
-    dmVoiceMessageUrl: '',
-    dmCardImageUrl: '',
-    dmCardTitle: '',
-    dmCardSubtitle: '',
-    dmCardButton: { text: '', url: '' },
     delayMinutes: 0,
     isLeadCapture: false,
   });
@@ -273,7 +252,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
           initialConfig.emailRetryMessage ||
           "Hmm, that doesn't look like a valid email address. 🤔\n\nPlease type it again so I can send you the guide! 📧",
 
-        dmType: (['text', 'text_button', 'image_video', 'card', 'voice_message'].includes(initialConfig.dmType as string)
+        dmType: (['text', 'text_button'].includes(initialConfig.dmType as string)
           ? initialConfig.dmType
           : 'text') as DmTypeValue,
         // Ensure dmMessages has valid content, not just empty strings
@@ -295,12 +274,6 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
           : ['Thanks for your interest! Check out our latest updates.', 'Hey! We have something special for you. Check it out!', 'Awesome! We sent you a message with more details.'],
         buttons:
           initialConfig.buttons || [{ text: 'Click me', url: '' }],
-        dmMediaUrl: initialConfig.dmMediaUrl ?? '',
-        dmVoiceMessageUrl: initialConfig.dmVoiceMessageUrl ?? '',
-        dmCardImageUrl: initialConfig.dmCardImageUrl ?? '',
-        dmCardTitle: initialConfig.dmCardTitle ?? '',
-        dmCardSubtitle: initialConfig.dmCardSubtitle ?? '',
-        dmCardButton: initialConfig.dmCardButton ?? { text: '', url: '' },
         delayMinutes: initialConfig.delayMinutes || 0,
         // Include isLeadCapture flag so MobilePreview can use it
         isLeadCapture: initialConfig.isLeadCapture || false,
@@ -1035,98 +1008,6 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                       </div>
                     )}
                   </div>
-
-                  {/* Image/Video: paste public URL only */}
-                  {config.dmType === 'image_video' && (
-                    <div className="space-y-3">
-                      <label className="block text-sm font-medium text-gray-700">
-                        Image or video (public URL) <span className="text-red-500">*</span>
-                      </label>
-                      <p className="text-xs text-gray-500">
-                        Paste a public URL to an image or video. This URL will be sent with each DM.
-                      </p>
-                      <input
-                        type="url"
-                        value={config.dmMediaUrl ?? ''}
-                        onChange={(e) => setConfig({ ...config, dmMediaUrl: e.target.value })}
-                        placeholder="https://..."
-                        className="w-full h-10 px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all"
-                      />
-                    </div>
-                  )}
-
-                  {/* Card: paste public URL for image, title, subtitle, optional button */}
-                  {config.dmType === 'card' && (
-                    <div className="space-y-3">
-                      <label className="block text-sm font-medium text-gray-700">
-                        Card image (public URL) <span className="text-red-500">*</span>
-                      </label>
-                      <p className="text-xs text-gray-500">
-                        Paste a public URL for the card image. This URL will be sent with each DM.
-                      </p>
-                      <input
-                        type="url"
-                        value={config.dmCardImageUrl ?? ''}
-                        onChange={(e) => setConfig({ ...config, dmCardImageUrl: e.target.value })}
-                        placeholder="https://..."
-                        className="w-full h-10 px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all"
-                      />
-                      <label className="block text-sm font-medium text-gray-700 mt-3">Title</label>
-                      <input
-                        type="text"
-                        value={config.dmCardTitle ?? ''}
-                        onChange={(e) => setConfig({ ...config, dmCardTitle: e.target.value })}
-                        placeholder="Card title"
-                        maxLength={80}
-                        className="w-full h-10 px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all"
-                      />
-                      <label className="block text-sm font-medium text-gray-700">Subtitle</label>
-                      <input
-                        type="text"
-                        value={config.dmCardSubtitle ?? ''}
-                        onChange={(e) => setConfig({ ...config, dmCardSubtitle: e.target.value })}
-                        placeholder="Card subtitle (optional)"
-                        maxLength={80}
-                        className="w-full h-10 px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all"
-                      />
-                      <label className="block text-sm font-medium text-gray-700">Button (optional)</label>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <input
-                          type="text"
-                          value={config.dmCardButton?.text ?? ''}
-                          onChange={(e) => setConfig({ ...config, dmCardButton: { ...(config.dmCardButton ?? { text: '', url: '' }), text: e.target.value } })}
-                          placeholder="Button text"
-                          className="h-10 px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all"
-                        />
-                        <input
-                          type="url"
-                          value={config.dmCardButton?.url ?? ''}
-                          onChange={(e) => setConfig({ ...config, dmCardButton: { ...(config.dmCardButton ?? { text: '', url: '' }), url: e.target.value } })}
-                          placeholder="Button URL"
-                          className="h-10 px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all"
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Voice message: paste public URL only */}
-                  {config.dmType === 'voice_message' && (
-                    <div className="space-y-3">
-                      <label className="block text-sm font-medium text-gray-700">
-                        Voice message (public URL) <span className="text-red-500">*</span>
-                      </label>
-                      <p className="text-xs text-gray-500">
-                        Paste a public URL to an audio file. This URL will be sent with each DM.
-                      </p>
-                      <input
-                        type="url"
-                        value={config.dmVoiceMessageUrl ?? ''}
-                        onChange={(e) => setConfig({ ...config, dmVoiceMessageUrl: e.target.value })}
-                        placeholder="https://..."
-                        className="w-full h-10 px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all"
-                      />
-                    </div>
-                  )}
 
                   {config.dmType === 'text_button' && (
                     <div className="space-y-3">

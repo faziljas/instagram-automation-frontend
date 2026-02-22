@@ -49,15 +49,11 @@ interface AutomationConfig {
   phoneInvalidRetryMessage?: string;
 
   // Primary DM
-  dmType: 'text' | 'text_button' | 'lead_capture' | 'image_video' | 'card' | 'voice_message';
+  dmType: 'text' | 'text_button' | 'lead_capture';
   dmMessages: string[]; // active messages (current mode, for backward compatibility)
   simpleDmMessages?: string[];
   leadDmMessages?: string[];
   buttons: Array<{ text: string; url: string }>;
-  dmCardImageUrl?: string;
-  dmCardTitle?: string;
-  dmCardSubtitle?: string;
-  dmCardButton?: { text: string; url: string };
   delayMinutes: number;
   isLeadCapture?: boolean;
   preDmFlowType?: 'email' | 'phone' | 'followers';
@@ -171,7 +167,7 @@ export default function MobilePreview({
   const preDmEngagementOn = config.enablePreDmEngagement ?? (config.askToFollow || config.askForEmail);
   const simpleFlowEmailOn = !!(config.simpleDmFlow && (config.simpleFlowMessage || config.simpleFlowEmailQuestion));
   const simpleFlowPhoneOn = !!(config.simpleDmFlowPhone && (config.simpleFlowPhoneMessage || config.simpleFlowPhoneQuestion));
-  const showDmPreviewButton = (activeDmMessages && activeDmMessages.length > 0) || (config.dmType === 'card' && config.dmCardImageUrl) || (isLeadMode && preDmEngagementOn && (simpleFlowEmailOn || simpleFlowPhoneOn || (config.askToFollow || config.askForEmail)));
+  const showDmPreviewButton = (activeDmMessages && activeDmMessages.length > 0) || (isLeadMode && preDmEngagementOn && (simpleFlowEmailOn || simpleFlowPhoneOn || (config.askToFollow || config.askForEmail)));
 
   return (
     <div className="flex justify-center">
@@ -286,36 +282,17 @@ export default function MobilePreview({
                       </div>
                       <div className="flex justify-start">
                         <div className="max-w-[70%] bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm overflow-hidden">
-                          {config.dmType === 'card' && config.dmCardImageUrl ? (
-                            <div className="rounded-2xl overflow-hidden border border-gray-200">
-                              <div className="aspect-video bg-gray-300">
-                                <img src={config.dmCardImageUrl} alt="Card" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                              </div>
-                              <div className="px-3 py-2">
-                                <p className="text-sm font-semibold">{config.dmCardTitle || 'Card title'}</p>
-                                {config.dmCardSubtitle && <p className="text-xs text-gray-600 mt-0.5">{config.dmCardSubtitle}</p>}
-                                {config.dmCardButton?.text && config.dmCardButton?.url && (
-                                  <div className="mt-2">
-                                    <span className="inline-block text-xs font-semibold text-blue-600 bg-white border border-blue-600 rounded-lg py-1.5 px-3">{config.dmCardButton.text}</span>
-                                  </div>
-                                )}
-                              </div>
+                          <p className="text-sm whitespace-pre-line px-4 py-2">
+                            {sampleDM}
+                          </p>
+                          {config.dmType === 'text_button' && config.buttons.length > 0 && (
+                            <div className="px-4 pb-2 space-y-1">
+                              {config.buttons.filter((b) => b.text.trim() && b.url.trim()).map((button, index) => (
+                                <a key={index} href={button.url} target="_blank" rel="noopener noreferrer" className="block w-full text-center text-xs font-semibold text-blue-600 bg-white border border-blue-600 rounded-lg py-2 px-3">
+                                  {button.text}
+                                </a>
+                              ))}
                             </div>
-                          ) : (
-                            <>
-                              <p className="text-sm whitespace-pre-line px-4 py-2">
-                                {sampleDM}
-                              </p>
-                              {config.dmType === 'text_button' && config.buttons.length > 0 && (
-                                <div className="px-4 pb-2 space-y-1">
-                                  {config.buttons.filter((b) => b.text.trim() && b.url.trim()).map((button, index) => (
-                                    <a key={index} href={button.url} target="_blank" rel="noopener noreferrer" className="block w-full text-center text-xs font-semibold text-blue-600 bg-white border border-blue-600 rounded-lg py-2 px-3">
-                                      {button.text}
-                                    </a>
-                                  ))}
-                                </div>
-                              )}
-                            </>
                           )}
                         </div>
                       </div>
@@ -344,34 +321,15 @@ export default function MobilePreview({
                       )}
                       <div className="flex justify-start">
                         <div className="max-w-[70%] bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm overflow-hidden">
-                          {config.dmType === 'card' && config.dmCardImageUrl ? (
-                            <div className="rounded-2xl overflow-hidden border border-gray-200">
-                              <div className="aspect-video bg-gray-300">
-                                <img src={config.dmCardImageUrl} alt="Card" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                              </div>
-                              <div className="px-3 py-2">
-                                <p className="text-sm font-semibold">{config.dmCardTitle || 'Card title'}</p>
-                                {config.dmCardSubtitle && <p className="text-xs text-gray-600 mt-0.5">{config.dmCardSubtitle}</p>}
-                                {config.dmCardButton?.text && config.dmCardButton?.url && (
-                                  <div className="mt-2">
-                                    <span className="inline-block text-xs font-semibold text-blue-600 bg-white border border-blue-600 rounded-lg py-1.5 px-3">{config.dmCardButton.text}</span>
-                                  </div>
-                                )}
-                              </div>
+                          <p className="text-sm whitespace-pre-line px-4 py-2">{sampleDM}</p>
+                          {config.dmType === 'text_button' && config.buttons.length > 0 && (
+                            <div className="px-4 pb-2 space-y-1">
+                              {config.buttons.filter((b) => b.text.trim() && b.url.trim()).map((button, index) => (
+                                <a key={index} href={button.url} target="_blank" rel="noopener noreferrer" className="block w-full text-center text-xs font-semibold text-blue-600 bg-white border border-blue-600 rounded-lg py-2 px-3">
+                                  {button.text}
+                                </a>
+                              ))}
                             </div>
-                          ) : (
-                            <>
-                              <p className="text-sm whitespace-pre-line px-4 py-2">{sampleDM}</p>
-                              {config.dmType === 'text_button' && config.buttons.length > 0 && (
-                                <div className="px-4 pb-2 space-y-1">
-                                  {config.buttons.filter((b) => b.text.trim() && b.url.trim()).map((button, index) => (
-                                    <a key={index} href={button.url} target="_blank" rel="noopener noreferrer" className="block w-full text-center text-xs font-semibold text-blue-600 bg-white border border-blue-600 rounded-lg py-2 px-3">
-                                      {button.text}
-                                    </a>
-                                  ))}
-                                </div>
-                              )}
-                            </>
                           )}
                         </div>
                       </div>
@@ -446,34 +404,15 @@ export default function MobilePreview({
 
                       <div className="flex justify-start">
                         <div className="max-w-[70%] bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm overflow-hidden">
-                          {config.dmType === 'card' && config.dmCardImageUrl ? (
-                            <div className="rounded-2xl overflow-hidden border border-gray-200">
-                              <div className="aspect-video bg-gray-300">
-                                <img src={config.dmCardImageUrl} alt="Card" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                              </div>
-                              <div className="px-3 py-2">
-                                <p className="text-sm font-semibold">{config.dmCardTitle || 'Card title'}</p>
-                                {config.dmCardSubtitle && <p className="text-xs text-gray-600 mt-0.5">{config.dmCardSubtitle}</p>}
-                                {config.dmCardButton?.text && config.dmCardButton?.url && (
-                                  <div className="mt-2">
-                                    <span className="inline-block text-xs font-semibold text-blue-600 bg-white border border-blue-600 rounded-lg py-1.5 px-3">{config.dmCardButton.text}</span>
-                                  </div>
-                                )}
-                              </div>
+                          <p className="text-sm whitespace-pre-line px-4 py-2">{sampleDM}</p>
+                          {config.dmType === 'text_button' && config.buttons.length > 0 && (
+                            <div className="px-4 pb-2 space-y-1">
+                              {config.buttons.filter((b) => b.text.trim() && b.url.trim()).map((button, index) => (
+                                <a key={index} href={button.url} target="_blank" rel="noopener noreferrer" className="block w-full text-center text-xs font-semibold text-blue-600 bg-white border border-blue-600 rounded-lg py-2 px-3">
+                                  {button.text}
+                                </a>
+                              ))}
                             </div>
-                          ) : (
-                            <>
-                              <p className="text-sm whitespace-pre-line px-4 py-2">{sampleDM}</p>
-                              {config.dmType === 'text_button' && config.buttons.length > 0 && (
-                                <div className="px-4 pb-2 space-y-1">
-                                  {config.buttons.filter((b) => b.text.trim() && b.url.trim()).map((button, index) => (
-                                    <a key={index} href={button.url} target="_blank" rel="noopener noreferrer" className="block w-full text-center text-xs font-semibold text-blue-600 bg-white border border-blue-600 rounded-lg py-2 px-3">
-                                      {button.text}
-                                    </a>
-                                  ))}
-                                </div>
-                              )}
-                            </>
                           )}
                         </div>
                       </div>

@@ -585,8 +585,8 @@ export default function AutomationsPage() {
       ruleConfig.email_success_message = config.emailSuccessMessage.trim() || '';
     }
 
-    // Persist DM type so backend sends media when type is image_video/voice_message/card
-    if (config.dmType) {
+    // Persist DM type (text or text_button only)
+    if (config.dmType === 'text' || config.dmType === 'text_button') {
       ruleConfig.dm_type = config.dmType;
     }
 
@@ -594,26 +594,6 @@ export default function AutomationsPage() {
       ruleConfig.buttons = config.buttons.filter(
         (b: { text: string; url: string }) => b.text.trim() && b.url.trim(),
       );
-    }
-    if (config.dmType === 'image_video' && config.dmMediaUrl?.trim()) {
-      const url = config.dmMediaUrl.trim();
-      ruleConfig.dm_media_url = url;
-      // Lead capture: also persist camelCase/snake_case so backend always finds it (reads dm_media_url, dmMediaUrl, lead_dm_media_url, leadDmMediaUrl)
-      if (config.isLeadCapture || config.enablePreDmEngagement || config.askToFollow || config.askForEmail) {
-        ruleConfig.lead_dm_media_url = url;
-        ruleConfig.leadDmMediaUrl = url;
-      }
-    }
-    if (config.dmType === 'voice_message' && config.dmVoiceMessageUrl?.trim()) {
-      ruleConfig.dm_voice_message_url = config.dmVoiceMessageUrl.trim();
-    }
-    if (config.dmType === 'card') {
-      if (config.dmCardImageUrl?.trim()) ruleConfig.dm_card_image_url = config.dmCardImageUrl.trim();
-      if (config.dmCardTitle?.trim()) ruleConfig.dm_card_title = config.dmCardTitle.trim();
-      if (config.dmCardSubtitle?.trim()) ruleConfig.dm_card_subtitle = config.dmCardSubtitle.trim();
-      if (config.dmCardButton?.text?.trim() && config.dmCardButton?.url?.trim()) {
-        ruleConfig.dm_card_button = { text: config.dmCardButton.text.trim(), url: config.dmCardButton.url.trim() };
-      }
     }
 
     // Mark rule as lead_capture for UX (used by builder + edit screens)
@@ -1453,18 +1433,12 @@ export default function AutomationsPage() {
                 commentReplies: (cfg.comment_replies && cfg.comment_replies.length > 0 && cfg.comment_replies.some(r => r.trim())) 
                   ? cfg.comment_replies.filter(r => r.trim()).slice(0, 3)
                   : ['Thanks! Please see DMs.', 'Sent you a message! Check it out!', 'Nice! Check your DMs!'],
-                dmType: cfg.dm_type || cfg.dmType || 'text',
+                dmType: (cfg.dm_type || cfg.dmType) === 'text_button' ? 'text_button' : 'text',
                 // Ensure message_variations has at least 3 items, filter out empty strings
                 dmMessages: (cfg.message_variations && cfg.message_variations.length > 0 && cfg.message_variations.some(m => m.trim()))
                   ? cfg.message_variations.filter(m => m.trim()).slice(0, 3)
                   : ['Thanks for your interest! Check out our latest updates.', 'Hey! We have something special for you. Check it out!', 'Awesome! We sent you a message with more details.'],
                 buttons: cfg.buttons || [{ text: 'Click me', url: '' }],
-                dmMediaUrl: (cfg.dm_media_url || cfg.dmMediaUrl || cfg.lead_dm_media_url || cfg.leadDmMediaUrl) ?? '',
-                dmVoiceMessageUrl: cfg.dm_voice_message_url ?? '',
-                dmCardImageUrl: cfg.dm_card_image_url ?? '',
-                dmCardTitle: cfg.dm_card_title ?? '',
-                dmCardSubtitle: cfg.dm_card_subtitle ?? '',
-                dmCardButton: cfg.dm_card_button ?? { text: '', url: '' },
                 delayMinutes: cfg.delay_minutes || 0,
 
                 // Per‑flow stored values:
