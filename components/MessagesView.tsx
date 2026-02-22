@@ -777,7 +777,6 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
             <div className="text-center max-w-sm">
               <ChatBubbleLeftRightIcon className="h-16 w-16 mx-auto mb-4" />
               <p className="text-lg">Select a conversation to view messages</p>
-              <p className="text-sm text-gray-400 mt-2">If messages or conversations are not showing, click Sync Conversations at the top to refresh from Instagram.</p>
             </div>
           </div>
         )}
