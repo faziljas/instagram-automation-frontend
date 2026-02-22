@@ -406,7 +406,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
         <div className="flex flex-col md:flex-row h-full w-full min-w-0 bg-white overflow-x-hidden">
           {/* Left Side: Settings Form - min width uses vw so zoom doesn't cause horizontal overflow */}
           <div className="flex-1 min-w-[min(280px,45vw)] overflow-y-auto border-r-0 md:border-r border-gray-200 max-w-full overflow-x-hidden">
-            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-100 bg-white px-4 md:px-6 py-4">
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-100 bg-white px-4 md:px-6 py-3">
               <h2 className="text-lg font-semibold text-gray-900">
                 Automation Builder
               </h2>
@@ -431,10 +431,10 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
               </div>
             </div>
 
-            <div className="px-4 md:px-6 py-4 md:py-6 space-y-6 max-w-full overflow-x-hidden">
+            <div className="px-4 md:px-6 py-3 md:py-4 space-y-4 max-w-full overflow-x-hidden">
               {/* DM Flow Type (Simple vs Lead Capture) */}
-              <div className="mb-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <div className="mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   DM Type
                 </label>
                 <div className="bg-gray-100 p-1 rounded-lg flex gap-1">
@@ -471,7 +471,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
 
               {/* Trigger Keywords */}
               <div>
-                <div className="flex items-center gap-2 mb-1.5">
+                <div className="flex items-center gap-2 mb-1">
                   <label className="block text-sm font-medium text-gray-700">
                     Trigger Keywords <span className="text-red-500">*</span>
                   </label>
@@ -489,7 +489,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                     </div>
                   </div>
                 </div>
-                <div className="space-y-3">
+                <div className="space-y-2">
                   <input
                     type="text"
                     value={currentKeyword}
@@ -590,8 +590,8 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
               {/* Public Comment Replies */}
               {media.media_product_type !== 'STORY' && (
                 <div>
-                  <div className="mb-3">
-                    <div className="flex items-center gap-2 mb-1">
+                  <div className="mb-2">
+                    <div className="flex items-center gap-2 mb-0.5">
                       <label className="block text-sm font-medium text-gray-700">
                         Public Acknowledgement Reply (required)
                       </label>
@@ -613,12 +613,12 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                   {(activeTab === 'simple' 
                     ? (config.simpleAutoReplyToComments ?? true)
                     : (config.leadAutoReplyToComments ?? true)) && (
-                    <div className="space-y-3 mt-3">
+                    <div className="space-y-2 mt-2">
                       {Array.from({ length: 3 }, (_, index) => {
                         const replies = activeTab === 'simple' ? config.simpleCommentReplies : config.leadCommentReplies;
                         const reply = replies[index] || '';
                         return (
-                          <div key={index} className="flex flex-col sm:flex-row gap-3">
+                          <div key={index} className="flex flex-col sm:flex-row gap-2">
                           <div className="flex-1">
                             <textarea
                               value={reply}
@@ -637,8 +637,8 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                                   setConfig({ ...config, leadCommentReplies: newReplies });
                                 }
                               }}
-                              rows={3}
-                              className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none min-h-[60px]"
+                              rows={2}
+                              className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none min-h-[52px]"
                               placeholder="Enter reply variation (public comment)"
                             />
                             <p className="text-xs text-gray-500 mt-0.5">{reply.length}/{INSTAGRAM_PUBLIC_COMMENT_MAX_CHARS}</p>
@@ -679,9 +679,9 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
               )}
 
               {/* Primary DM Section (same for both tabs) */}
-              <div className="border-t border-gray-200 pt-6">
-                <div className="mb-4">
-                  <h3 className="text-sm font-semibold text-gray-900 mb-2">
+              <div className="border-t border-gray-200 pt-4">
+                <div className="mb-2">
+                  <h3 className="text-sm font-semibold text-gray-900 mb-0.5">
                     Then send your primary DM...
                   </h3>
                   <p className="text-xs text-gray-500">
@@ -691,9 +691,9 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                 </div>
                 {/* Pre‑DM Engagement – only relevant when Lead Capture is selected */}
                 {activeTab === 'lead' && (
-                  <div className="mb-6">
-                    <div className="mb-3">
-                      <h3 className="text-sm font-semibold text-gray-900 mb-1">
+                  <div className="mb-4">
+                    <div className="mb-2">
+                      <h3 className="text-sm font-semibold text-gray-900 mb-0.5">
                         Before you send your primary DM, send them...
                       </h3>
                       <p className="text-xs text-gray-500">
@@ -701,15 +701,15 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                       </p>
                     </div>
 
-                    <div className="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                    <div className="p-3 border border-gray-200 rounded-lg bg-gray-50">
                       {/* Radio buttons for Pre-DM Flow Type */}
-                      <div className="space-y-3">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
                           Select Pre-DM Flow Type
                         </label>
                         
                         {/* Email Option */}
-                        <label className="flex items-start p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                        <label className="flex items-start p-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
                           <input
                             type="radio"
                             name="preDmFlowType"
@@ -737,7 +737,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                         </label>
 
                         {/* Phone Option */}
-                        <label className="flex items-start p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                        <label className="flex items-start p-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
                           <input
                             type="radio"
                             name="preDmFlowType"
@@ -765,7 +765,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                         </label>
 
                         {/* Followers Option */}
-                        <label className="flex items-start p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                        <label className="flex items-start p-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
                           <input
                             type="radio"
                             name="preDmFlowType"
@@ -801,12 +801,12 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
 
                       {/* Show fields based on selected option */}
                       {config.preDmFlowType && (
-                        <div className="space-y-4 mt-4 pt-4 border-t border-gray-200">
+                        <div className="space-y-3 mt-3 pt-3 border-t border-gray-200">
 
                           {/* Email Flow Fields - Simplified */}
                           {config.preDmFlowType === 'email' && (
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                              <label className="block text-sm font-medium text-gray-700 mb-1">
                                 First message (follow + ask for email)
                               </label>
                               <textarea
@@ -815,7 +815,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                                 onChange={(e) =>
                                   setConfig({ ...config, simpleFlowMessage: e.target.value.slice(0, INSTAGRAM_PRE_DM_MESSAGE_MAX_CHARS) })
                                 }
-                                rows={3}
+                                rows={2}
                                 className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none"
                                 placeholder="Follow me to get the guide 👇 Reply with your email and I'll send it! 📧"
                               />
@@ -828,7 +828,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                           {/* Phone Flow Fields - Simplified */}
                           {config.preDmFlowType === 'phone' && (
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                              <label className="block text-sm font-medium text-gray-700 mb-1">
                                 First message (follow + ask for phone)
                               </label>
                               <textarea
@@ -837,7 +837,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                                 onChange={(e) =>
                                   setConfig({ ...config, simpleFlowPhoneMessage: e.target.value.slice(0, INSTAGRAM_PRE_DM_MESSAGE_MAX_CHARS) })
                                 }
-                                rows={3}
+                                rows={2}
                                 className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none"
                                 placeholder="Follow me to get the guide 👇 Reply with your phone number and I'll send it! 📱"
                               />
@@ -850,7 +850,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                           {/* Followers Flow Fields - First message only; backend handles recheck/exit */}
                           {config.preDmFlowType === 'followers' && (
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                              <label className="block text-sm font-medium text-gray-700 mb-1">
                                 Follow request message
                               </label>
                               <textarea
@@ -862,7 +862,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                                     askToFollowMessage: e.target.value.slice(0, INSTAGRAM_PRE_DM_MESSAGE_MAX_CHARS),
                                   })
                                 }
-                                rows={5}
+                                rows={4}
                                 className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none"
                                 placeholder={`Hey! Would you mind following me? I share great content! 🙌\n\n✅ Once you've followed, type 'done' or 'followed' to continue!\n🔗 Visit my profile: https://www.instagram.com/${accountUsername}\nClick one of the options below:`}
                               />
@@ -876,19 +876,19 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                   </div>
                 )}
 
-                <div className="space-y-4">
+                <div className="space-y-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
                       DM Messages (variations for randomization)
                     </label>
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       {Array.from({ length: 3 }, (_, index) => {
                         const messages = activeTab === 'simple' 
                           ? (config.simpleDmMessages.length ? config.simpleDmMessages : [''])
                           : (config.leadDmMessages.length ? config.leadDmMessages : ['']);
                         const message = messages[index] || '';
                         return (
-                          <div key={index} className="flex flex-col sm:flex-row gap-3">
+                          <div key={index} className="flex flex-col sm:flex-row gap-2">
                           <div className="flex-1">
                             <textarea
                               value={message}
@@ -909,8 +909,8 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                                   setConfig({ ...config, leadDmMessages: newMessages });
                                 }
                               }}
-                              rows={3}
-                              className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none min-h-[60px]"
+                              rows={2}
+                              className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none min-h-[52px]"
                               placeholder="Enter DM message variation"
                             />
                             <p className="text-xs text-gray-500 mt-0.5">{message.length}/{INSTAGRAM_DM_MAX_CHARS}</p>
@@ -950,7 +950,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
 
                   {/* DM type – SS1-style dropdown with icons */}
                   <div className="relative" ref={dmTypeDropdownRef}>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
                       DM type
                     </label>
                     <button
@@ -1006,10 +1006,10 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                   </div>
 
                   {config.dmType === 'text_button' && (
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                        {config.buttons.map((button, index) => (
-                          <div key={index} className="flex gap-3 items-start">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-1">
+                          <div key={index} className="flex gap-2 items-start">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 flex-1">
                               <div>
                                 <input
                                   type="text"
@@ -1074,8 +1074,8 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                     </div>
                   )}
 
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <div className="mt-3">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
                       Delay (minutes)
                     </label>
                     <input
@@ -1095,7 +1095,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
               </div>
 
               {/* Save Button */}
-              <div className="sticky bottom-0 bg-white flex flex-col sm:flex-row justify-end gap-3 pt-4 md:pt-6 pb-4 md:pb-6 px-4 md:px-0 border-t border-gray-200 mt-6">
+              <div className="sticky bottom-0 bg-white flex flex-col sm:flex-row justify-end gap-2 pt-3 md:pt-4 pb-3 md:pb-4 px-4 md:px-0 border-t border-gray-200 mt-4">
                 <button
                   onClick={onClose}
                   className="px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-700 rounded-lg transition-colors"
@@ -1115,12 +1115,12 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
 
           {/* Right Side: Live Preview - min width uses vw so zoom doesn't cause horizontal overflow */}
           <div className="flex-1 min-w-[min(300px,45vw)] overflow-y-auto bg-gray-50 max-w-full overflow-x-hidden hidden md:block">
-            <div className="sticky top-0 z-10 bg-gray-50 px-4 md:px-6 py-4 border-b border-gray-200">
+            <div className="sticky top-0 z-10 bg-gray-50 px-4 md:px-6 py-3 border-b border-gray-200">
               <h3 className="text-lg font-semibold text-gray-900">
                 Live Preview
               </h3>
             </div>
-            <div className="p-4 md:p-6">
+            <div className="p-3 md:p-4">
               <MobilePreview
                 media={media}
                 config={config as React.ComponentProps<typeof MobilePreview>['config']}
