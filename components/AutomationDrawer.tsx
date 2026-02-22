@@ -590,7 +590,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
               {/* Public Comment Replies */}
               {media.media_product_type !== 'STORY' && (
                 <div>
-                  <div className="mb-2">
+                  <div className="mb-1">
                     <div className="flex items-center gap-2 mb-0.5">
                       <label className="block text-sm font-medium text-gray-700">
                         Public Acknowledgement Reply (required)
@@ -606,19 +606,19 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                         </div>
                       </div>
                     </div>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-500 leading-tight">
                       A public reply is automatically posted to confirm message delivery and prevent spam.
                     </p>
                   </div>
                   {(activeTab === 'simple' 
                     ? (config.simpleAutoReplyToComments ?? true)
                     : (config.leadAutoReplyToComments ?? true)) && (
-                    <div className="space-y-2 mt-2">
+                    <div className="space-y-1.5 mt-1.5">
                       {Array.from({ length: 3 }, (_, index) => {
                         const replies = activeTab === 'simple' ? config.simpleCommentReplies : config.leadCommentReplies;
                         const reply = replies[index] || '';
                         return (
-                          <div key={index} className="flex flex-col sm:flex-row gap-2">
+                          <div key={index} className="flex flex-col sm:flex-row gap-1.5">
                           <div className="flex-1">
                             <textarea
                               value={reply}
@@ -637,8 +637,8 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                                   setConfig({ ...config, leadCommentReplies: newReplies });
                                 }
                               }}
-                              rows={2}
-                              className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none min-h-[52px]"
+                              rows={1}
+                              className="w-full px-2.5 py-1.5 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-y min-h-[34px] max-h-[80px]"
                               placeholder="Enter reply variation (public comment)"
                             />
                             <p className="text-xs text-gray-500 mt-0.5">{reply.length}/{INSTAGRAM_PUBLIC_COMMENT_MAX_CHARS}</p>
@@ -815,8 +815,8 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                                 onChange={(e) =>
                                   setConfig({ ...config, simpleFlowMessage: e.target.value.slice(0, INSTAGRAM_PRE_DM_MESSAGE_MAX_CHARS) })
                                 }
-                                rows={2}
-                                className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none"
+                                rows={1}
+                                className="w-full px-2.5 py-1.5 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-y min-h-[34px] max-h-[80px]"
                                 placeholder="Follow me to get the guide 👇 Reply with your email and I'll send it! 📧"
                               />
                               <p className="text-xs text-gray-500 mt-1">
@@ -837,8 +837,8 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                                 onChange={(e) =>
                                   setConfig({ ...config, simpleFlowPhoneMessage: e.target.value.slice(0, INSTAGRAM_PRE_DM_MESSAGE_MAX_CHARS) })
                                 }
-                                rows={2}
-                                className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none"
+                                rows={1}
+                                className="w-full px-2.5 py-1.5 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-y min-h-[34px] max-h-[80px]"
                                 placeholder="Follow me to get the guide 👇 Reply with your phone number and I'll send it! 📱"
                               />
                               <p className="text-xs text-gray-500 mt-1">
@@ -862,8 +862,8 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                                     askToFollowMessage: e.target.value.slice(0, INSTAGRAM_PRE_DM_MESSAGE_MAX_CHARS),
                                   })
                                 }
-                                rows={4}
-                                className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none"
+                                rows={2}
+                                className="w-full px-2.5 py-1.5 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-y min-h-[52px] max-h-[120px]"
                                 placeholder={`Hey! Would you mind following me? I share great content! 🙌\n\n✅ Once you've followed, type 'done' or 'followed' to continue!\n🔗 Visit my profile: https://www.instagram.com/${accountUsername}\nClick one of the options below:`}
                               />
                               <p className="text-xs text-gray-500 mt-1">{(config.askToFollowMessage || '').length}/{INSTAGRAM_PRE_DM_MESSAGE_MAX_CHARS}</p>
@@ -881,14 +881,14 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       DM Messages (variations for randomization)
                     </label>
-                    <div className="space-y-2">
+                    <div className="space-y-1.5">
                       {Array.from({ length: 3 }, (_, index) => {
                         const messages = activeTab === 'simple' 
                           ? (config.simpleDmMessages.length ? config.simpleDmMessages : [''])
                           : (config.leadDmMessages.length ? config.leadDmMessages : ['']);
                         const message = messages[index] || '';
                         return (
-                          <div key={index} className="flex flex-col sm:flex-row gap-2">
+                          <div key={index} className="flex flex-col sm:flex-row gap-1.5">
                           <div className="flex-1">
                             <textarea
                               value={message}
@@ -909,8 +909,8 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                                   setConfig({ ...config, leadDmMessages: newMessages });
                                 }
                               }}
-                              rows={2}
-                              className="w-full px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none min-h-[52px]"
+                              rows={1}
+                              className="w-full px-2.5 py-1.5 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-y min-h-[34px] max-h-[80px]"
                               placeholder="Enter DM message variation"
                             />
                             <p className="text-xs text-gray-500 mt-0.5">{message.length}/{INSTAGRAM_DM_MAX_CHARS}</p>
