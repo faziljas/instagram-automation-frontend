@@ -352,7 +352,7 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
           <div className="w-full md:w-auto flex items-center gap-2">
             <h2 className="text-xl md:text-2xl font-bold text-gray-900">Messages</h2>
             <span
-              className="text-gray-400 hover:text-gray-600 cursor-help"
+              className="text-gray-400 hover:text-gray-600 cursor-pointer"
               title="If messages are not showing, click Sync Conversations to refresh from Instagram."
             >
               <InformationCircleIcon className="h-5 w-5" aria-hidden />
