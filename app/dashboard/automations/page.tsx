@@ -596,6 +596,14 @@ export default function AutomationsPage() {
     if (config.dmType === 'voice_message' && config.dmVoiceMessageUrl?.trim()) {
       ruleConfig.dm_voice_message_url = config.dmVoiceMessageUrl.trim();
     }
+    if (config.dmType === 'card') {
+      if (config.dmCardImageUrl?.trim()) ruleConfig.dm_card_image_url = config.dmCardImageUrl.trim();
+      if (config.dmCardTitle?.trim()) ruleConfig.dm_card_title = config.dmCardTitle.trim();
+      if (config.dmCardSubtitle?.trim()) ruleConfig.dm_card_subtitle = config.dmCardSubtitle.trim();
+      if (config.dmCardButton?.text?.trim() && config.dmCardButton?.url?.trim()) {
+        ruleConfig.dm_card_button = { text: config.dmCardButton.text.trim(), url: config.dmCardButton.url.trim() };
+      }
+    }
 
     // Mark rule as lead_capture for UX (used by builder + edit screens)
     // Explicitly set is_lead_capture to ensure backend uses correct comment replies
@@ -1434,7 +1442,7 @@ export default function AutomationsPage() {
                 commentReplies: (cfg.comment_replies && cfg.comment_replies.length > 0 && cfg.comment_replies.some(r => r.trim())) 
                   ? cfg.comment_replies.filter(r => r.trim()).slice(0, 3)
                   : ['Thanks! Please see DMs.', 'Sent you a message! Check it out!', 'Nice! Check your DMs!'],
-                dmType: cfg.dmType || 'text',
+                dmType: cfg.dm_type || cfg.dmType || 'text',
                 // Ensure message_variations has at least 3 items, filter out empty strings
                 dmMessages: (cfg.message_variations && cfg.message_variations.length > 0 && cfg.message_variations.some(m => m.trim()))
                   ? cfg.message_variations.filter(m => m.trim()).slice(0, 3)
@@ -1442,6 +1450,10 @@ export default function AutomationsPage() {
                 buttons: cfg.buttons || [{ text: 'Click me', url: '' }],
                 dmMediaUrl: cfg.dm_media_url ?? '',
                 dmVoiceMessageUrl: cfg.dm_voice_message_url ?? '',
+                dmCardImageUrl: cfg.dm_card_image_url ?? '',
+                dmCardTitle: cfg.dm_card_title ?? '',
+                dmCardSubtitle: cfg.dm_card_subtitle ?? '',
+                dmCardButton: cfg.dm_card_button ?? { text: '', url: '' },
                 delayMinutes: cfg.delay_minutes || 0,
 
                 // Per‑flow stored values:

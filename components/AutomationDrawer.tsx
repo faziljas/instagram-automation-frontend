@@ -83,6 +83,11 @@ interface AutomationConfig {
   dmMediaUrl?: string;
   /** Public URL for audio when dmType is voice_message (user uploads or pastes URL) */
   dmVoiceMessageUrl?: string;
+  /** Card: image URL, title, subtitle, optional button */
+  dmCardImageUrl?: string;
+  dmCardTitle?: string;
+  dmCardSubtitle?: string;
+  dmCardButton?: { text: string; url: string };
   delayMinutes: number;
 
   // Legacy lead‑capture fields (kept optional so old data still loads)
@@ -156,6 +161,10 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
     buttons: [{ text: 'Click me', url: '' }],
     dmMediaUrl: '',
     dmVoiceMessageUrl: '',
+    dmCardImageUrl: '',
+    dmCardTitle: '',
+    dmCardSubtitle: '',
+    dmCardButton: { text: '', url: '' },
     delayMinutes: 0,
     isLeadCapture: false,
   });
@@ -165,10 +174,11 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
   const dmTypeDropdownRef = useRef<HTMLDivElement>(null);
   const prevIsOpenRef = useRef(false);
   const [dmTypeDropdownOpen, setDmTypeDropdownOpen] = useState(false);
-  const [uploadingMedia, setUploadingMedia] = useState<'image_video' | 'voice_message' | null>(null);
-  const [uploadError, setUploadError] = useState<{ type: 'image_video' | 'voice_message'; message: string } | null>(null);
+  const [uploadingMedia, setUploadingMedia] = useState<'image_video' | 'voice_message' | 'card' | null>(null);
+  const [uploadError, setUploadError] = useState<{ type: 'image_video' | 'voice_message' | 'card'; message: string } | null>(null);
   const imageVideoInputRef = useRef<HTMLInputElement>(null);
   const voiceMessageInputRef = useRef<HTMLInputElement>(null);
+  const cardImageInputRef = useRef<HTMLInputElement>(null);
   const [activeTab, setActiveTab] = useState<'simple' | 'lead'>('simple');
   const [currentKeyword, setCurrentKeyword] = useState('');
   const [showPreviewMobile, setShowPreviewMobile] = useState(false);
@@ -296,6 +306,10 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
           initialConfig.buttons || [{ text: 'Click me', url: '' }],
         dmMediaUrl: initialConfig.dmMediaUrl ?? '',
         dmVoiceMessageUrl: initialConfig.dmVoiceMessageUrl ?? '',
+        dmCardImageUrl: initialConfig.dmCardImageUrl ?? '',
+        dmCardTitle: initialConfig.dmCardTitle ?? '',
+        dmCardSubtitle: initialConfig.dmCardSubtitle ?? '',
+        dmCardButton: initialConfig.dmCardButton ?? { text: '', url: '' },
         delayMinutes: initialConfig.delayMinutes || 0,
         // Include isLeadCapture flag so MobilePreview can use it
         isLeadCapture: initialConfig.isLeadCapture || false,
@@ -321,7 +335,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
   }, [dmTypeDropdownOpen]);
 
   const handleDmMediaUpload = async (
-    type: 'image_video' | 'voice_message',
+    type: 'image_video' | 'voice_message' | 'card',
     file: File
   ) => {
     setUploadError(null);
@@ -331,12 +345,9 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
         type,
         message: `File is too large. Maximum size is ${maxMB}MB. Your file is ${(file.size / (1024 * 1024)).toFixed(1)}MB.`,
       });
-      if (type === 'image_video' && imageVideoInputRef.current) {
-        imageVideoInputRef.current.value = '';
-      }
-      if (type === 'voice_message' && voiceMessageInputRef.current) {
-        voiceMessageInputRef.current.value = '';
-      }
+      if (type === 'image_video' && imageVideoInputRef.current) imageVideoInputRef.current.value = '';
+      if (type === 'voice_message' && voiceMessageInputRef.current) voiceMessageInputRef.current.value = '';
+      if (type === 'card' && cardImageInputRef.current) cardImageInputRef.current.value = '';
       return;
     }
     setUploadingMedia(type);
@@ -349,8 +360,10 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
       );
       if (type === 'image_video') {
         setConfig((c) => ({ ...c, dmMediaUrl: data.url }));
-      } else {
+      } else if (type === 'voice_message') {
         setConfig((c) => ({ ...c, dmVoiceMessageUrl: data.url }));
+      } else {
+        setConfig((c) => ({ ...c, dmCardImageUrl: data.url }));
       }
     } catch (err: unknown) {
       const message =
@@ -366,6 +379,9 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
       }
       if (type === 'voice_message' && voiceMessageInputRef.current) {
         voiceMessageInputRef.current.value = '';
+      }
+      if (type === 'card' && cardImageInputRef.current) {
+        cardImageInputRef.current.value = '';
       }
     }
   };
@@ -1129,6 +1145,85 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                   )}
 
                   {/* Voice message: upload file or paste URL */}
+                  {/* Card: image, title, subtitle, optional button */}
+                  {config.dmType === 'card' && (
+                    <div className="space-y-3">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Card image <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        ref={cardImageInputRef}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) void handleDmMediaUpload('card', file);
+                        }}
+                      />
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <button
+                          type="button"
+                          disabled={uploadingMedia === 'card'}
+                          onClick={() => cardImageInputRef.current?.click()}
+                          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-400 rounded-lg hover:bg-gray-50 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 disabled:opacity-50 transition-all"
+                        >
+                          <ArrowUpTrayIcon className="h-5 w-5" />
+                          {uploadingMedia === 'card' ? 'Uploading...' : 'Upload image'}
+                        </button>
+                        <span className="text-xs text-gray-500 self-center sm:self-auto">or paste URL below</span>
+                      </div>
+                      <input
+                        type="url"
+                        value={config.dmCardImageUrl ?? ''}
+                        onChange={(e) => {
+                          setConfig({ ...config, dmCardImageUrl: e.target.value });
+                          if (uploadError?.type === 'card') setUploadError(null);
+                        }}
+                        placeholder="https://..."
+                        className="w-full h-10 px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all"
+                      />
+                      {uploadError?.type === 'card' && uploadingMedia === null && (
+                        <p className="text-sm text-red-600">{uploadError.message}</p>
+                      )}
+                      <label className="block text-sm font-medium text-gray-700 mt-3">Title</label>
+                      <input
+                        type="text"
+                        value={config.dmCardTitle ?? ''}
+                        onChange={(e) => setConfig({ ...config, dmCardTitle: e.target.value })}
+                        placeholder="Card title"
+                        maxLength={80}
+                        className="w-full h-10 px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all"
+                      />
+                      <label className="block text-sm font-medium text-gray-700">Subtitle</label>
+                      <input
+                        type="text"
+                        value={config.dmCardSubtitle ?? ''}
+                        onChange={(e) => setConfig({ ...config, dmCardSubtitle: e.target.value })}
+                        placeholder="Card subtitle (optional)"
+                        maxLength={80}
+                        className="w-full h-10 px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all"
+                      />
+                      <label className="block text-sm font-medium text-gray-700">Button (optional)</label>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <input
+                          type="text"
+                          value={config.dmCardButton?.text ?? ''}
+                          onChange={(e) => setConfig({ ...config, dmCardButton: { ...(config.dmCardButton ?? { text: '', url: '' }), text: e.target.value } })}
+                          placeholder="Button text"
+                          className="h-10 px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all"
+                        />
+                        <input
+                          type="url"
+                          value={config.dmCardButton?.url ?? ''}
+                          onChange={(e) => setConfig({ ...config, dmCardButton: { ...(config.dmCardButton ?? { text: '', url: '' }), url: e.target.value } })}
+                          placeholder="Button URL"
+                          className="h-10 px-3 py-2 text-sm border border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-gray-400 transition-all"
+                        />
+                      </div>
+                    </div>
+                  )}
+
                   {config.dmType === 'voice_message' && (
                     <div className="space-y-3">
                       <label className="block text-sm font-medium text-gray-700">
