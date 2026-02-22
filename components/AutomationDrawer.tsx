@@ -697,8 +697,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                         Before you send your primary DM, send them...
                       </h3>
                       <p className="text-xs text-gray-500">
-                        Optional: Engage users with follow requests and/or email
-                        collection before your main message.
+                        Engage users with Email/Phone/Follow request collection before your main message.
                       </p>
                     </div>
 
@@ -732,7 +731,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                           <div className="ml-3 flex-1">
                             <div className="text-sm font-medium text-gray-700">Email</div>
                             <div className="text-xs text-gray-500">
-                              One message (follow + email), then keep asking for email until valid. No buttons.
+                              One message (follow + email), then keep asking for email until valid.
                             </div>
                           </div>
                         </label>
@@ -760,7 +759,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                           <div className="ml-3 flex-1">
                             <div className="text-sm font-medium text-gray-700">Phone</div>
                             <div className="text-xs text-gray-500">
-                              One message (follow + phone), then keep asking for phone until valid. No buttons.
+                              One message (follow + phone), then keep asking for phone until valid.
                             </div>
                           </div>
                         </label>
@@ -882,7 +881,6 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
                       DM Messages (variations for randomization)
                     </label>
-                    <p className="text-xs text-gray-500 mb-2">Max {INSTAGRAM_DM_MAX_CHARS} characters per message (Instagram DM limit).</p>
                     <div className="space-y-3">
                       {Array.from({ length: 3 }, (_, index) => {
                         const messages = activeTab === 'simple' 
@@ -1009,7 +1007,6 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
 
                   {config.dmType === 'text_button' && (
                     <div className="space-y-3">
-                      <p className="text-xs text-gray-500">Button text: max {INSTAGRAM_BUTTON_TEXT_MAX_CHARS} characters (Instagram limit).</p>
                        {config.buttons.map((button, index) => (
                           <div key={index} className="flex gap-3 items-start">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-1">

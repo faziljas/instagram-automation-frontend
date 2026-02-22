@@ -805,7 +805,7 @@ export default function EditRulePage() {
                           Before you send your primary DM, send them...
                         </h3>
                         <p className="text-xs text-gray-500 mb-4">
-                          Optional: Engage users with follow requests or email collection before your main message.
+                          Engage users with Email/Phone/Follow request collection before your main message.
                         </p>
                       </div>
 
