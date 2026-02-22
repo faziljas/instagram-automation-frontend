@@ -158,7 +158,13 @@ export default function MobilePreview({
   const sampleComment = sampleKeyword || 'Sample comment';
   const sampleReply =
     activeCommentReplies.length > 0 ? activeCommentReplies[0] : null;
-  
+
+  // For Story: reply is already in DMs, so show first DM message (not "Thanks! Please see DMs.")
+  const sampleStoryReply =
+    activeDmMessages && activeDmMessages.length > 0
+      ? activeDmMessages[0]
+      : "Hey! We have something special for you. Check it out!";
+
   // Primary DM text (final message)
   const sampleDM =
     activeDmMessages && activeDmMessages.length > 0 ? activeDmMessages[0] : '';
@@ -242,14 +248,12 @@ export default function MobilePreview({
                           <p className="text-xs">{sampleKeyword}</p>
                         </div>
                       </div>
-                      {sampleReply && (
-                        <div className="flex justify-start">
-                          <div className="max-w-[85%] bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm px-3 py-2">
-                            <span className="text-[10px] text-gray-500 block">@{accountUsername}</span>
-                            <p className="text-xs">{sampleReply}</p>
-                          </div>
+                      <div className="flex justify-start">
+                        <div className="max-w-[85%] bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm px-3 py-2">
+                          <span className="text-[10px] text-gray-500 block">@{accountUsername}</span>
+                          <p className="text-xs">{sampleStoryReply}</p>
                         </div>
-                      )}
+                      </div>
                     </div>
                   </div>
                 )
