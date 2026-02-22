@@ -6,11 +6,15 @@
 @layer base {
   html {
     height: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
     background-color: rgb(243 244 246) !important; /* gray-100 – match dashboard background */
   }
   body {
     min-height: 100vh;
     height: auto;
+    max-width: 100vw;
+    overflow-x: hidden;
     background-color: rgb(243 244 246) !important; /* gray-100 – match dashboard background */
     margin: 0;
     padding: 0;

@@ -703,7 +703,7 @@ export default function AutomationsPage() {
   }, [accounts, selectedAccount]);
 
   return (
-    <div className="max-w-7xl mx-auto w-full overflow-x-hidden">
+    <div className="w-full max-w-[min(80rem,100%)] mx-auto overflow-x-hidden">
       {/* Hero Banner */}
       <div className="relative overflow-hidden bg-gradient-to-br from-purple-500 via-pink-500 to-rose-600 rounded-2xl mb-8 shadow-xl w-full">
         <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent"></div>
