@@ -490,7 +490,6 @@ export default function MobilePreview({
                         </div>
                       </div>
                     </>
-                  )
                   )}
                 </div>
               </div>
