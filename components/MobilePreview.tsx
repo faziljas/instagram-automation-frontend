@@ -239,32 +239,8 @@ export default function MobilePreview({
                 )}
               </div>
 
-              {/* Post/Reel: Comment section. Story: only DM reply (no comments — story replies are DMs) */}
-              {isStory ? (
-                (activeDmMessages && activeDmMessages.length > 0) && (
-                  <div className="px-4 py-2 border-t border-gray-200 bg-gray-50">
-                    <p className="text-xs font-medium text-gray-500 mb-2">
-                      {isLeadMode ? 'Keyword DM' : 'Default DM'} · When they reply to your story:
-                    </p>
-                    <div className="space-y-2">
-                      <div className="flex justify-end">
-                        <div className="max-w-[85%] bg-blue-500 text-white rounded-2xl rounded-tr-sm px-3 py-2">
-                          <span className="text-[10px] opacity-90 block">user123</span>
-                          <p className="text-xs">
-                            {isLeadMode && activeKeywords && activeKeywords.length > 0 ? sampleKeyword : 'Hi 👋'}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex justify-start">
-                        <div className="max-w-[85%] bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm px-3 py-2">
-                          <span className="text-[10px] text-gray-500 block">@{accountUsername}</span>
-                          <p className="text-xs">{sampleStoryReply}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )
-              ) : (
+              {/* Post/Reel: Comment section. Story: no inline preview (removed for Default DM and Keyword DM) */}
+              {!isStory && (
                 activeKeywords && activeKeywords.length > 0 && (
                   <div className="px-4 py-2 border-t border-gray-200 bg-gray-50">
                     <div className="space-y-2">
