@@ -597,11 +597,13 @@ export default function AutomationsPage() {
     }
 
     // Mark rule as lead_capture for UX (used by builder + edit screens)
-    // Explicitly set is_lead_capture to ensure backend uses correct comment replies
-    if (config.isLeadCapture || config.enablePreDmEngagement || config.askToFollow || config.askForEmail) {
+    // For stories: "Keyword DM" tab is keyword-based reply only (no lead capture flow). Post/reels unchanged.
+    const isStory = selectedMedia.media_product_type === 'STORY';
+    if (isStory) {
+      ruleConfig.is_lead_capture = false;
+    } else if (config.isLeadCapture || config.enablePreDmEngagement || config.askToFollow || config.askForEmail) {
       ruleConfig.is_lead_capture = true;
     } else {
-      // Explicitly set to false for Simple Reply rules to prevent backend from using Lead Capture messages
       ruleConfig.is_lead_capture = false;
     }
 

@@ -307,17 +307,19 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
   }, [dmTypeDropdownOpen]);
 
   const handleSave = async () => {
-    // Validate trigger keywords - must have at least one keyword
     const activeKeywords =
       activeTab === 'simple' ? config.simpleKeywords : config.leadKeywords;
-    
-    if (!activeKeywords || activeKeywords.length === 0 || activeKeywords.filter((k) => k.trim().length > 0).length === 0) {
+    const isStory = media.media_product_type === 'STORY';
+    // For stories: "Any DM" tab = keywords optional; "Keyword DM" tab = at least one keyword required. Post/reels = always require at least one.
+    const keywordsRequired = !isStory || activeTab === 'lead';
+    const hasValidKeywords = activeKeywords && activeKeywords.length > 0 && activeKeywords.filter((k) => k.trim().length > 0).length > 0;
+
+    if (keywordsRequired && !hasValidKeywords) {
       setKeywordError('At least one trigger keyword is required');
       setIsSaving(false);
       return;
     }
-    
-    // Clear error if validation passes
+
     setKeywordError('');
     
     setIsSaving(true);
@@ -432,7 +434,12 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
             </div>
 
             <div className="px-4 md:px-6 py-3 md:py-4 space-y-4 max-w-full overflow-x-hidden">
-              {/* DM Flow Type (Simple vs Lead Capture) */}
+              {/* DM Flow Type: For stories show "Any DM" / "Keyword DM"; for posts/reels show "Simple Reply" / "Lead Capture" */}
+              {(() => {
+                const isStory = media.media_product_type === 'STORY';
+                const firstTabLabel = isStory ? 'Any DM' : 'Simple Reply';
+                const secondTabLabel = isStory ? 'Keyword DM' : 'Lead Capture';
+                return (
               <div className="mb-1">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   DM Type
@@ -450,7 +457,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                         : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     }`}
                   >
-                    Simple Reply
+                    {firstTabLabel}
                   </button>
                   <button
                     type="button"
@@ -464,16 +471,29 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                         : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     }`}
                   >
-                    Lead Capture
+                    {secondTabLabel}
                   </button>
                 </div>
               </div>
+                );
+              })()}
 
-              {/* Trigger Keywords */}
+              {/* Trigger Keywords: required for Keyword DM (stories) / Lead Capture; optional for Any DM (stories) */}
+              {(() => {
+                const isStory = media.media_product_type === 'STORY';
+                const isKeywordTab = activeTab === 'lead';
+                const keywordsRequired = !isStory || isKeywordTab;
+                const tooltipStory = isStory
+                  ? (isKeywordTab
+                    ? 'Add at least one keyword. Automation runs only when the story reply matches a keyword.'
+                    : 'Optional. Leave empty to reply to every story reply, or add keywords to reply only when one matches.')
+                  : 'Add keywords to trigger automation only on matching comments. At least one keyword is required.';
+                const tooltipPostReel = `Max ${INSTAGRAM_TRIGGER_KEYWORDS_MAX_COUNT} keywords, ${INSTAGRAM_TRIGGER_KEYWORD_MAX_LENGTH} chars each.`;
+                return (
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <label className="block text-sm font-medium text-gray-700">
-                    Trigger Keywords <span className="text-red-500">*</span>
+                    Trigger Keywords {keywordsRequired ? <span className="text-red-500">*</span> : null}
                   </label>
                   <span className="text-xs text-gray-500">
                     {(activeTab === 'simple' ? config.simpleKeywords.length : config.leadKeywords.length)}/{INSTAGRAM_TRIGGER_KEYWORDS_MAX_COUNT} keywords
@@ -482,7 +502,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                     <InformationCircleIcon className="h-5 w-5 text-blue-500 hover:text-blue-600 cursor-help transition-colors" />
                     <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-64 md:w-72 max-w-[calc(100vw-2rem)] p-3 bg-gray-900 text-white text-xs rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none whitespace-normal">
                       <p className="text-center leading-relaxed">
-                        Add keywords to trigger automation only on matching comments. At least one keyword is required. Max {INSTAGRAM_TRIGGER_KEYWORDS_MAX_COUNT} keywords, {INSTAGRAM_TRIGGER_KEYWORD_MAX_LENGTH} chars each.
+                        {isStory ? tooltipStory : `Add keywords to trigger automation only on matching comments. At least one keyword is required. ${tooltipPostReel}`}
                       </p>
                       {/* Tooltip arrow */}
                       <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
@@ -586,6 +606,8 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                   )}
                 </div>
               </div>
+                );
+              })()}
 
               {/* Public Comment Replies */}
               {media.media_product_type !== 'STORY' && (
@@ -689,8 +711,8 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                     takes them to your link or product.
                   </p>
                 </div>
-                {/* Pre‑DM Engagement – only relevant when Lead Capture is selected */}
-                {activeTab === 'lead' && (
+                {/* Pre‑DM Engagement – only for Lead Capture; hide for stories (Keyword DM = keyword-based reply only) */}
+                {activeTab === 'lead' && media.media_product_type !== 'STORY' && (
                   <div className="mb-4">
                     <div className="mb-2">
                       <h3 className="text-sm font-semibold text-gray-900 mb-0.5">
