@@ -239,12 +239,12 @@ export default function MobilePreview({
                 )}
               </div>
 
-              {/* For Post/Reel: Comment Section (public comments). For Story: Default DM or Keyword DM reply preview */}
+              {/* Post/Reel: Comment section. Story: only DM reply (no comments — story replies are DMs) */}
               {isStory ? (
                 (activeDmMessages && activeDmMessages.length > 0) && (
                   <div className="px-4 py-2 border-t border-gray-200 bg-gray-50">
                     <p className="text-xs font-medium text-gray-500 mb-2">
-                      {isLeadMode ? 'Keyword DM' : 'Default DM'} · Reply to story (message, not comment):
+                      {isLeadMode ? 'Keyword DM' : 'Default DM'} · When they reply to your story:
                     </p>
                     <div className="space-y-2">
                       <div className="flex justify-end">
@@ -304,7 +304,7 @@ export default function MobilePreview({
               )}
             </div>
 
-              {/* DM Chat Preview */}
+              {/* DM Chat Preview — for stories: only user message → your configured reply (no Pre-DM/Lead Capture) */}
             {showDM && showDmPreviewButton && (
               <div className="mt-4 border-t-4 border-gray-200 pt-4">
                 <div className="px-4 py-2 bg-gray-100">
@@ -313,8 +313,33 @@ export default function MobilePreview({
                   </p>
                 </div>
                 <div className="px-4 py-3 space-y-3">
-                  {/* ——— Simple flow (Phone): one message (follow + phone) → user phone → primary DM ——— */}
-                  {simpleFlowPhoneOn ? (
+                  {/* ——— Story: only DM reply — user sends keyword (Keyword DM) or any message (Default DM) → your configured reply ——— */}
+                  {isStory ? (
+                    <>
+                      <div className="flex justify-end">
+                        <div className="max-w-[70%] bg-blue-500 text-white rounded-2xl rounded-tr-sm px-4 py-2">
+                          <span className="text-[10px] opacity-90 block">user123</span>
+                          <p className="text-sm">
+                            {isLeadMode && activeKeywords && activeKeywords.length > 0 ? sampleKeyword : 'Hi 👋'}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex justify-start">
+                        <div className="max-w-[70%] bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm overflow-hidden">
+                          <p className="text-sm whitespace-pre-line px-4 py-2">{sampleDM}</p>
+                          {config.dmType === 'text_button' && config.buttons.length > 0 && (
+                            <div className="px-4 pb-2 space-y-1">
+                              {config.buttons.filter((b) => b.text.trim() && b.url.trim()).map((button, index) => (
+                                <a key={index} href={button.url} target="_blank" rel="noopener noreferrer" className="block w-full text-center text-xs font-semibold text-blue-600 bg-white border border-blue-600 rounded-lg py-2 px-3">
+                                  {button.text}
+                                </a>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  ) : simpleFlowPhoneOn ? (
                     <>
                       <div className="flex justify-start">
                         <div className="max-w-[70%] bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm px-4 py-2">
@@ -465,6 +490,7 @@ export default function MobilePreview({
                         </div>
                       </div>
                     </>
+                  )
                   )}
                 </div>
               </div>
