@@ -230,22 +230,29 @@ export default function MobilePreview({
                   </>
                 )}
                 {isStory && (
-                  <div className="text-xs text-gray-500">
-                    Story · Replies come as direct messages
+                  <div className="text-xs text-gray-500 space-y-0.5">
+                    <span className="block">Story · Replies come as direct messages</span>
+                    <span className="inline-block font-medium text-gray-700">
+                      {isLeadMode ? 'Keyword DM' : 'Default DM'}
+                    </span>
                   </div>
                 )}
               </div>
 
-              {/* For Post/Reel: Comment Section (public comments). For Story: Message reply preview (user sends message, not comment) */}
+              {/* For Post/Reel: Comment Section (public comments). For Story: Default DM or Keyword DM reply preview */}
               {isStory ? (
-                activeKeywords && activeKeywords.length > 0 && (
+                (activeDmMessages && activeDmMessages.length > 0) && (
                   <div className="px-4 py-2 border-t border-gray-200 bg-gray-50">
-                    <p className="text-xs font-medium text-gray-500 mb-2">Reply to story (message, not comment):</p>
+                    <p className="text-xs font-medium text-gray-500 mb-2">
+                      {isLeadMode ? 'Keyword DM' : 'Default DM'} · Reply to story (message, not comment):
+                    </p>
                     <div className="space-y-2">
                       <div className="flex justify-end">
                         <div className="max-w-[85%] bg-blue-500 text-white rounded-2xl rounded-tr-sm px-3 py-2">
                           <span className="text-[10px] opacity-90 block">user123</span>
-                          <p className="text-xs">{sampleKeyword}</p>
+                          <p className="text-xs">
+                            {isLeadMode && activeKeywords && activeKeywords.length > 0 ? sampleKeyword : 'Hi 👋'}
+                          </p>
                         </div>
                       </div>
                       <div className="flex justify-start">
@@ -301,7 +308,9 @@ export default function MobilePreview({
             {showDM && showDmPreviewButton && (
               <div className="mt-4 border-t-4 border-gray-200 pt-4">
                 <div className="px-4 py-2 bg-gray-100">
-                  <p className="text-xs font-semibold text-gray-700">Direct Message</p>
+                  <p className="text-xs font-semibold text-gray-700">
+                    Direct Message{isStory ? ` (${isLeadMode ? 'Keyword DM' : 'Default DM'})` : ''}
+                  </p>
                 </div>
                 <div className="px-4 py-3 space-y-3">
                   {/* ——— Simple flow (Phone): one message (follow + phone) → user phone → primary DM ——— */}
