@@ -76,6 +76,8 @@ interface MobilePreviewProps {
   config: AutomationConfig;
   accountUsername: string;
   mode?: 'simple' | 'lead';
+  /** When true, use smaller phone and truncated text to fit modal and reduce scroll */
+  compact?: boolean;
 }
 
 export default function MobilePreview({
@@ -83,6 +85,7 @@ export default function MobilePreview({
   config,
   accountUsername,
   mode = 'simple',
+  compact = false,
 }: MobilePreviewProps) {
   const [showDM, setShowDM] = useState(false);
 
@@ -155,15 +158,8 @@ export default function MobilePreview({
               : config.commentReplies || []))
     : [];
 
-  const sampleComment = sampleKeyword || 'Sample comment';
   const sampleReply =
     activeCommentReplies.length > 0 ? activeCommentReplies[0] : null;
-
-  // For Story: reply is already in DMs, so show first DM message (not "Thanks! Please see DMs.")
-  const sampleStoryReply =
-    activeDmMessages && activeDmMessages.length > 0
-      ? activeDmMessages[0]
-      : "Hey! We have something special for you. Check it out!";
 
   // Primary DM text (final message)
   const sampleDM =
@@ -177,10 +173,19 @@ export default function MobilePreview({
 
   const isStory = media.media_product_type === 'STORY';
 
+  // Compact mode: truncate lengths and line-clamp to fit modal and reduce scroll
+  const captionMax = compact ? 40 : 100;
+  const dmLineClamp = compact ? 'line-clamp-2' : '';
+  const followMsgClamp = compact ? 'line-clamp-2' : '';
+
   return (
-    <div className="flex justify-center w-full max-w-full min-w-0">
-      {/* iPhone Frame - scales with container when zoomed or narrow so layout doesn't break */}
-      <div className="relative w-[375px] max-w-full aspect-[375/812] bg-black rounded-[3rem] p-2 shadow-2xl shrink-0">
+    <div className={`flex justify-center w-full max-w-full min-w-0 ${compact ? 'scale-90 origin-top' : ''}`}>
+      {/* iPhone Frame - smaller when compact to fit modal */}
+      <div
+        className={`relative bg-black rounded-[3rem] p-2 shadow-2xl shrink-0 ${
+          compact ? 'w-[260px] max-w-full aspect-[375/812]' : 'w-[375px] max-w-full aspect-[375/812]'
+        }`}
+      >
         <div className="w-full h-full bg-white rounded-[2.5rem] overflow-hidden">
           {/* Status Bar */}
           <div className="h-11 bg-white flex items-center justify-between px-6 pt-2">
@@ -223,7 +228,9 @@ export default function MobilePreview({
                 </div>
                 {!isStory && (
                   <>
-                    <p className="text-sm text-gray-900">{media.caption.substring(0, 100)}...</p>
+                    <p className={`text-sm text-gray-900 ${compact ? 'line-clamp-2' : ''}`}>
+                      {media.caption.length > captionMax ? `${media.caption.substring(0, captionMax)}…` : media.caption}
+                    </p>
                     <div className="text-xs text-gray-500">
                       {media.like_count} likes • {media.comments_count} comments
                     </div>
@@ -302,7 +309,7 @@ export default function MobilePreview({
                       </div>
                       <div className="flex justify-start">
                         <div className="max-w-[70%] bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm overflow-hidden">
-                          <p className="text-sm whitespace-pre-line px-4 py-2">{sampleDM}</p>
+                          <p className={`text-sm whitespace-pre-line px-4 py-2 ${dmLineClamp}`}>{sampleDM}</p>
                           {config.dmType === 'text_button' && config.buttons.length > 0 && (
                             <div className="px-4 pb-2 space-y-1">
                               {config.buttons.filter((b) => b.text.trim() && b.url.trim()).map((button, index) => (
@@ -319,7 +326,7 @@ export default function MobilePreview({
                     <>
                       <div className="flex justify-start">
                         <div className="max-w-[70%] bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm px-4 py-2">
-                          <p className="text-sm whitespace-pre-line">
+                          <p className={`text-sm whitespace-pre-line ${dmLineClamp}`}>
                             {config.simpleFlowPhoneMessage || "Follow me to get the guide 👇 Reply with your phone number and I'll send it! 📱"}
                           </p>
                         </div>
@@ -331,7 +338,7 @@ export default function MobilePreview({
                       </div>
                       <div className="flex justify-start">
                         <div className="max-w-[70%] bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm overflow-hidden">
-                          <p className="text-sm whitespace-pre-line px-4 py-2">
+                          <p className={`text-sm whitespace-pre-line px-4 py-2 ${dmLineClamp}`}>
                             {sampleDM}
                           </p>
                           {config.dmType === 'text_button' && config.buttons.length > 0 && (
@@ -351,7 +358,7 @@ export default function MobilePreview({
                     <>
                       <div className="flex justify-start">
                         <div className="max-w-[70%] bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm px-4 py-2">
-                          <p className="text-sm whitespace-pre-line">
+                          <p className={`text-sm whitespace-pre-line ${dmLineClamp}`}>
                             {config.simpleFlowMessage || "Follow me to get the guide 👇 Reply with your email and I'll send it! 📧"}
                           </p>
                         </div>
@@ -364,13 +371,13 @@ export default function MobilePreview({
                       {config.emailSuccessMessage && (
                         <div className="flex justify-start">
                           <div className="max-w-[70%] bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm px-4 py-2">
-                            <p className="text-sm whitespace-pre-line">{config.emailSuccessMessage}</p>
+                            <p className={`text-sm whitespace-pre-line ${dmLineClamp}`}>{config.emailSuccessMessage}</p>
                           </div>
                         </div>
                       )}
                       <div className="flex justify-start">
                         <div className="max-w-[70%] bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm overflow-hidden">
-                          <p className="text-sm whitespace-pre-line px-4 py-2">{sampleDM}</p>
+                          <p className={`text-sm whitespace-pre-line px-4 py-2 ${dmLineClamp}`}>{sampleDM}</p>
                           {config.dmType === 'text_button' && config.buttons.length > 0 && (
                             <div className="px-4 pb-2 space-y-1">
                               {config.buttons.filter((b) => b.text.trim() && b.url.trim()).map((button, index) => (
@@ -398,7 +405,7 @@ export default function MobilePreview({
                         <>
                           <div className="flex justify-start">
                             <div className="max-w-[70%] min-w-0 bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm px-4 py-2 overflow-hidden">
-                              <p className="text-sm whitespace-pre-line break-words">
+                              <p className={`text-sm whitespace-pre-line break-words ${followMsgClamp}`}>
                                 {config.preDmFlowType === 'followers'
                                   ? (config.askToFollowMessage && config.askToFollowMessage.includes("✅ Once you've followed")
                                       ? config.askToFollowMessage
@@ -432,7 +439,7 @@ export default function MobilePreview({
                         <>
                           <div className="flex justify-start">
                             <div className="max-w-[70%] bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm px-4 py-2">
-                              <p className="text-sm">{config.askForEmailMessage}</p>
+                              <p className={`text-sm ${compact ? 'line-clamp-2' : ''}`}>{config.askForEmailMessage}</p>
                             </div>
                           </div>
                           <div className="flex justify-end">
@@ -446,14 +453,14 @@ export default function MobilePreview({
                       {isLeadMode && config.askForEmail && config.emailSuccessMessage && (
                         <div className="flex justify-start">
                           <div className="max-w-[70%] bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm px-4 py-2">
-                            <p className="text-sm whitespace-pre-line">{config.emailSuccessMessage}</p>
+                            <p className={`text-sm whitespace-pre-line ${dmLineClamp}`}>{config.emailSuccessMessage}</p>
                           </div>
                         </div>
                       )}
 
                       <div className="flex justify-start">
                         <div className="max-w-[70%] bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm overflow-hidden">
-                          <p className="text-sm whitespace-pre-line px-4 py-2">{sampleDM}</p>
+                          <p className={`text-sm whitespace-pre-line px-4 py-2 ${dmLineClamp}`}>{sampleDM}</p>
                           {config.dmType === 'text_button' && config.buttons.length > 0 && (
                             <div className="px-4 pb-2 space-y-1">
                               {config.buttons.filter((b) => b.text.trim() && b.url.trim()).map((button, index) => (

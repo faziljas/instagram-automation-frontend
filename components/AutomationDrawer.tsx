@@ -1131,19 +1131,20 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
             </div>
           </div>
 
-          {/* Right Side: Live Preview - visible on desktop inside modal */}
-          <div className="flex-1 min-w-[min(300px,45%)] overflow-y-auto bg-slate-100 max-w-full hidden md:block">
-            <div className="sticky top-0 z-10 bg-slate-200 px-4 md:px-6 py-3 border-b border-slate-300">
-              <h3 className="text-lg font-semibold text-slate-800">
+          {/* Right Side: Live Preview - visible on desktop inside modal; scaled to fit */}
+          <div className="hidden md:flex flex-1 min-w-0 min-h-0 flex-col items-center justify-start overflow-auto bg-slate-100 max-w-full">
+            <div className="sticky top-0 z-10 bg-slate-200 px-4 md:px-6 py-3 border-b border-slate-300 w-full flex-shrink-0">
+              <h3 className="text-base font-semibold text-slate-800">
                 Live Preview
               </h3>
             </div>
-            <div className="p-3 md:p-4">
+            <div className="p-3 md:p-4 flex-1 min-h-0 overflow-auto flex justify-center">
               <MobilePreview
                 media={media}
                 config={config as React.ComponentProps<typeof MobilePreview>['config']}
                 mode={activeTab}
                 accountUsername={accountUsername}
+                compact
               />
             </div>
           </div>
@@ -1162,12 +1163,13 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                   <XMarkIcon className="h-5 w-5" />
                 </button>
               </div>
-              <div className="p-4 max-h-[50vh] overflow-y-auto">
+              <div className="p-4 max-h-[45vh] overflow-auto flex justify-center">
                 <MobilePreview
                   media={media}
                   config={config as React.ComponentProps<typeof MobilePreview>['config']}
                   mode={activeTab}
                   accountUsername={accountUsername}
+                  compact
                 />
               </div>
             </div>
