@@ -127,7 +127,16 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
     }).format(amount);
   };
 
-  const renewalText = currentPeriodEnd
+  const isCancelled = subscription.status === 'cancelled';
+  const renewalText = isCancelled
+    ? currentPeriodEnd
+      ? `Access continues until ${currentPeriodEnd.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        })}. You will not be charged again.`
+      : 'Your subscription is canceled. You will not be charged again.'
+    : currentPeriodEnd
     ? `Your plan renews on ${currentPeriodEnd.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
@@ -165,16 +174,19 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
     );
   }
 
-  // Treat subscription as cancelled as soon as backend marks status='cancelled'.
-  // cancellation_end_date is nice to have for messaging, but should not block UI state.
-  const isCancelled = subscription.status === 'cancelled';
-
   // Pro (or higher) layout
   return (
     <div className="space-y-8 font-inter">
       {/* Current Plan */}
       <section className="bg-gray-50/50 border border-gray-200 rounded-xl p-6">
-        <h2 className="text-base font-semibold text-gray-900">Pro Plan</h2>
+        <div className="flex flex-wrap items-center gap-2">
+          <h2 className="text-base font-semibold text-gray-900">Pro Plan</h2>
+          {isCancelled && (
+            <span className="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-800">
+              Canceled
+            </span>
+          )}
+        </div>
         <p className="mt-1 text-sm text-gray-600">{renewalText}</p>
       </section>
 
