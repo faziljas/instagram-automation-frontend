@@ -173,9 +173,9 @@ export default function MobilePreview({
 
   const isStory = media.media_product_type === 'STORY';
 
-  // Compact mode: truncate lengths and line-clamp to fit modal and reduce scroll
+  // Compact mode: truncate lengths and line-clamp to fit modal and reduce scroll (mild: allow more lines for DM text)
   const captionMax = compact ? 40 : 100;
-  const dmLineClamp = compact ? 'line-clamp-2' : '';
+  const dmLineClamp = compact ? 'line-clamp-4' : '';
   const followMsgClamp = compact ? 'line-clamp-2' : '';
 
   return (
