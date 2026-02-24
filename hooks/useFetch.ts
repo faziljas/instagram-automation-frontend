@@ -13,12 +13,12 @@ const CACHE_TIMES: Record<string, number> = {
   '/users/subscription': 5 * 60 * 1000, // 5 minutes (already cached in useSubscription)
   '/users/me': 2 * 60 * 1000, // 2 minutes
   '/users/me/accounts': 1 * 60 * 1000, // 1 minute
-  '/users/me/dashboard': 2 * 60 * 1000, // 2 min - show last data immediately on refresh
+  '/users/me/dashboard': 60 * 1000, // 1 min - dashboard should feel fresh
   '/automation/rules': 30 * 1000, // 30 seconds
-  // Analytics + media should feel "live" – keep cache short
-  '/api/analytics': 60 * 1000, // 1 minute
-  '/api/instagram/media': 60 * 1000, // 1 minute - automations/DM stats refresh quickly
-  '/api/leads': 60 * 1000, // 1 minute
+  // Analytics + media + leads should feel "live" – keep cache very short
+  '/api/analytics': 15 * 1000, // 15 seconds
+  '/api/instagram/media': 15 * 1000, // 15 seconds - automations/DM stats refresh quickly
+  '/api/leads': 15 * 1000, // 15 seconds
 };
 
 const CACHE_KEY_PREFIX = 'swr_';
@@ -102,9 +102,10 @@ export function useFetch<T = unknown>(
       return response;
     },
     {
-      revalidateOnFocus: false, // Changed to false - reduce unnecessary refetches
+      // Revalidate on focus so dashboard/analytics/automations feel live again
+      revalidateOnFocus: true,
       revalidateOnReconnect: true, // Still revalidate on reconnect
-      refreshInterval: 0, // Disable auto-refresh (we'll handle it manually)
+      refreshInterval: 0, // Disable auto-refresh by default (pages can override)
       dedupingInterval: getCacheTime(url), // Use cache time based on endpoint for deduplication
       focusThrottleInterval: 5000, // Throttle focus revalidation to 5 seconds
       ...swrOptions,

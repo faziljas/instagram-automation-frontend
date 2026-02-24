@@ -122,9 +122,18 @@ export default function AutomationsPage() {
   const [deleteConfirmRuleId, setDeleteConfirmRuleId] = useState<number | null>(null);
   
   // PERFORMANCE: useFetch so we get localStorage cache and show stats immediately on refresh
-  const { data: allRulesData } = useFetch<AutomationRuleResponse[]>('/automation/rules');
+  const { data: allRulesData } = useFetch<AutomationRuleResponse[]>('/automation/rules', {
+    // Short dedupe so rules list reflects changes quickly
+    dedupingInterval: 15_000,
+    refreshInterval: 15_000,
+  });
   const { data: mediaAnalyticsData, isLoading: isLoadingAnalytics } = useFetch<MediaAnalytics[]>(
-    selectedAccount ? `/api/analytics/media?days=30&instagram_account_id=${selectedAccount}` : null
+    selectedAccount ? `/api/analytics/media?days=30&instagram_account_id=${selectedAccount}` : null,
+    {
+      // Media analytics should feel live while user is tuning automations
+      dedupingInterval: 15_000,
+      refreshInterval: 15_000,
+    }
   );
   
   const automationRules = useMemo(() => {
@@ -151,8 +160,8 @@ export default function AutomationsPage() {
     next_cursor?: string | null;
     has_more?: boolean;
   }>(initialMediaUrl, {
-    dedupingInterval: 60 * 1000,
-    revalidateOnFocus: false,
+    // Keep media list reasonably fresh without hammering API
+    dedupingInterval: 30_000,
   });
 
   // Base (first page) media filtered by tab; full media = base + load-more
@@ -265,12 +274,10 @@ export default function AutomationsPage() {
         comments_count: 0,
         permalink: '',
       }));
-      
-      setMedia(dmRuleItems);
-    } catch (error: any) {
+      // DM tab uses MessagesView; no local media state needed
+    } catch (error: unknown) {
       console.error('Error fetching DM rules:', error);
-      alert(error?.message || 'Failed to fetch DM automation rules. Please try again.');
-      setMedia([]);
+      alert(error instanceof Error ? error.message : 'Failed to fetch DM automation rules. Please try again.');
     } finally {
       setIsLoadingDMs(false);
     }

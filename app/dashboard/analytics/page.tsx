@@ -81,11 +81,13 @@ export default function AnalyticsPage() {
       // Reduced retries for faster failure handling
       errorRetryCount: 1,
       errorRetryInterval: 500,
-      // Don't revalidate on focus to reduce unnecessary requests
-      revalidateOnFocus: false,
-      // Increase cache time for analytics (5 minutes) - SWR keeps previous data by default
-      dedupingInterval: 300000,
-      cacheTime: 300000, // 5 minutes cache
+      // Revalidate on focus + short dedupe so analytics feel live
+      revalidateOnFocus: true,
+      // Keep deduping + local cache short so new events show up quickly
+      dedupingInterval: 15_000,
+      cacheTime: 60_000, // 1 minute cache for smoother reloads
+      // Poll periodically while page is open so charts auto-update
+      refreshInterval: 15_000,
     }
   );
   const { data: leadsData, isLoading: leadsLoading } = useFetch<Lead[]>('/api/leads');

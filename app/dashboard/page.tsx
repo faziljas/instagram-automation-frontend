@@ -98,8 +98,12 @@ export default function DashboardPage() {
   const { planTier: plan } = useSubscription();
   const limits = PLAN_LIMITS[plan] || PLAN_LIMITS.free;
 
-  // Fetch critical data first (dashboard stats)
-  const { data, isLoading } = useFetch<DashboardResponse>('/users/me/dashboard');
+  // Fetch critical data first (dashboard stats) - keep dashboard feeling live
+  const { data, isLoading } = useFetch<DashboardResponse>('/users/me/dashboard', {
+    // Short dedupe and periodic refresh so counts update quickly when user is active
+    dedupingInterval: 15_000,
+    refreshInterval: 15_000,
+  });
   
   // Fetch analytics and leads immediately (no delay) so values display as fast as possible
   const shouldLoadSecondaryData = true;
