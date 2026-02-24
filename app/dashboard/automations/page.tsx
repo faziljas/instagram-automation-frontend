@@ -472,15 +472,12 @@ export default function AutomationsPage() {
     }
 
     // Mark rule as lead_capture for UX (used by builder + edit screens)
-    // For stories: "Keyword DM" tab is keyword-based reply only (no lead capture flow). Post/reels unchanged.
+    // IMPORTANT: Let the drawer's selected DM Type (Simple Reply vs Lead Capture)
+    // be the single source of truth via config.isLeadCapture, instead of
+    // inferring from pre‑DM flags. This ensures that when a user saves from the
+    // Simple Reply tab, the rule always re-opens as Simple Reply.
     const isStory = selectedMedia.media_product_type === 'STORY';
-    if (isStory) {
-      ruleConfig.is_lead_capture = false;
-    } else if (config.isLeadCapture || config.enablePreDmEngagement || config.askToFollow || config.askForEmail) {
-      ruleConfig.is_lead_capture = true;
-    } else {
-      ruleConfig.is_lead_capture = false;
-    }
+    ruleConfig.is_lead_capture = !isStory && !!config.isLeadCapture;
 
     // Determine trigger type
     const triggerType = config.keywords.length > 0 ? 'keyword' : 'post_comment';
