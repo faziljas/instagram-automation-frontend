@@ -1138,7 +1138,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                 Live Preview
               </h3>
             </div>
-            <div className="p-3 md:p-4 flex-1 min-h-0 overflow-auto flex justify-center">
+            <div className="px-2 md:px-3 py-3 md:py-4 flex-1 min-h-0 overflow-auto flex justify-center">
               <MobilePreview
                 media={media}
                 config={config as React.ComponentProps<typeof MobilePreview>['config']}

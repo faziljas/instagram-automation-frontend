@@ -179,11 +179,11 @@ export default function MobilePreview({
   const followMsgClamp = compact ? 'line-clamp-2' : '';
 
   return (
-    <div className={`flex justify-center w-full max-w-full min-w-0 ${compact ? 'scale-90 origin-top' : ''}`}>
-      {/* iPhone Frame - smaller when compact to fit modal */}
+    <div className={`flex justify-center w-full max-w-full min-w-0 ${compact ? 'origin-top' : ''}`}>
+      {/* iPhone Frame - smaller when compact to fit modal; wider to use panel space */}
       <div
         className={`relative bg-black rounded-[3rem] p-2 shadow-2xl shrink-0 ${
-          compact ? 'w-[260px] max-w-full aspect-[375/812]' : 'w-[375px] max-w-full aspect-[375/812]'
+          compact ? 'w-[340px] max-w-full aspect-[375/812]' : 'w-[375px] max-w-full aspect-[375/812]'
         }`}
       >
         <div className="w-full h-full bg-white rounded-[2.5rem] overflow-hidden">
