@@ -7,7 +7,7 @@ import { useFetch } from '@/hooks/useFetch';
 import { usePut, useDelete, usePost } from '@/hooks/useApi';
 import { useAuth } from '@/hooks/useAuth';
 import { User } from '@/types';
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { ExclamationTriangleIcon, CalendarDaysIcon } from '@heroicons/react/24/outline';
 import { mutate } from 'swr';
 
 // Zod validation schemas
@@ -189,6 +189,35 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
         </div>
         <p className="mt-1 text-sm text-gray-600">{renewalText}</p>
       </section>
+
+      {/* Cancellation banner: "Your subscription will be canceled on [date]" + Resubscribe */}
+      {isCancelled && (
+        <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-xl border border-amber-200/80 bg-amber-50/80 px-4 py-3 text-sm">
+          <div className="flex items-center gap-3 text-gray-800">
+            <CalendarDaysIcon className="h-5 w-5 shrink-0 text-amber-600" aria-hidden />
+            <span>
+              Your subscription will be canceled on{' '}
+              <span className="font-medium">
+                {currentPeriodEnd
+                  ? currentPeriodEnd.toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                    })
+                  : 'the end of your billing period'}
+                .
+              </span>
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={onUpgrade}
+            className="shrink-0 rounded-lg border border-amber-300 bg-amber-100/90 px-4 py-2 text-sm font-semibold text-amber-900 hover:bg-amber-200/90"
+          >
+            Resubscribe
+          </button>
+        </section>
+      )}
 
       {/* Payment Method */}
       <section className="space-y-3">
