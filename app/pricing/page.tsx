@@ -38,7 +38,9 @@ export default function PricingPage() {
         return;
       }
 
-      const response = await createCheckoutSession('/api/dodo/create-checkout-session', {});
+      const response = await createCheckoutSession('/api/dodo/create-checkout-session', {
+        plan: billingCycle,
+      });
       if (response?.checkout_url) {
         window.location.href = response.checkout_url;
       }
