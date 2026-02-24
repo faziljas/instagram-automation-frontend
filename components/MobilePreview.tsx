@@ -165,11 +165,25 @@ export default function MobilePreview({
   const sampleDM =
     activeDmMessages && activeDmMessages.length > 0 ? activeDmMessages[0] : '';
 
-  // Pre-DM engagement: show DM preview when lead flow has content (standard or simple)
-  const preDmEngagementOn = config.enablePreDmEngagement ?? (config.askToFollow || config.askForEmail);
-  const simpleFlowEmailOn = !!(config.simpleDmFlow && (config.simpleFlowMessage || config.simpleFlowEmailQuestion));
-  const simpleFlowPhoneOn = !!(config.simpleDmFlowPhone && (config.simpleFlowPhoneMessage || config.simpleFlowPhoneQuestion));
-  const showDmPreviewButton = (activeDmMessages && activeDmMessages.length > 0) || (isLeadMode && preDmEngagementOn && (simpleFlowEmailOn || simpleFlowPhoneOn || (config.askToFollow || config.askForEmail)));
+  // Pre-DM engagement (Lead Capture only)
+  // Simple Reply should always preview a direct DM with NO pre-DM steps.
+  const preDmEngagementOn =
+    isLeadMode &&
+    (config.enablePreDmEngagement ?? (config.askToFollow || config.askForEmail));
+  const simpleFlowEmailOn =
+    isLeadMode &&
+    !!(config.simpleDmFlow && (config.simpleFlowMessage || config.simpleFlowEmailQuestion));
+  const simpleFlowPhoneOn =
+    isLeadMode &&
+    !!(config.simpleDmFlowPhone && (config.simpleFlowPhoneMessage || config.simpleFlowPhoneQuestion));
+
+  const hasPrimaryDm = !!(activeDmMessages && activeDmMessages.length > 0);
+  const hasLeadPreDm =
+    isLeadMode &&
+    preDmEngagementOn &&
+    (simpleFlowEmailOn || simpleFlowPhoneOn || (config.askToFollow || config.askForEmail));
+
+  const showDmPreviewButton = hasPrimaryDm || hasLeadPreDm;
 
   const isStory = media.media_product_type === 'STORY';
 
@@ -322,7 +336,7 @@ export default function MobilePreview({
                         </div>
                       </div>
                     </>
-                  ) : simpleFlowPhoneOn ? (
+                  ) : isLeadMode && simpleFlowPhoneOn ? (
                     <>
                       <div className="flex justify-start">
                         <div className="max-w-[70%] bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm px-4 py-2">
@@ -353,7 +367,7 @@ export default function MobilePreview({
                         </div>
                       </div>
                     </>
-                  ) : simpleFlowEmailOn ? (
+                  ) : isLeadMode && simpleFlowEmailOn ? (
                     /* ——— Simple flow (Email): one message (follow + email) → user email → success → primary DM ——— */
                     <>
                       <div className="flex justify-start">
@@ -390,8 +404,8 @@ export default function MobilePreview({
                         </div>
                       </div>
                     </>
-                  ) : (
-                    /* ——— Standard Pre-DM: Hi → follow + Follow Me → ✓ Followed → email question → user email → success → primary DM ——— */
+                  ) : isLeadMode && (preDmEngagementOn || config.askToFollow || config.askForEmail) ? (
+                    /* ——— Standard Lead Capture Pre-DM: Hi → follow + Follow Me → ✓ Followed → email question → user email → success → primary DM ——— */
                     <>
                       {isLeadMode && (
                         <div className="flex justify-start">
@@ -463,16 +477,48 @@ export default function MobilePreview({
                           <p className={`text-sm whitespace-pre-line px-4 py-2 ${dmLineClamp}`}>{sampleDM}</p>
                           {config.dmType === 'text_button' && config.buttons.length > 0 && (
                             <div className="px-4 pb-2 space-y-1">
-                              {config.buttons.filter((b) => b.text.trim() && b.url.trim()).map((button, index) => (
-                                <a key={index} href={button.url} target="_blank" rel="noopener noreferrer" className="block w-full text-center text-xs font-semibold text-blue-600 bg-white border border-blue-600 rounded-lg py-2 px-3">
-                                  {button.text}
-                                </a>
-                              ))}
+                              {config.buttons
+                                .filter((b) => b.text.trim() && b.url.trim())
+                                .map((button, index) => (
+                                  <a
+                                    key={index}
+                                    href={button.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="block w-full text-center text-xs font-semibold text-blue-600 bg-white border border-blue-600 rounded-lg py-2 px-3"
+                                  >
+                                    {button.text}
+                                  </a>
+                                ))}
                             </div>
                           )}
                         </div>
                       </div>
                     </>
+                  ) : (
+                    /* ——— Simple Reply: direct primary DM only (no lead-capture or pre-DM steps) ——— */
+                    <div className="flex justify-start">
+                      <div className="max-w-[70%] bg-gray-200 text-gray-900 rounded-2xl rounded-tl-sm overflow-hidden">
+                        <p className={`text-sm whitespace-pre-line px-4 py-2 ${dmLineClamp}`}>{sampleDM}</p>
+                        {config.dmType === 'text_button' && config.buttons.length > 0 && (
+                          <div className="px-4 pb-2 space-y-1">
+                            {config.buttons
+                              .filter((b) => b.text.trim() && b.url.trim())
+                              .map((button, index) => (
+                                <a
+                                  key={index}
+                                  href={button.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="block w-full text-center text-xs font-semibold text-blue-600 bg-white border border-blue-600 rounded-lg py-2 px-3"
+                                >
+                                  {button.text}
+                                </a>
+                              ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   )}
                 </div>
               </div>
