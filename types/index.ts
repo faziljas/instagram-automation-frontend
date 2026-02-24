@@ -11,6 +11,10 @@ export interface User {
   createdAt?: string;
   updatedAt?: string;
   subscription?: Subscription;
+  /** Email preference: product updates and news. Default true. */
+  notifyProductUpdates?: boolean;
+  /** Email preference: billing and invoices. Default true. */
+  notifyBilling?: boolean;
 }
 
 // Instagram Account Types

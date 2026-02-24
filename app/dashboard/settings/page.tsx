@@ -395,6 +395,12 @@ export default function SettingsPage() {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  // Notification preferences (synced from user, editable in Notifications tab)
+  const [notifyProductUpdates, setNotifyProductUpdates] = useState(true);
+  const [notifyBilling, setNotifyBilling] = useState(true);
+  const [notificationSaving, setNotificationSaving] = useState(false);
+  const [notificationSuccess, setNotificationSuccess] = useState(false);
+
   const isGoogleUser = !!supabaseUser && supabaseUser.app_metadata?.provider === 'google';
 
   // Pre-fill profile form with user data
@@ -414,6 +420,14 @@ export default function SettingsPage() {
       setAvatarPreview(user.profilePictureUrl);
     } else {
       setAvatarPreview(null);
+    }
+  }, [user]);
+
+  // Sync notification preferences from user (API returns camelCase via transformUserResponse)
+  useEffect(() => {
+    if (user) {
+      if (typeof user.notifyProductUpdates === 'boolean') setNotifyProductUpdates(user.notifyProductUpdates);
+      if (typeof user.notifyBilling === 'boolean') setNotifyBilling(user.notifyBilling);
     }
   }, [user]);
 
@@ -938,14 +952,92 @@ export default function SettingsPage() {
     );
   };
 
+  const handleNotificationPrefChange = async (
+    field: 'notify_product_updates' | 'notify_billing',
+    value: boolean
+  ) => {
+    if (field === 'notify_product_updates') setNotifyProductUpdates(value);
+    else setNotifyBilling(value);
+    setNotificationSuccess(false);
+    setNotificationSaving(true);
+    try {
+      const payload: Record<string, boolean> = {
+        notify_product_updates: field === 'notify_product_updates' ? value : notifyProductUpdates,
+        notify_billing: field === 'notify_billing' ? value : notifyBilling,
+      };
+      const response = await updateProfile('/users/me', payload);
+      if (response) {
+        updateUser(response as User);
+        mutate('/users/me');
+        setNotificationSuccess(true);
+        setTimeout(() => setNotificationSuccess(false), 3000);
+      }
+    } catch (err) {
+      console.error('Failed to update notification preferences:', err);
+    } finally {
+      setNotificationSaving(false);
+    }
+  };
+
   const renderNotificationsContent = () => (
     <div className="space-y-6">
       <div>
         <h2 className="text-lg font-semibold text-gray-900">Notifications</h2>
         <p className="mt-0.5 text-sm text-gray-500">
-          Email preferences for product updates and billing. Coming soon.
+          Email preferences for product updates and billing.
         </p>
       </div>
+      <section className="space-y-4">
+        <div className="flex items-center justify-between rounded-lg border border-gray-100 bg-white px-4 py-3">
+          <div>
+            <p className="text-sm font-medium text-gray-900">Product updates</p>
+            <p className="text-xs text-gray-500">Receive emails about new features and product news.</p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={notifyProductUpdates}
+            onClick={() => handleNotificationPrefChange('notify_product_updates', !notifyProductUpdates)}
+            disabled={notificationSaving}
+            className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-60 ${
+              notifyProductUpdates ? 'bg-blue-600' : 'bg-gray-200'
+            }`}
+          >
+            <span
+              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition ${
+                notifyProductUpdates ? 'translate-x-5' : 'translate-x-1'
+              }`}
+            />
+          </button>
+        </div>
+        <div className="flex items-center justify-between rounded-lg border border-gray-100 bg-white px-4 py-3">
+          <div>
+            <p className="text-sm font-medium text-gray-900">Billing & invoices</p>
+            <p className="text-xs text-gray-500">Receive emails about payments and invoice receipts.</p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={notifyBilling}
+            onClick={() => handleNotificationPrefChange('notify_billing', !notifyBilling)}
+            disabled={notificationSaving}
+            className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-60 ${
+              notifyBilling ? 'bg-blue-600' : 'bg-gray-200'
+            }`}
+          >
+            <span
+              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition ${
+                notifyBilling ? 'translate-x-5' : 'translate-x-1'
+              }`}
+            />
+          </button>
+        </div>
+      </section>
+      {notificationSuccess && (
+        <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+          Notification preferences saved.
+        </div>
+      )}
     </div>
   );
 
@@ -1066,9 +1158,6 @@ export default function SettingsPage() {
                 }`}
               >
                 <span>Notifications</span>
-                <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-800">
-                  SOON
-                </span>
               </button>
               <button
                 type="button"

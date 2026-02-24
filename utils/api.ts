@@ -150,7 +150,15 @@ function transformUserResponse(data: any): any {
     if (data.profile_picture_url !== undefined) {
       transformed.profilePictureUrl = data.profile_picture_url;
     }
-    
+
+    // Notification preferences
+    if (data.notify_product_updates !== undefined) {
+      transformed.notifyProductUpdates = data.notify_product_updates;
+    }
+    if (data.notify_billing !== undefined) {
+      transformed.notifyBilling = data.notify_billing;
+    }
+
     // Convert id from number to string for frontend consistency
     if (data.id !== undefined && typeof data.id === 'number') {
       transformed.id = String(data.id);
