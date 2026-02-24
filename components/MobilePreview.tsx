@@ -170,12 +170,13 @@ export default function MobilePreview({
   const preDmEngagementOn =
     isLeadMode &&
     (config.enablePreDmEngagement ?? (config.askToFollow || config.askForEmail));
+  // Use preDmFlowType as source of truth so preview matches selected flow (e.g. Email) even when legacy simpleDmFlow isn't set
   const simpleFlowEmailOn =
     isLeadMode &&
-    !!(config.simpleDmFlow && (config.simpleFlowMessage || config.simpleFlowEmailQuestion));
+    !!((config.preDmFlowType === 'email' || config.simpleDmFlow) && (config.simpleFlowMessage || config.simpleFlowEmailQuestion));
   const simpleFlowPhoneOn =
     isLeadMode &&
-    !!(config.simpleDmFlowPhone && (config.simpleFlowPhoneMessage || config.simpleFlowPhoneQuestion));
+    !!((config.preDmFlowType === 'phone' || config.simpleDmFlowPhone) && (config.simpleFlowPhoneMessage || config.simpleFlowPhoneQuestion));
 
   const hasPrimaryDm = !!(activeDmMessages && activeDmMessages.length > 0);
   const hasLeadPreDm =
