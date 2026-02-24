@@ -80,9 +80,9 @@ function RegisterPageContent() {
         setError(`Signup failed: ${error.message}. Please ensure ${redirectTo} is added to Supabase Redirect URLs.`);
         setIsGoogleLoading(false);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Signup error:', error);
-      setError(error.message || 'Failed to sign up with Google');
+      setError((error as Error).message || 'Failed to sign up with Google');
       setIsGoogleLoading(false);
     }
   };
@@ -116,9 +116,9 @@ function RegisterPageContent() {
       // Reject disposable/temporary email addresses before sign-up (required: do not proceed on any failure)
       try {
         await get(`/auth/validate-email?email=${encodeURIComponent(normalizedEmail)}`);
-      } catch (validateErr: any) {
-        const detail = validateErr?.response?.data?.detail;
-        const message = detail ?? validateErr?.message ?? 'Temporary or disposable email addresses are not allowed. Please use a permanent email address.';
+      } catch (validateErr: unknown) {
+        const detail = (validateErr as { response?: { data?: { detail?: string | string[] } }; message?: string })?.response?.data?.detail;
+        const message = detail ?? (validateErr as Error).message ?? 'Temporary or disposable email addresses are not allowed. Please use a permanent email address.';
         setError(Array.isArray(message) ? message[0] : message);
         setIsLoading(false);
         return;
@@ -128,8 +128,8 @@ function RegisterPageContent() {
       let backendCheck: { exists?: boolean } | null = null;
       try {
         backendCheck = await get(`/auth/check-email/${encodeURIComponent(normalizedEmail)}`);
-      } catch (checkErr: any) {
-        const detail = checkErr?.response?.data?.detail;
+      } catch (checkErr: unknown) {
+        const detail = (checkErr as { response?: { data?: { detail?: string | string[] } } })?.response?.data?.detail;
         if (detail) {
           setError(Array.isArray(detail) ? detail[0] : detail);
           setIsLoading(false);
@@ -222,9 +222,9 @@ function RegisterPageContent() {
         setError('Failed to create account. Please try again.');
         setIsLoading(false);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Signup error:', error);
-      setError(error.message || 'Failed to create account. Please try again.');
+      setError((error as Error).message || 'Failed to create account. Please try again.');
       setIsLoading(false);
     }
   };
@@ -308,7 +308,7 @@ function RegisterPageContent() {
                       Check your email
                     </h3>
                     <p className="text-sm text-green-700">
-                      We've sent a confirmation link to <strong>{formData.email}</strong>.
+                      We&apos;ve sent a confirmation link to <strong>{formData.email}</strong>.
                       Please check your inbox and follow the instructions to confirm your account before signing in.
                     </p>
                   </div>

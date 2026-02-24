@@ -10,7 +10,6 @@ import {
   UserGroupIcon,
   BoltIcon,
   PaperAirplaneIcon,
-  CreditCardIcon,
   ClockIcon,
 } from '@heroicons/react/24/outline';
 
@@ -31,19 +30,6 @@ interface DashboardStatsData {
 interface DashboardResponse {
   user: DashboardUser;
   stats: DashboardStatsData;
-}
-
-interface SubscriptionUsageData {
-  accounts: number;
-  rules: number;
-  dms_sent_this_month: number;
-}
-
-interface SubscriptionResponse {
-  plan_tier: string;
-  status: string;
-  stripe_subscription_id: string | null;
-  usage: SubscriptionUsageData;
 }
 
 interface AnalyticsSummary {
@@ -83,23 +69,14 @@ interface Lead {
   automation_rule_id: number;
 }
 
-// Plan limits (must match backend and other pages)
-const PLAN_LIMITS: Record<string, { accounts: number; rules: number; dms: number }> = {
-  free: { accounts: 1, rules: -1, dms: 1000 }, // High Volume pricing: unlimited rules, 1000 DMs
-  basic: { accounts: 3, rules: 10, dms: 500 },
-  pro: { accounts: 10, rules: 50, dms: 5000 },
-  enterprise: { accounts: -1, rules: -1, dms: -1 }, // unlimited
-};
-
 export default function DashboardPage() {
   const { user } = useAuth();
   
   // Use subscription hook with caching to prevent pro users from appearing as free on refresh
-  const { planTier: plan } = useSubscription();
-  const limits = PLAN_LIMITS[plan] || PLAN_LIMITS.free;
+  useSubscription();
 
   // Fetch critical data first (dashboard stats) - keep dashboard feeling live
-  const { data, isLoading } = useFetch<DashboardResponse>('/users/me/dashboard', {
+  const { data } = useFetch<DashboardResponse>('/users/me/dashboard', {
     // Short dedupe and periodic refresh so counts update quickly when user is active
     dedupingInterval: 15_000,
     refreshInterval: 15_000,
@@ -109,10 +86,7 @@ export default function DashboardPage() {
   const shouldLoadSecondaryData = true;
 
   // Fetch analytics and leads in parallel
-  const {
-    data: secondaryData,
-    isLoading: isSecondaryLoading,
-  } = useParallelFetch<{
+  const { data: secondaryData } = useParallelFetch<{
     analytics: AnalyticsSummary;
     leads: Lead[];
   }>(
@@ -125,7 +99,6 @@ export default function DashboardPage() {
 
   const analyticsData = secondaryData.analytics;
   const leadsData = secondaryData.leads;
-  const isAnalyticsLoading = isSecondaryLoading;
 
   // OPTIMIZED: Memoize expensive computations to prevent recalculation on every render
   const metrics = useMemo(() => {

@@ -1,7 +1,5 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useApi, usePost, usePut, useDelete } from '@/hooks/useApi';
-import { mockApiResponse } from '../utils/test-data';
-
 // Mock the API module
 jest.mock('@/utils/api', () => ({
   post: jest.fn(),
@@ -27,7 +25,7 @@ describe('useApi Hook', () => {
 
     it('should execute POST request successfully', async () => {
       const mockData = { id: '1', name: 'Test' };
-      (post as jest.Mock).mockResolvedValue(mockApiResponse(mockData));
+      (post as jest.Mock).mockResolvedValue(mockData);
 
       const { result } = renderHook(() => usePost());
 
@@ -46,17 +44,14 @@ describe('useApi Hook', () => {
     });
 
     it('should handle POST request error', async () => {
-      const errorMessage = 'Request failed';
-      (post as jest.Mock).mockResolvedValue(
-        mockApiResponse(null, false)
-      );
+      (post as jest.Mock).mockRejectedValue(new Error('Request failed'));
 
       const { result } = renderHook(() => usePost());
 
       await act(async () => {
         try {
           await result.current.execute('/test', { name: 'Test' });
-        } catch (e) {
+        } catch {
           // Expected error
         }
       });
@@ -69,7 +64,7 @@ describe('useApi Hook', () => {
 
     it('should reset state', async () => {
       const mockData = { id: '1', name: 'Test' };
-      (post as jest.Mock).mockResolvedValue(mockApiResponse(mockData));
+      (post as jest.Mock).mockResolvedValue(mockData);
 
       const { result } = renderHook(() => usePost());
 
@@ -94,7 +89,7 @@ describe('useApi Hook', () => {
   describe('usePut', () => {
     it('should execute PUT request successfully', async () => {
       const mockData = { id: '1', name: 'Updated' };
-      (put as jest.Mock).mockResolvedValue(mockApiResponse(mockData));
+      (put as jest.Mock).mockResolvedValue(mockData);
 
       const { result } = renderHook(() => usePut());
 
@@ -113,7 +108,7 @@ describe('useApi Hook', () => {
   describe('useDelete', () => {
     it('should execute DELETE request successfully', async () => {
       const mockData = { success: true };
-      (del as jest.Mock).mockResolvedValue(mockApiResponse(mockData));
+      (del as jest.Mock).mockResolvedValue(mockData);
 
       const { result } = renderHook(() => useDelete());
 
@@ -132,7 +127,7 @@ describe('useApi Hook', () => {
   describe('useApi', () => {
     it('should default to POST method', async () => {
       const mockData = { id: '1' };
-      (post as jest.Mock).mockResolvedValue(mockApiResponse(mockData));
+      (post as jest.Mock).mockResolvedValue(mockData);
 
       const { result } = renderHook(() => useApi());
 
@@ -145,7 +140,7 @@ describe('useApi Hook', () => {
 
     it('should support custom method', async () => {
       const mockData = { success: true };
-      (del as jest.Mock).mockResolvedValue(mockApiResponse(mockData));
+      (del as jest.Mock).mockResolvedValue(mockData);
 
       const { result } = renderHook(() => useApi('DELETE'));
 

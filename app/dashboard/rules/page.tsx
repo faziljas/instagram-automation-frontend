@@ -14,7 +14,7 @@ interface AutomationRuleResponse {
   name: string | null;
   trigger_type: string;
   action_type: string;
-  config: Record<string, any>;
+  config: Record<string, unknown>;
   media_id?: string | null; // Media ID from rule (if attached to specific media)
   is_active: boolean;
   created_at: string;

@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { HiShieldCheck } from 'react-icons/hi';
-import { FaInstagram, FaBolt, FaRocket, FaEnvelope, FaChartLine, FaPaperPlane, FaCheckCircle } from 'react-icons/fa';
+import { FaInstagram, FaBolt, FaRocket, FaEnvelope, FaChartLine } from 'react-icons/fa';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { z } from 'zod';
@@ -76,7 +76,7 @@ function LoginPageContent() {
     }
   }, [searchParams]);
 
-  const handleGoogleAuth = async (isSignup: boolean = false) => {
+  const handleGoogleAuth = async () => {
     setIsGoogleLoading(true);
     setError(null);
     setInfoMessage(null);
@@ -99,8 +99,8 @@ function LoginPageContent() {
         setError(`Authentication failed: ${error.message}`);
         setIsGoogleLoading(false);
       }
-    } catch (error: any) {
-      setError(error.message || 'Failed to authenticate with Google');
+    } catch (error: unknown) {
+      setError((error as Error).message || 'Failed to authenticate with Google');
       setIsGoogleLoading(false);
     }
   };
@@ -127,8 +127,8 @@ function LoginPageContent() {
         await fetchUser();
         router.push('/dashboard');
       }
-    } catch (error: any) {
-      setError(error.message || 'Failed to sign in. Please try again.');
+    } catch (error: unknown) {
+      setError((error as Error).message || 'Failed to sign in. Please try again.');
       setIsLoading(false);
     }
   };
@@ -161,9 +161,9 @@ function LoginPageContent() {
       // Reject disposable/temporary email addresses before sign-up (required: do not proceed on any failure)
       try {
         await get(`/auth/validate-email?email=${encodeURIComponent(normalizedEmail)}`);
-      } catch (validateErr: any) {
-        const detail = validateErr?.response?.data?.detail;
-        const message = detail ?? validateErr?.message ?? 'Temporary or disposable email addresses are not allowed. Please use a permanent email address.';
+      } catch (validateErr: unknown) {
+        const detail = (validateErr as { response?: { data?: { detail?: string | string[] } }; message?: string })?.response?.data?.detail;
+        const message = detail ?? (validateErr as Error).message ?? 'Temporary or disposable email addresses are not allowed. Please use a permanent email address.';
         setError(Array.isArray(message) ? message[0] : message);
         setIsLoading(false);
         return;
@@ -173,8 +173,8 @@ function LoginPageContent() {
       let backendCheck: { exists?: boolean } | null = null;
       try {
         backendCheck = await get(`/auth/check-email/${encodeURIComponent(normalizedEmail)}`);
-      } catch (checkErr: any) {
-        const detail = checkErr?.response?.data?.detail;
+      } catch (checkErr: unknown) {
+        const detail = (checkErr as { response?: { data?: { detail?: string | string[] } } })?.response?.data?.detail;
         if (detail) {
           setError(Array.isArray(detail) ? detail[0] : detail);
           setIsLoading(false);
@@ -246,8 +246,8 @@ function LoginPageContent() {
         await fetchUser();
         router.push('/dashboard');
       }
-    } catch (error: any) {
-      setError(error.message || 'Failed to sign up. Please try again.');
+    } catch (error: unknown) {
+      setError((error as Error).message || 'Failed to sign up. Please try again.');
       setIsLoading(false);
     }
   };
@@ -647,7 +647,7 @@ function LoginPageContent() {
               </form>
 
               <div className="text-center text-sm text-gray-600">
-                Don't have an account?{' '}
+                Don&apos;t have an account?{' '}
                 <button
                   onClick={() => {
                     setError(null);
@@ -822,7 +822,7 @@ function LoginPageContent() {
                   <div className="flex-1 pt-2">
                     <div className="backdrop-blur-md bg-white/10 p-5 rounded-xl border border-white/20 shadow-lg">
                       <h3 className="text-lg font-semibold text-white mb-1">Set a Keyword</h3>
-                      <p className="text-sm text-white/80">Choose a trigger word like 'Price' or 'Link' for your posts.</p>
+                      <p className="text-sm text-white/80">Choose a trigger word like &apos;Price&apos; or &apos;Link&apos; for your posts.</p>
                     </div>
                   </div>
                 </div>

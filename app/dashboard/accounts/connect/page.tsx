@@ -68,9 +68,9 @@ export default function ConnectAccountPage() {
       // Navigate to Instagram OAuth in the same tab
       console.log('🔄 Redirecting to Instagram OAuth...');
       window.location.href = url;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('OAuth error:', error);
-      setErrorMessage(error?.message || 'Failed to initiate OAuth connection. Please try again.');
+      setErrorMessage((error as Error)?.message || 'Failed to initiate OAuth connection. Please try again.');
       setOauthLoading(false);
     }
   };

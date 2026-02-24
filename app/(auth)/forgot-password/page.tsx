@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { z } from 'zod';
 import { supabase } from '@/lib/supabase';
@@ -18,7 +17,6 @@ const forgotPasswordSchema = z.object({
 type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 
 function ForgotPasswordForm() {
-  const router = useRouter();
   const [formData, setFormData] = useState<ForgotPasswordFormData>({
     email: '',
   });
@@ -131,7 +129,7 @@ function ForgotPasswordForm() {
                 Check your email
               </h3>
               <p className="text-sm text-green-700">
-                We've sent a password reset link to <strong>{formData.email}</strong>. 
+                We&apos;ve sent a password reset link to <strong>{formData.email}</strong>. 
                 Please check your inbox and follow the instructions to reset your password.
               </p>
             </div>
@@ -240,7 +238,7 @@ function ForgotPasswordPageContent() {
                   Forgot your password?
                 </h2>
                 <p className="mt-1 text-sm text-gray-500">
-                  No worries! Enter your email and we'll send you a reset link.
+                  No worries! Enter your email and we&apos;ll send you a reset link.
                 </p>
               </div>
             </div>

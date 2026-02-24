@@ -16,19 +16,6 @@ interface InstagramAccountResponse {
   created_at: string | null;
 }
 
-interface SubscriptionUsageData {
-  accounts: number;
-  rules: number;
-  dms_sent_this_month: number;
-}
-
-interface SubscriptionResponse {
-  plan_tier: string;
-  status: string;
-  stripe_subscription_id: string | null;
-  usage: SubscriptionUsageData;
-}
-
 // Plan limits (must match backend)
 const PLAN_LIMITS: Record<string, { accounts: number; rules: number; dms: number }> = {
   free: { accounts: 1, rules: -1, dms: 1000 }, // High Volume pricing: unlimited rules, 1000 DMs
@@ -208,7 +195,7 @@ export default function AccountsPage() {
       if (typeof window !== 'undefined') {
         try {
           localStorage.removeItem('logicdm_subscription_cache');
-        } catch (e) {
+        } catch {
           // Ignore cache errors
         }
       }

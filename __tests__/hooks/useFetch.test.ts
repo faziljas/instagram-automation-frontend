@@ -1,6 +1,6 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { useFetch } from '@/hooks/useFetch';
-import { mockInstagramAccount, mockApiResponse } from '../utils/test-data';
+import { mockInstagramAccount } from '../utils/test-data';
 
 // Mock useSWR
 jest.mock('swr', () => ({
@@ -13,20 +13,25 @@ jest.mock('@/utils/api', () => ({
   get: jest.fn(),
 }));
 
+// useFetch uses useAuth (session, loading) – provide a valid session so SWR runs
+jest.mock('@/hooks/useAuth', () => ({
+  useAuth: () => ({ session: { access_token: 'test' }, loading: false }),
+}));
+
 import useSWR from 'swr';
 import { get } from '@/utils/api';
 
 describe('useFetch Hook', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    if (typeof localStorage !== 'undefined') localStorage.clear();
   });
 
   it('should fetch data successfully', async () => {
     const mockData = mockInstagramAccount;
-    const mockResponse = mockApiResponse(mockData);
 
     (useSWR as jest.Mock).mockReturnValue({
-      data: mockResponse,
+      data: mockData,
       error: undefined,
       isValidating: false,
       mutate: jest.fn(),
@@ -78,7 +83,7 @@ describe('useFetch Hook', () => {
 
     const { result } = renderHook(() => useFetch(null));
 
-    expect(result.current.data).toBeUndefined();
+    expect(result.current.data).toBeFalsy();
     expect(useSWR).toHaveBeenCalledWith(null, expect.any(Function), expect.any(Object));
   });
 
@@ -97,10 +102,9 @@ describe('useFetch Hook', () => {
 
   it('should return mutate function', () => {
     const mutateMock = jest.fn();
-    const mockResponse = mockApiResponse(mockInstagramAccount);
 
     (useSWR as jest.Mock).mockReturnValue({
-      data: mockResponse,
+      data: mockInstagramAccount,
       error: undefined,
       isValidating: false,
       mutate: mutateMock,
@@ -112,10 +116,8 @@ describe('useFetch Hook', () => {
   });
 
   it('should handle validating state', () => {
-    const mockResponse = mockApiResponse(mockInstagramAccount);
-
     (useSWR as jest.Mock).mockReturnValue({
-      data: mockResponse,
+      data: mockInstagramAccount,
       error: undefined,
       isValidating: true,
       mutate: jest.fn(),

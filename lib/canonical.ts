@@ -23,21 +23,6 @@ export function getCanonicalBase(): string {
 }
 
 /**
- * Normalize a base URL to use https.
- */
-function ensureHttps(url: string): string {
-  const trimmed = url.trim();
-  if (!trimmed) return DEFAULT_BASE;
-  if (trimmed.startsWith('http://')) {
-    return 'https://' + trimmed.slice(7);
-  }
-  if (!trimmed.startsWith('https://')) {
-    return 'https://' + trimmed;
-  }
-  return trimmed;
-}
-
-/**
  * Normalize path: remove trailing slash except for root.
  * /terms/ -> /terms, / -> /
  */

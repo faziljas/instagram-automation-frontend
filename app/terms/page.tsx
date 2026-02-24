@@ -42,7 +42,7 @@ export default function TermsPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Acceptance of Terms</h2>
             <p className="text-gray-700 leading-relaxed mb-4">
-              By accessing or using LogicDM ("the Service"), you agree to be bound by these Terms of Service ("Terms"). If you disagree with any part of these terms, then you may not access the Service.
+              By accessing or using LogicDM (&quot;the Service&quot;), you agree to be bound by these Terms of Service (&quot;Terms&quot;). If you disagree with any part of these terms, then you may not access the Service.
             </p>
             <p className="text-gray-700 leading-relaxed mb-4">
               These Terms apply to all visitors, users, and others who access or use the Service. Your use of the Service constitutes your acceptance of and agreement to be bound by these Terms.
@@ -93,7 +93,7 @@ export default function TermsPage() {
             </p>
             <ul className="list-disc pl-6 text-gray-700 leading-relaxed mb-4 space-y-2">
               <li>Use the Service to send spam, unsolicited messages, or engage in any form of harassment or abuse</li>
-              <li>Use the Service to violate Instagram's Terms of Service or Community Guidelines</li>
+              <li>Use the Service to violate Instagram&apos;s Terms of Service or Community Guidelines</li>
               <li>Use automated systems (bots, scripts, etc.) in a manner that violates platform policies or applicable laws</li>
               <li>Attempt to gain unauthorized access to any portion of the Service or any other accounts, computer systems, or networks connected to the Service</li>
               <li>Interfere with or disrupt the Service or servers or networks connected to the Service</li>
@@ -129,7 +129,7 @@ export default function TermsPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">8. Disclaimer of Warranties</h2>
             <p className="text-gray-700 leading-relaxed mb-4">
-              The Service is provided on an "AS IS" and "AS AVAILABLE" basis. We make no warranties, expressed or implied, and hereby disclaim and negate all other warranties, including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.
+              The Service is provided on an &quot;AS IS&quot; and &quot;AS AVAILABLE&quot; basis. We make no warranties, expressed or implied, and hereby disclaim and negate all other warranties, including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.
             </p>
           </section>
 
@@ -143,7 +143,7 @@ export default function TermsPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">10. Indemnification</h2>
             <p className="text-gray-700 leading-relaxed mb-4">
-              You agree to defend, indemnify, and hold harmless LogicDM and its licensee and licensors, and their employees, contractors, agents, officers and directors, from and against any and all claims, damages, obligations, losses, liabilities, costs or debt, and expenses (including but not limited to attorney's fees), resulting from or arising out of your use and access of the Service, or a breach of these Terms.
+              You agree to defend, indemnify, and hold harmless LogicDM and its licensee and licensors, and their employees, contractors, agents, officers and directors, from and against any and all claims, damages, obligations, losses, liabilities, costs or debt, and expenses (including but not limited to attorney&apos;s fees), resulting from or arising out of your use and access of the Service, or a breach of these Terms.
             </p>
           </section>
 

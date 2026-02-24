@@ -16,8 +16,6 @@ import {
   HomeIcon,
   UserGroupIcon,
   BoltIcon,
-  CreditCardIcon,
-  Cog6ToothIcon,
   SparklesIcon,
   ChartBarIcon,
 } from '@heroicons/react/24/outline';
@@ -41,7 +39,7 @@ export default function DashboardLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   
@@ -86,7 +84,7 @@ export default function DashboardLayout({
                   key={item.name}
                   href={item.href}
                   prefetch={true}
-                  onClick={(e) => {
+                  onClick={() => {
                     setSidebarOpen(false);
                     startTransition(() => {
                       // Navigation is handled by Next.js Link
@@ -159,7 +157,7 @@ export default function DashboardLayout({
                       // Prefetch on hover for faster navigation
                       router.prefetch(item.href);
                     }}
-                    onClick={(e) => {
+                    onClick={() => {
                       startTransition(() => {
                         // Navigation is handled by Next.js Link
                       });

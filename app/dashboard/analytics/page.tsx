@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useFetch } from '@/hooks/useFetch';
 import { Card } from '@/components/Card';
 import { Table } from '@/components/Table';
@@ -75,7 +75,7 @@ export default function AnalyticsPage() {
   }, [days]);
   
   // PERFORMANCE: Don't block page render - show content immediately with better caching
-  const { data, error, isLoading, mutate } = useFetch<AnalyticsSummary>(
+  const { data, error, isLoading } = useFetch<AnalyticsSummary>(
     `/api/analytics/dashboard?days=${debouncedDays}`,
     {
       // Reduced retries for faster failure handling

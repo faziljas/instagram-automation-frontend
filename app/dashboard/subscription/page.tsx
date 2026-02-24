@@ -51,8 +51,8 @@ export default function SubscriptionPage() {
     // Retry on 404 and 500 errors for new users (user might be auto-created on retry)
     onErrorRetry: (error, key, config, revalidate, { retryCount }) => {
       // Check error status from different possible error formats
-      const status = (error as any)?.response?.status || 
-                    (error as any)?.status ||
+      const status = (error as { response?: { status?: number }; status?: number })?.response?.status ||
+                    (error as { status?: number })?.status ||
                     (error?.message?.includes('404') ? 404 : 
                      error?.message?.includes('500') ? 500 : null);
       const maxRetries = 3; // Reduced retries to avoid long waits
@@ -70,9 +70,7 @@ export default function SubscriptionPage() {
     errorRetryCount: 3,
     errorRetryInterval: 500,
   });
-  const { execute: cancelSubscription, loading: cancelLoading } = usePost();
   const { execute: createCheckoutSession, loading: checkoutLoading } = usePost();
-  const [showCancelModal, setShowCancelModal] = useState(false);
   const [showPlanModal, setShowPlanModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -364,34 +362,6 @@ export default function SubscriptionPage() {
       } else {
         setErrorMessage(errorMessage || 'Failed to create checkout session. Please check your connection and try again.');
       }
-    }
-  };
-
-  const handleCancelSubscription = async () => {
-    try {
-      const response = await cancelSubscription('/api/dodo/cancel-subscription', {}) as { cancellation_end_date?: string } | undefined;
-      setShowCancelModal(false);
-      
-      // Show success message with cancellation end date
-      if (response?.cancellation_end_date) {
-        const endDate = new Date(response.cancellation_end_date);
-        const formattedEndDate = endDate.toLocaleDateString('en-US', { 
-          year: 'numeric', 
-          month: 'long', 
-          day: 'numeric' 
-        });
-        setSuccessMessage(
-          `Your subscription has been successfully canceled. You will continue to have full access to Pro features until ${formattedEndDate}. You will not be charged again.`
-        );
-      } else {
-        setSuccessMessage('Your subscription has been successfully canceled.');
-      }
-      
-      // Refresh subscription data
-      await refetchSubscription(undefined, { revalidate: true });
-    } catch (error) {
-      console.error('Failed to cancel subscription:', error);
-      setErrorMessage(error instanceof Error ? error.message : 'Failed to cancel subscription');
     }
   };
 

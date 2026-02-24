@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '../utils/test-utils';
+import { render, screen, waitFor, act } from '../utils/test-utils';
 import { useToast } from '@/components/Toast';
 
 function ToastTestComponent() {
@@ -18,8 +18,9 @@ describe('Toast Component', () => {
   it('should show success toast', async () => {
     render(<ToastTestComponent />);
     const button = screen.getByText('Show Success');
-    button.click();
-
+    await act(async () => {
+      button.click();
+    });
     await waitFor(() => {
       expect(screen.getByText('Success!')).toBeInTheDocument();
     });
@@ -28,8 +29,9 @@ describe('Toast Component', () => {
   it('should show error toast', async () => {
     render(<ToastTestComponent />);
     const button = screen.getByText('Show Error');
-    button.click();
-
+    await act(async () => {
+      button.click();
+    });
     await waitFor(() => {
       expect(screen.getByText('Error!')).toBeInTheDocument();
     });
@@ -38,8 +40,9 @@ describe('Toast Component', () => {
   it('should show warning toast', async () => {
     render(<ToastTestComponent />);
     const button = screen.getByText('Show Warning');
-    button.click();
-
+    await act(async () => {
+      button.click();
+    });
     await waitFor(() => {
       expect(screen.getByText('Warning!')).toBeInTheDocument();
     });
@@ -48,8 +51,9 @@ describe('Toast Component', () => {
   it('should show info toast', async () => {
     render(<ToastTestComponent />);
     const button = screen.getByText('Show Info');
-    button.click();
-
+    await act(async () => {
+      button.click();
+    });
     await waitFor(() => {
       expect(screen.getByText('Info!')).toBeInTheDocument();
     });
@@ -58,19 +62,20 @@ describe('Toast Component', () => {
   it('should remove toast when close button is clicked', async () => {
     render(<ToastTestComponent />);
     const button = screen.getByText('Show Success');
-    button.click();
-
+    await act(async () => {
+      button.click();
+    });
     await waitFor(() => {
       expect(screen.getByText('Success!')).toBeInTheDocument();
     });
 
-    const toastElement = screen.getByText('Success!');
     const closeButtons = screen.getAllByRole('button', { name: '' });
     const closeButton = closeButtons[closeButtons.length - 1];
 
     if (closeButton) {
-      closeButton.click();
-
+      await act(async () => {
+        closeButton.click();
+      });
       await waitFor(() => {
         expect(screen.queryByText('Success!')).not.toBeInTheDocument();
       });
@@ -82,14 +87,16 @@ describe('Toast Component', () => {
 
     render(<ToastTestComponent />);
     const button = screen.getByText('Show Success');
-    button.click();
-
+    await act(async () => {
+      button.click();
+    });
     await waitFor(() => {
       expect(screen.getByText('Success!')).toBeInTheDocument();
     });
 
-    jest.advanceTimersByTime(5500);
-
+    await act(async () => {
+      jest.advanceTimersByTime(5500);
+    });
     await waitFor(() => {
       expect(screen.queryByText('Success!')).not.toBeInTheDocument();
     });

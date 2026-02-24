@@ -58,7 +58,6 @@ export default function CreateRulePage() {
   // Dynamic config fields based on action type
   const [messageTemplate, setMessageTemplate] = useState('');
   const [delay, setDelay] = useState('0');
-  const [listName, setListName] = useState('');
   const [triggerKeyword, setTriggerKeyword] = useState(''); // For keyword trigger type
 
   const [errors, setErrors] = useState<Partial<Record<keyof CreateRuleFormData, string>>>({});
@@ -334,7 +333,7 @@ export default function CreateRulePage() {
                     <p className="mt-1 text-sm text-red-600">{configErrors.triggerKeyword}</p>
                   )}
                   <p className="mt-1 text-xs text-gray-500">
-                    The message must be EXACTLY this keyword to trigger this rule (case-insensitive). The rule will only fire if the message is exactly this keyword (e.g., "help", "HELP", "Help" will all match, but "Need help" will not).
+                    The message must be EXACTLY this keyword to trigger this rule (case-insensitive). The rule will only fire if the message is exactly this keyword (e.g., &quot;help&quot;, &quot;HELP&quot;, &quot;Help&quot; will all match, but &quot;Need help&quot; will not).
                   </p>
                 </div>
               )}

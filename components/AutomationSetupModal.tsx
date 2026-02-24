@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { usePost } from '@/hooks/useApi';
 import {
@@ -214,7 +214,7 @@ export default function AutomationSetupModal({
           try {
             const url = new URL(btn.url.trim());
             return url.protocol === 'http:' || url.protocol === 'https:';
-          } catch (e) {
+          } catch {
             return false;
           }
         });
@@ -270,7 +270,7 @@ export default function AutomationSetupModal({
       const hasKeywords = config.keywords.filter((k) => k.trim().length > 0).length > 0;
       
       // Build rule configuration
-      const ruleConfig: Record<string, any> = {
+      const ruleConfig: Record<string, unknown> = {
         delay_minutes: config.delayMinutes,
       };
       
@@ -318,7 +318,7 @@ export default function AutomationSetupModal({
               return false;
             }
             return true;
-          } catch (e) {
+          } catch {
             // Invalid URL format
             return false;
           }

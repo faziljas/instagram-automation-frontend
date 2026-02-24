@@ -214,13 +214,6 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
       })
     : allConversations; // Show ALL when no search query (including Unknown)
   
-  // CRITICAL FIX: Always use allConversations if filteredConversations is empty but we have data
-  // This ensures "Unknown" conversations are NEVER hidden
-  // IMPORTANT: If we have ANY conversations but filtered is empty, always show allConversations
-  const displayConversations = (allConversations.length > 0 && filteredConversations.length === 0)
-    ? allConversations
-    : filteredConversations;
-  
   const handleRefresh = useCallback(() => {
     refreshStats();
     fetchConversations();
@@ -255,9 +248,9 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
       refreshStats();
       fetchConversations();
       if (selectedConversation) fetchMessages();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('❌ Error syncing conversations:', error);
-      alert(error?.message || 'Failed to sync conversations. Please try again.');
+      alert((error as Error)?.message || 'Failed to sync conversations. Please try again.');
     } finally {
       setIsSyncing(false);
     }
@@ -734,7 +727,7 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
                         fetchMessages(false, true);
                         refreshStats();
                       }, 2000);
-                    } catch (error: any) {
+                    } catch (error: unknown) {
                       console.error('Failed to send message:', error);
                       
                       // Remove optimistic message on error
@@ -746,7 +739,7 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
                       // Reset sending state on error
                       setIsSending(false);
                       
-                      alert(error?.message || 'Failed to send message. Please try again.');
+                      alert((error as Error)?.message || 'Failed to send message. Please try again.');
                     }
                   }}
                 >

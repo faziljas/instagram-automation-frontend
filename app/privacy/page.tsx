@@ -35,7 +35,7 @@ export default function PrivacyPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">Introduction</h2>
             <p className="text-gray-700 leading-relaxed mb-4">
-              Welcome to LogicDM ("we," "our," or "us"). We are committed to protecting your privacy and ensuring you have a positive experience on our website and in using our products and services. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our service.
+              Welcome to LogicDM (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;). We are committed to protecting your privacy and ensuring you have a positive experience on our website and in using our products and services. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our service.
             </p>
           </section>
 
@@ -135,7 +135,7 @@ export default function PrivacyPage() {
           </section>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">Children's Privacy</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">Children&apos;s Privacy</h2>
             <p className="text-gray-700 leading-relaxed mb-4">
               Our service is not intended for children under the age of 13. We do not knowingly collect personal information from children under 13. If you are a parent or guardian and believe your child has provided us with personal information, please contact us so we can delete such information.
             </p>
@@ -144,7 +144,7 @@ export default function PrivacyPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">Changes to This Privacy Policy</h2>
             <p className="text-gray-700 leading-relaxed mb-4">
-              We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last updated" date. You are advised to review this Privacy Policy periodically for any changes.
+              We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the &quot;Last updated&quot; date. You are advised to review this Privacy Policy periodically for any changes.
             </p>
           </section>
 

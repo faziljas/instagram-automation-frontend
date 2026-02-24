@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { z } from 'zod';
 import { useFetch } from '@/hooks/useFetch';
 import { usePut, useDelete } from '@/hooks/useApi';
-import { AutomationRule } from '@/types';
 import { ArrowLeftIcon, TrashIcon } from '@heroicons/react/24/outline';
 
 // Trigger and Action types (matching backend exactly)
@@ -67,8 +66,8 @@ export default function EditRulePage() {
   // Dynamic config fields based on action type
   const [messageTemplate, setMessageTemplate] = useState('');
   const [delay, setDelay] = useState('');
-  const [listName, setListName] = useState('');
-  const [triggerKeyword, setTriggerKeyword] = useState(''); // For keyword trigger type
+  const [, setListName] = useState('');
+  const [, setTriggerKeyword] = useState(''); // For keyword trigger type
   const [keywords, setKeywords] = useState<string[]>([]); // Multiple keywords
   const [keywordInput, setKeywordInput] = useState(''); // Input for adding keywords
   const [autoReplyToComments, setAutoReplyToComments] = useState(false);
@@ -122,7 +121,7 @@ export default function EditRulePage() {
 
             if (response.ok) {
               const data = await response.json();
-              const foundMedia = data.media?.find((item: any) => item.id === mediaId);
+              const foundMedia = data.media?.find((item: { id: string }) => item.id === mediaId);
               if (foundMedia) {
                 setMediaItem(foundMedia);
                 setIsLoadingMedia(false);
@@ -684,7 +683,7 @@ export default function EditRulePage() {
                   )}
                   {formData.trigger_type === 'keyword' && (
                     <p className="mt-2 text-xs text-gray-500">
-                      The message must be EXACTLY one of these keywords to trigger this rule (case-insensitive). The rule will only fire if the message is exactly one of these keywords (e.g., "help", "HELP", "Help" will all match, but "Need help" will not).
+                      The message must be EXACTLY one of these keywords to trigger this rule (case-insensitive). The rule will only fire if the message is exactly one of these keywords (e.g., &quot;help&quot;, &quot;HELP&quot;, &quot;Help&quot; will all match, but &quot;Need help&quot; will not).
                     </p>
                   )}
                   {configErrors.triggerKeyword && (

@@ -10,13 +10,13 @@ describe('Button Component', () => {
   it('should render with primary variant by default', () => {
     render(<Button>Primary</Button>);
     const button = screen.getByRole('button');
-    expect(button).toHaveClass('bg-blue-600');
+    expect(button).toHaveClass('bg-[#3B82F6]');
   });
 
   it('should render with secondary variant', () => {
     render(<Button variant="secondary">Secondary</Button>);
     const button = screen.getByRole('button');
-    expect(button).toHaveClass('bg-gray-200');
+    expect(button).toHaveClass('bg-white');
   });
 
   it('should render with danger variant', () => {

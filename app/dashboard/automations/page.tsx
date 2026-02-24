@@ -50,17 +50,6 @@ interface AutomationRuleResponse {
   created_at: string;
 }
 
-interface SubscriptionResponse {
-  plan_tier: string;
-  status: string;
-  stripe_subscription_id: string | null;
-  usage: {
-    accounts: number;
-    rules: number;
-    dms_sent_this_month: number;
-  };
-}
-
 interface MediaAnalytics {
   media_id: string;
   rule_id: number | null;
@@ -113,7 +102,7 @@ export default function AutomationsPage() {
   const [loadMoreNextCursor, setLoadMoreNextCursor] = useState<string | null>(null);
   const [loadMoreHasMore, setLoadMoreHasMore] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [isLoadingDMs, setIsLoadingDMs] = useState(false);
+  const [, setIsLoadingDMs] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<MediaItem | null>(null);
   const [showSetupModal, setShowSetupModal] = useState(false);
   const [showDrawer, setShowDrawer] = useState(false);
@@ -254,26 +243,6 @@ export default function AutomationsPage() {
       );
       
       console.log('DM automation rules:', dmRules);
-      
-      // Transform DM rules to display format
-      const dmRuleItems = dmRules.map((rule: AutomationRuleResponse) => ({
-        id: `rule_${rule.id}`,
-        rule_id: rule.id,
-        name: rule.name,
-        trigger_type: rule.trigger_type,
-        is_active: rule.is_active,
-        created_at: rule.created_at,
-        type: 'dm_rule',
-        // Add placeholder fields for display consistency
-        media_type: 'DM',
-        media_product_type: 'DM',
-        caption: rule.name || 'DM Automation',
-        media_url: '',
-        timestamp: rule.created_at,
-        like_count: 0,
-        comments_count: 0,
-        permalink: '',
-      }));
       // DM tab uses MessagesView; no local media state needed
     } catch (error: unknown) {
       console.error('Error fetching DM rules:', error);
@@ -334,7 +303,7 @@ export default function AutomationsPage() {
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleSaveAutomation = async (config: any) => {
+  const handleSaveAutomation = async (config: Record<string, unknown>) => {
     if (!selectedAccount || !selectedMedia) return;
     
     // CRITICAL: Wait for session token before making API call
@@ -540,9 +509,9 @@ export default function AutomationsPage() {
       // Refresh rules so useFetch data updates (automationRules is derived from it)
       mutate('/automation/rules');
       handleCloseDrawer();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Failed to save automation:', error);
-      throw new Error(error?.message || 'Failed to save automation');
+      throw new Error((error as Error)?.message || 'Failed to save automation');
     }
   };
 
@@ -795,7 +764,7 @@ export default function AutomationsPage() {
                 {tableViewData.length === 0 ? (
                   <div className="p-12 text-center">
                     <p className="text-gray-500">No media found for this account.</p>
-                    <p className="text-sm text-gray-400 mt-2">Posts, reels, and stories will appear here once they're fetched.</p>
+                    <p className="text-sm text-gray-400 mt-2">Posts, reels, and stories will appear here once they&apos;re fetched.</p>
                   </div>
                 ) : (
                 <>
@@ -951,14 +920,14 @@ export default function AutomationsPage() {
                                           if (typeof window !== 'undefined') {
                                             try {
                                               localStorage.removeItem('logicdm_subscription_cache');
-                                            } catch (e) {
+                                            } catch {
                                               // Ignore
                                             }
                                           }
-                                        } catch (error: any) {
+                                        } catch (error: unknown) {
                                           console.error('Failed to delete automation rule:', error);
                                           alert(
-                                            error?.message ||
+                                            (error as Error)?.message ||
                                               'Failed to delete automation rule. Please try again.',
                                           );
                                         } finally {
