@@ -434,43 +434,43 @@ export default function SubscriptionPage() {
   if (isLoading && !subscriptionData) {
     // Show page layout with skeletons so the page paints immediately (no full-page spinner)
     return (
-      <div className="max-w-5xl mx-auto">
-        <div className="relative overflow-hidden bg-gradient-to-br from-green-500 via-emerald-500 to-teal-500 rounded-2xl mb-8 shadow-xl">
-          <div className="relative py-10 px-8">
-            <div className="h-10 bg-white/20 rounded w-64 mb-2 animate-pulse" />
-            <div className="h-6 bg-white/20 rounded w-96 animate-pulse" />
+      <div className="w-full">
+        <div className="relative overflow-hidden bg-gradient-to-br from-green-500 via-emerald-500 to-teal-500 rounded-xl mb-6 shadow-lg">
+          <div className="relative py-5 px-6">
+            <div className="h-8 bg-white/20 rounded w-56 mb-1.5 animate-pulse" />
+            <div className="h-5 bg-white/20 rounded w-80 animate-pulse" />
           </div>
         </div>
-        <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl p-8 mb-6">
-          <div className="h-6 bg-gray-200 rounded w-32 mb-4 animate-pulse" />
-          <div className="flex items-center space-x-4">
-            <div className="h-10 bg-gray-200 rounded w-24 animate-pulse" />
-            <div className="h-8 bg-gray-200 rounded w-28 animate-pulse" />
+        <div className="bg-white rounded-xl border border-gray-200 shadow p-6 mb-4">
+          <div className="h-5 bg-gray-200 rounded w-28 mb-3 animate-pulse" />
+          <div className="flex items-center space-x-3">
+            <div className="h-9 bg-gray-200 rounded w-20 animate-pulse" />
+            <div className="h-7 bg-gray-200 rounded w-24 animate-pulse" />
           </div>
         </div>
-        <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl p-8 mb-6">
-          <div className="h-6 bg-gray-200 rounded w-36 mb-6 animate-pulse" />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-white rounded-xl border border-gray-200 shadow p-6 mb-4">
+          <div className="h-5 bg-gray-200 rounded w-32 mb-4 animate-pulse" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-6 bg-gray-100 rounded w-full animate-pulse" />
+              <div key={i} className="h-5 bg-gray-100 rounded w-full animate-pulse" />
             ))}
           </div>
         </div>
-        <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl p-8 mb-6">
-          <div className="h-6 bg-gray-200 rounded w-40 mb-6 animate-pulse" />
-          <div className="space-y-6">
+        <div className="bg-white rounded-xl border border-gray-200 shadow p-6 mb-4">
+          <div className="h-5 bg-gray-200 rounded w-36 mb-4 animate-pulse" />
+          <div className="space-y-4">
             {[1, 2, 3].map((i) => (
               <div key={i}>
-                <div className="flex justify-between mb-2">
-                  <div className="h-4 bg-gray-200 rounded w-32 animate-pulse" />
-                  <div className="h-4 bg-gray-200 rounded w-20 animate-pulse" />
+                <div className="flex justify-between mb-1.5">
+                  <div className="h-3.5 bg-gray-200 rounded w-28 animate-pulse" />
+                  <div className="h-3.5 bg-gray-200 rounded w-16 animate-pulse" />
                 </div>
                 <div className="h-2 bg-gray-100 rounded-full animate-pulse" />
               </div>
             ))}
           </div>
         </div>
-        <div className="text-center py-4">
+        <div className="text-center py-3">
           <p className="text-sm text-gray-500">Loading subscription...</p>
         </div>
       </div>
@@ -479,8 +479,8 @@ export default function SubscriptionPage() {
 
   if (!subscriptionData) {
     return (
-      <div className="max-w-5xl mx-auto">
-        <div className="text-center py-12">
+      <div className="w-full">
+        <div className="text-center py-10">
           <p className="text-red-600">Unable to load subscription data</p>
         </div>
       </div>
@@ -499,56 +499,56 @@ export default function SubscriptionPage() {
   const features = PLAN_FEATURES[displayPlan] || PLAN_FEATURES.free;
 
   return (
-    <div className="max-w-5xl mx-auto">
-      {/* Hero Banner */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-green-500 via-emerald-500 to-teal-500 rounded-2xl mb-8 shadow-xl">
+    <div className="w-full">
+      {/* Hero Banner - compact */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-green-500 via-emerald-500 to-teal-500 rounded-xl mb-6 shadow-lg">
         <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent"></div>
-        <div className="relative py-10 px-8">
-          <h1 className="text-4xl font-bold text-white mb-2">Usage Details</h1>
-          <p className="text-lg text-white/90">View how you&apos;re using LogicDM each month</p>
+        <div className="relative py-4 md:py-5 px-4 md:px-6">
+          <h1 className="text-xl md:text-2xl font-bold text-white mb-1">Usage Details</h1>
+          <p className="text-sm text-white/90">View how you&apos;re using LogicDM each month</p>
         </div>
       </div>
 
       {/* Success/Error Messages */}
       {successMessage && (
-        <div className="mb-6 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 p-5 shadow-md">
+        <div className="mb-4 rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 p-4 shadow-sm">
           <div className="flex">
             <div className="flex-shrink-0">
-              <CheckCircleIcon className="h-6 w-6 text-green-500" />
+              <CheckCircleIcon className="h-5 w-5 text-green-500" />
             </div>
             <div className="ml-3">
-              <p className="text-sm font-bold text-green-800">{successMessage}</p>
+              <p className="text-sm font-semibold text-green-800">{successMessage}</p>
             </div>
           </div>
         </div>
       )}
       
       {errorMessage && (
-        <div className="mb-6 rounded-xl bg-gradient-to-r from-red-50 to-rose-50 border-2 border-red-200 p-5 shadow-md">
+        <div className="mb-4 rounded-lg bg-gradient-to-r from-red-50 to-rose-50 border border-red-200 p-4 shadow-sm">
           <div className="flex">
             <div className="flex-shrink-0">
-              <ExclamationTriangleIcon className="h-6 w-6 text-red-500" />
+              <ExclamationTriangleIcon className="h-5 w-5 text-red-500" />
             </div>
             <div className="ml-3">
-              <p className="text-sm font-bold text-red-800">{errorMessage}</p>
+              <p className="text-sm font-semibold text-red-800">{errorMessage}</p>
             </div>
           </div>
         </div>
       )}
 
       {/* Current Plan Card */}
-      <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl p-8 mb-6">
-        <div className="flex items-center justify-between mb-6">
+      <div className="bg-white rounded-xl border border-gray-200 shadow p-6 mb-4">
+        <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-xl font-bold text-gray-900 mb-3">Current Plan</h2>
-            <div className="flex items-center space-x-4">
+            <h2 className="text-base font-bold text-gray-900 mb-2">Current Plan</h2>
+            <div className="flex items-center space-x-3">
               <span
-                className={`text-4xl font-bold capitalize ${getPlanColor(displayPlan)}`}
+                className={`text-2xl font-bold capitalize ${getPlanColor(displayPlan)}`}
               >
                 {displayPlan === 'pro' && subscriptionData.status === 'active' ? 'Pro - Active' : displayPlan}
               </span>
               <span
-                className={`px-4 py-2 inline-flex text-sm font-bold rounded-xl shadow-sm ${
+                className={`px-3 py-1.5 inline-flex text-xs font-semibold rounded-lg shadow-sm ${
                   displayPlan === 'pro' && subscriptionData.status === 'active'
                     ? 'bg-gradient-to-r from-yellow-400 via-amber-500 to-orange-500 text-white border border-amber-600 shadow-lg'
                     : subscriptionData.status === 'active' 
@@ -571,7 +571,7 @@ export default function SubscriptionPage() {
               <button
                 onClick={handleUpgrade}
                 disabled={checkoutLoading}
-                className="inline-flex items-center px-6 py-3 border border-transparent rounded-xl shadow-lg text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105"
+                className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 <ArrowUpIcon className="h-5 w-5 mr-2" />
                 {checkoutLoading ? 'Processing...' : 'Upgrade Plan'}
@@ -585,9 +585,9 @@ export default function SubscriptionPage() {
       </div>
 
       {/* Plan Features */}
-      <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl p-8 mb-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Plan Features</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="bg-white rounded-xl border border-gray-200 shadow p-6 mb-4">
+        <h2 className="text-base font-bold text-gray-900 mb-4">Plan Features</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {features.map((feature, index) => (
             <div key={index} className="flex items-start">
               <CheckCircleIcon className="h-6 w-6 text-green-500 mr-3 flex-shrink-0 mt-0.5" />
@@ -598,9 +598,9 @@ export default function SubscriptionPage() {
       </div>
 
       {/* Usage Stats */}
-      <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl p-8 mb-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Usage Statistics</h2>
-        <div className="space-y-6">
+      <div className="bg-white rounded-xl border border-gray-200 shadow p-6 mb-4">
+        <h2 className="text-base font-bold text-gray-900 mb-4">Usage Statistics</h2>
+        <div className="space-y-4">
           {/* Accounts Usage */}
           <div>
             <div className="flex items-center justify-between mb-2">
@@ -665,13 +665,13 @@ export default function SubscriptionPage() {
 
       {/* Cancellation Message */}
       {subscriptionData.status === 'cancelled' && subscriptionData.cancellation_end_date && (
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-2xl p-6 mb-6">
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4 mb-4">
           <div className="flex items-start">
             <div className="flex-shrink-0">
-              <CheckCircleIcon className="h-6 w-6 text-blue-600" />
+              <CheckCircleIcon className="h-5 w-5 text-blue-600" />
             </div>
             <div className="ml-3">
-              <h3 className="text-lg font-bold text-blue-900 mb-2">Subscription Cancelled</h3>
+              <h3 className="text-base font-bold text-blue-900 mb-1">Subscription Cancelled</h3>
               <p className="text-sm text-blue-800">
                 Your subscription has been successfully canceled.
                 <br />

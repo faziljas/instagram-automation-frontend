@@ -488,10 +488,10 @@ export default function EditRulePage() {
       </div>
 
       {/* Header */}
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Edit Automation Rule</h1>
-          <p className="mt-2 text-gray-600">Update your automation rule settings.</p>
+          <h1 className="text-xl font-bold text-gray-900">Edit Automation Rule</h1>
+          <p className="mt-1 text-sm text-gray-600">Update your automation rule settings.</p>
         </div>
         <button
           onClick={() => setDeleteConfirm(true)}
@@ -510,7 +510,7 @@ export default function EditRulePage() {
               className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
               onClick={() => setDeleteConfirm(false)}
             />
-            <div className="relative bg-white rounded-lg px-4 pt-5 pb-4 text-center shadow-xl sm:p-6">
+            <div className="relative bg-white rounded-lg px-4 pt-4 pb-4 text-center shadow sm:p-5">
               <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
                 <TrashIcon className="h-6 w-6 text-red-600" />
               </div>

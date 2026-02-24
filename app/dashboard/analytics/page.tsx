@@ -271,25 +271,25 @@ export default function AnalyticsPage() {
   const minBarHeightPx = hasAnyData && maxActivity > 0 ? 25 : 4;
 
   return (
-    <div className="max-w-7xl mx-auto w-full overflow-x-hidden">
-      {/* Hero Banner */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-2xl mb-8 shadow-xl w-full">
+    <div className="w-full overflow-x-hidden">
+      {/* Hero Banner - compact */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-xl mb-6 shadow-lg w-full">
         <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent"></div>
-        <div className="relative py-6 md:py-10 px-4 md:px-8">
-          <h1 className="text-4xl font-bold text-white mb-2">Analytics Dashboard</h1>
-          <p className="text-lg text-white/90">
+        <div className="relative py-4 md:py-5 px-4 md:px-6">
+          <h1 className="text-xl md:text-2xl font-bold text-white mb-1">Analytics Dashboard</h1>
+          <p className="text-sm text-white/90">
             Track your automation performance and engagement metrics
           </p>
         </div>
       </div>
 
       {/* Time Range Selector */}
-      <div className="mb-6 flex items-center space-x-4">
-        <label className="text-sm font-bold text-gray-900">Time Range:</label>
+      <div className="mb-4 flex items-center space-x-3">
+        <label className="text-sm font-semibold text-gray-900">Time Range:</label>
         <select
           value={days}
           onChange={(e) => setDays(Number(e.target.value))}
-          className="px-5 py-3 border-2 border-gray-300 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-md hover:border-blue-400 transition-all duration-200"
+          className="px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm hover:border-gray-400 transition-colors"
         >
           <option value={7}>Last 7 days</option>
           <option value={14}>Last 14 days</option>
@@ -300,7 +300,7 @@ export default function AnalyticsPage() {
 
       {/* Error State */}
       {error && (
-        <div className="mb-6 bg-gradient-to-r from-red-50 to-rose-50 border-2 border-red-200 rounded-xl p-5 shadow-md">
+        <div className="mb-4 bg-gradient-to-r from-red-50 to-rose-50 border border-red-200 rounded-lg p-4 shadow-sm">
           <p className="text-red-800 text-sm font-semibold">
             Failed to load analytics: {error instanceof Error ? error.message : 'Unknown error'}
           </p>
@@ -309,27 +309,27 @@ export default function AnalyticsPage() {
 
       {/* Stats Cards */}
       {isLoading ? (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
           {[1, 2, 3, 4].map((i) => (
             <Card key={i} className="animate-pulse">
-              <div className="h-20 bg-gray-200 rounded"></div>
+              <div className="h-16 bg-gray-200 rounded"></div>
             </Card>
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
           {stats.map((stat) => {
             const Icon = stat.icon;
             return (
-              <Card key={stat.name} className="hover:shadow-xl transition-all duration-300 hover:scale-105 rounded-2xl border-2 border-gray-200 shadow-lg">
+              <Card key={stat.name} className="hover:shadow transition-all duration-200 rounded-xl border border-gray-200 shadow-sm">
                 <div className="flex items-center">
-                  <div className={`flex-shrink-0 ${stat.bgColor} p-4 rounded-xl shadow-md`}>
-                    <Icon className={`h-7 w-7 ${stat.color}`} />
+                  <div className={`flex-shrink-0 ${stat.bgColor} p-3 rounded-lg shadow-sm`}>
+                    <Icon className={`h-6 w-6 ${stat.color}`} />
                   </div>
-                  <div className="ml-4 flex-1">
-                    <p className="text-sm font-semibold text-gray-500">{stat.name}</p>
-                    <p className="text-3xl font-bold text-gray-900">{stat.value.toLocaleString()}</p>
-                    <p className="text-xs font-medium text-gray-500 mt-1">{stat.description}</p>
+                  <div className="ml-3 flex-1">
+                    <p className="text-xs font-semibold text-gray-500">{stat.name}</p>
+                    <p className="text-xl font-bold text-gray-900">{stat.value.toLocaleString()}</p>
+                    <p className="text-xs font-medium text-gray-500 mt-0.5">{stat.description}</p>
                   </div>
                 </div>
               </Card>
@@ -338,9 +338,9 @@ export default function AnalyticsPage() {
         </div>
       )}
 
-      {/* Activity Chart - pt-12 reserves space so tooltip renders inside container (not clipped) */}
-      <Card className="mb-8 rounded-2xl border-2 border-gray-200 shadow-xl overflow-visible">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Activity Over Time</h2>
+      {/* Activity Chart */}
+      <Card className="mb-6 rounded-xl border border-gray-200 shadow overflow-visible">
+        <h2 className="text-base font-bold text-gray-900 mb-4">Activity Over Time</h2>
         <div
           className="flex items-end gap-1 px-4 pt-12 pb-1 overflow-x-auto overflow-y-visible"
           style={{ minHeight: chartHeightPx + 52 + 48 }}
@@ -403,25 +403,25 @@ export default function AnalyticsPage() {
       </Card>
 
       {/* Comment Replies */}
-      <div className="grid grid-cols-1 md:grid-cols-1 gap-6 mb-8 max-w-xs">
-        <Card className="rounded-2xl border-2 border-gray-200 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+      <div className="grid grid-cols-1 md:grid-cols-1 gap-4 mb-6 max-w-xs">
+        <Card className="rounded-xl border border-gray-200 shadow-sm hover:shadow transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-semibold text-gray-500">Comment Replies</p>
-              <p className="text-3xl font-bold text-gray-900">
+              <p className="text-xs font-semibold text-gray-500">Comment Replies</p>
+              <p className="text-xl font-bold text-gray-900">
                 {data?.comment_replies || 0}
               </p>
-              <p className="text-xs font-medium text-gray-500 mt-1">Public replies sent to comments</p>
+              <p className="text-xs font-medium text-gray-500 mt-0.5">Public replies sent to comments</p>
             </div>
-            <ChartBarIcon className="h-10 w-10 text-purple-500" />
+            <ChartBarIcon className="h-8 w-8 text-purple-500" />
           </div>
         </Card>
       </div>
 
       {/* Recent leads */}
-      <Card className="mb-8 rounded-2xl border-2 border-gray-200 shadow-xl">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-          <h2 className="text-xl font-bold text-gray-900">Recent leads</h2>
+      <Card className="mb-6 rounded-xl border border-gray-200 shadow">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+          <h2 className="text-base font-bold text-gray-900">Recent leads</h2>
           {leadsLoading && totalLeads === 0 ? (
             <span className="text-sm text-gray-500">Loading leads…</span>
           ) : totalLeads > 0 ? (
@@ -489,9 +489,9 @@ export default function AnalyticsPage() {
       </Card>
 
       {/* Lead capture (Email) */}
-      <Card className="mb-8 rounded-2xl border-2 border-gray-200 shadow-xl">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-          <h2 className="text-xl font-bold text-gray-900">Lead capture (Email)</h2>
+      <Card className="mb-6 rounded-xl border border-gray-200 shadow">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+          <h2 className="text-base font-bold text-gray-900">Lead capture (Email)</h2>
           {emailLeads.length > 0 && (
             <div className="flex flex-wrap items-center gap-3">
               <span className="text-sm text-gray-500">
@@ -537,9 +537,9 @@ export default function AnalyticsPage() {
       </Card>
 
       {/* Lead capture (Phone) */}
-      <Card className="mb-8 rounded-2xl border-2 border-gray-200 shadow-xl">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-          <h2 className="text-xl font-bold text-gray-900">Lead capture (Phone)</h2>
+      <Card className="mb-6 rounded-xl border border-gray-200 shadow">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+          <h2 className="text-base font-bold text-gray-900">Lead capture (Phone)</h2>
           {phoneLeads.length > 0 && (
             <div className="flex flex-wrap items-center gap-3">
               <span className="text-sm text-gray-500">
@@ -585,8 +585,8 @@ export default function AnalyticsPage() {
       </Card>
 
       {/* Top Performing Contents */}
-      <Card className="rounded-2xl border-2 border-gray-200 shadow-xl">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Top Performing Contents</h2>
+      <Card className="rounded-xl border border-gray-200 shadow">
+        <h2 className="text-base font-bold text-gray-900 mb-4">Top Performing Contents</h2>
         {isLoading ? (
           <div className="flex justify-center py-12">
             <Spinner />

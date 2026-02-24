@@ -621,31 +621,31 @@ export default function AutomationsPage() {
   }, [accounts, selectedAccount]);
 
   return (
-    <div className="w-full max-w-[min(80rem,100%)] mx-auto overflow-x-hidden">
-      {/* Hero Banner */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-purple-500 via-pink-500 to-rose-600 rounded-2xl mb-8 shadow-xl w-full">
+    <div className="w-full mx-auto overflow-x-hidden">
+      {/* Hero Banner - compact like competitor */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-purple-500 via-pink-500 to-rose-600 rounded-xl mb-6 shadow-lg w-full">
         <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent"></div>
-        <div className="relative py-6 md:py-10 px-4 md:px-8">
-          <h1 className="text-2xl md:text-4xl font-bold text-white mb-2">Automations</h1>
-          <p className="text-sm md:text-lg text-white/90">Jump right in and automate your Instagram</p>
+        <div className="relative py-4 md:py-5 px-4 md:px-6">
+          <h1 className="text-xl md:text-2xl font-bold text-white mb-1">Automations</h1>
+          <p className="text-sm text-white/90">Jump right in and automate your Instagram</p>
         </div>
       </div>
 
       {/* Account Selection */}
       {accountsLoading ? (
-        <div className="mb-6">
-          <div className="h-12 bg-gray-200 animate-pulse rounded-xl w-64"></div>
+        <div className="mb-4">
+          <div className="h-10 bg-gray-200 animate-pulse rounded-lg w-56"></div>
         </div>
       ) : accounts && accounts.length > 0 ? (
-        <div className="mb-6">
-          <label htmlFor="account-select" className="block text-sm font-semibold text-gray-900 mb-2">
+        <div className="mb-4">
+          <label htmlFor="account-select" className="block text-sm font-semibold text-gray-900 mb-1.5">
             Instagram Account
           </label>
           <select
             id="account-select"
             value={selectedAccount || ''}
             onChange={(e) => setSelectedAccount(Number(e.target.value))}
-            className="block w-full max-w-xs md:w-64 px-4 py-3 border-2 border-gray-300 rounded-xl shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white font-medium transition-all duration-200 hover:border-blue-400"
+            className="block w-full max-w-xs md:w-56 px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white font-medium text-sm transition-colors hover:border-gray-400"
           >
             {accounts.map((account) => (
               <option key={account.id} value={account.id}>
@@ -655,7 +655,7 @@ export default function AutomationsPage() {
           </select>
         </div>
       ) : (
-        <div className="mb-6 p-5 bg-gradient-to-r from-yellow-50 to-amber-50 border-2 border-yellow-200 rounded-xl shadow-md">
+        <div className="mb-4 p-4 bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-200 rounded-lg shadow-sm">
           <p className="text-sm font-semibold text-yellow-800">
             No Instagram accounts connected. Please{' '}
             <a href="/dashboard/accounts/connect" className="text-blue-600 underline font-bold hover:text-blue-800">
@@ -667,11 +667,11 @@ export default function AutomationsPage() {
       )}
 
       {/* Content Type Tabs */}
-      <div className="mb-6 border-b-2 border-gray-200 overflow-x-auto">
-        <nav className="-mb-px flex space-x-4 md:space-x-8 min-w-max md:min-w-0">
+      <div className="mb-4 border-b border-gray-200 overflow-x-auto">
+        <nav className="-mb-px flex space-x-2 md:space-x-6 min-w-max md:min-w-0">
           <button
             onClick={() => setSelectedTab('posts')}
-            className={`py-3 md:py-4 px-2 md:px-1 border-b-3 font-bold text-xs md:text-sm transition-all duration-200 whitespace-nowrap ${
+            className={`py-2.5 md:py-3 px-1 border-b-2 font-semibold text-xs md:text-sm transition-colors whitespace-nowrap ${
               selectedTab === 'posts'
                 ? 'border-blue-500 text-blue-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -688,7 +688,7 @@ export default function AutomationsPage() {
               }
             }}
             disabled={!hasProPlan}
-            className={`py-3 md:py-4 px-2 md:px-1 border-b-3 font-bold text-xs md:text-sm relative transition-all duration-200 whitespace-nowrap ${
+            className={`py-2.5 md:py-3 px-1 border-b-2 font-semibold text-xs md:text-sm relative transition-colors whitespace-nowrap ${
               selectedTab === 'stories'
                 ? 'border-blue-500 text-blue-600'
                 : !hasProPlan
@@ -711,7 +711,7 @@ export default function AutomationsPage() {
               }
             }}
             disabled={!hasProPlan}
-            className={`py-3 md:py-4 px-2 md:px-1 border-b-3 font-bold text-xs md:text-sm relative transition-all duration-200 whitespace-nowrap ${
+            className={`py-2.5 md:py-3 px-1 border-b-2 font-semibold text-xs md:text-sm relative transition-colors whitespace-nowrap ${
               selectedTab === 'dms'
                 ? 'border-blue-500 text-blue-600'
                 : !hasProPlan
@@ -730,7 +730,7 @@ export default function AutomationsPage() {
               // IG Live is in private beta – show info toast and keep tab inactive
               toast.info('IG Live Automation is currently in private beta. Check back soon!', 4000);
             }}
-            className={`py-3 md:py-4 px-2 md:px-1 border-b-3 font-bold text-xs md:text-sm relative transition-all duration-200 border-transparent text-gray-400 cursor-not-allowed whitespace-nowrap`}
+            className={`py-2.5 md:py-3 px-1 border-b-2 font-semibold text-xs md:text-sm relative transition-colors border-transparent text-gray-400 cursor-not-allowed whitespace-nowrap`}
             title="IG Live Automation is currently in private beta. Check back soon!"
           >
             IG Live
@@ -743,26 +743,26 @@ export default function AutomationsPage() {
 
       {/* View Toggle and Stats Summary - Only for posts/stories/live tabs */}
       {selectedAccount && (selectedTab === 'posts' || selectedTab === 'stories' || selectedTab === 'live') && (
-        <div className="mb-6">
+        <div className="mb-4">
           {/* View Toggle */}
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-3">
             <div className="flex items-center space-x-2">
               <button
                 onClick={() => setViewMode('table')}
-                className={`px-3 md:px-5 py-2 md:py-2.5 text-xs md:text-sm font-bold rounded-xl transition-all duration-200 whitespace-nowrap ${
+                className={`px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors whitespace-nowrap ${
                   viewMode === 'table'
-                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
-                    : 'bg-white text-gray-700 border-2 border-gray-300 hover:bg-gray-50 hover:border-blue-400 shadow-md'
+                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow'
+                    : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-blue-400'
                 }`}
               >
                 Table View
               </button>
               <button
                 onClick={() => setViewMode('grid')}
-                className={`px-3 md:px-5 py-2 md:py-2.5 text-xs md:text-sm font-bold rounded-xl transition-all duration-200 whitespace-nowrap ${
+                className={`px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors whitespace-nowrap ${
                   viewMode === 'grid'
-                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
-                    : 'bg-white text-gray-700 border-2 border-gray-300 hover:bg-gray-50 hover:border-blue-400 shadow-md'
+                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow'
+                    : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-blue-400'
                 }`}
               >
                 Grid View
@@ -779,25 +779,25 @@ export default function AutomationsPage() {
             const totalFollowersGained = mediaAnalytics.reduce((sum, m) => sum + (m.follow_button_clicks || 0) + (m.im_following_clicks || 0), 0);
             
             return (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6">
-                <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl border-2 border-blue-200 shadow-lg p-4 md:p-6 hover:shadow-xl hover:scale-105 transition-all duration-300">
-                  <div className="text-xs md:text-sm font-semibold text-blue-700 mb-1">DMs Sent</div>
-                  <div className="text-2xl md:text-3xl font-bold text-blue-900">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 mb-4">
+                <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200 shadow-sm p-3 md:p-4 hover:shadow transition-all duration-200">
+                  <div className="text-xs font-semibold text-blue-700 mb-0.5">DMs Sent</div>
+                  <div className="text-xl md:text-2xl font-bold text-blue-900">
                     {isLoadingAnalytics ? '...' : totalDmsSent}
                   </div>
                 </div>
-                <div className="bg-gradient-to-br from-green-50 to-emerald-100 rounded-2xl border-2 border-green-200 shadow-lg p-4 md:p-6 hover:shadow-xl hover:scale-105 transition-all duration-300">
-                  <div className="text-xs md:text-sm font-semibold text-green-700 mb-1">Leads Generated</div>
-                  <div className="text-2xl md:text-3xl font-bold text-green-900">
+                <div className="bg-gradient-to-br from-green-50 to-emerald-100 rounded-xl border border-green-200 shadow-sm p-3 md:p-4 hover:shadow transition-all duration-200">
+                  <div className="text-xs font-semibold text-green-700 mb-0.5">Leads Generated</div>
+                  <div className="text-xl md:text-2xl font-bold text-green-900">
                     {isLoadingAnalytics ? '...' : totalLeadsGenerated}
                   </div>
                 </div>
-                <div className="bg-gradient-to-br from-purple-50 to-pink-100 rounded-2xl border-2 border-purple-200 shadow-lg p-4 md:p-6 hover:shadow-xl hover:scale-105 transition-all duration-300" title="Increases when users click &quot;Follow Me&quot; or &quot;I&#39;m following&quot; in your DM flow">
-                  <div className="text-xs md:text-sm font-semibold text-purple-700 mb-1">Followers Gained via AutoDM</div>
-                  <div className="text-2xl md:text-3xl font-bold text-purple-900">
+                <div className="bg-gradient-to-br from-purple-50 to-pink-100 rounded-xl border border-purple-200 shadow-sm p-3 md:p-4 hover:shadow transition-all duration-200" title="Increases when users click &quot;Follow Me&quot; or &quot;I&#39;m following&quot; in your DM flow">
+                  <div className="text-xs font-semibold text-purple-700 mb-0.5">Followers Gained via AutoDM</div>
+                  <div className="text-xl md:text-2xl font-bold text-purple-900">
                     {isLoadingAnalytics ? '...' : totalFollowersGained}
                   </div>
-                  <div className="text-xs font-medium text-purple-600 mt-2">Follow / I&apos;m following button clicks</div>
+                  <div className="text-xs font-medium text-purple-600 mt-1">Follow / I&apos;m following button clicks</div>
                 </div>
               </div>
             );
@@ -826,9 +826,9 @@ export default function AutomationsPage() {
             )}
             {/* Show content immediately if we have media, even if still loading more */}
             {media.length > 0 && viewMode === 'table' ? (
-              <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl overflow-hidden w-full">
-                <div className="px-4 md:px-6 py-3 md:py-4 border-b-2 border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
-                  <h3 className="text-base md:text-xl font-bold text-gray-900">AUTOMATIONS</h3>
+              <div className="bg-white rounded-xl border border-gray-200 shadow overflow-hidden w-full">
+                <div className="px-4 md:px-5 py-2.5 md:py-3 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
+                  <h3 className="text-sm md:text-base font-bold text-gray-900">AUTOMATIONS</h3>
                 </div>
                 {/* Show content immediately - don't block on analytics loading */}
                 {tableViewData.length === 0 ? (
@@ -842,28 +842,28 @@ export default function AutomationsPage() {
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
                       <tr>
-                        <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        <th className="px-4 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider">
                           <div className="w-full text-center">Automation</div>
                         </th>
                         <th
-                          className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider"
+                          className="px-4 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider"
                           title="Increases when users click &quot;Follow Me&quot; / &quot;I&#39;m following&quot; in DMs"
                         >
                           <div className="w-full text-center">NEW FOLLOWERS</div>
                         </th>
-                        <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        <th className="px-4 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider">
                           <div className="w-full text-center">RUNS</div>
                         </th>
-                        <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        <th className="px-4 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider">
                           <div className="w-full text-center">CLICKS</div>
                         </th>
-                        <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        <th className="px-4 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider">
                           <div className="w-full text-center">STATUS</div>
                         </th>
-                        <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        <th className="px-4 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider">
                           <div className="w-full text-center">LAST MODIFIED</div>
                         </th>
-                        <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        <th className="px-4 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider">
                           <div className="w-full text-center">Action</div>
                         </th>
                       </tr>
@@ -880,7 +880,7 @@ export default function AutomationsPage() {
                         className="transition-colors duration-150 hover:bg-blue-50/50"
                       >
                             <td
-                              className={`px-6 py-4 whitespace-nowrap ${
+                              className={`px-4 py-3 whitespace-nowrap ${
                                 !rule && hasReachedRulesLimit
                                   ? 'opacity-60 cursor-not-allowed'
                                   : 'cursor-pointer'
@@ -897,21 +897,21 @@ export default function AutomationsPage() {
                               }}
                             >
                               <div className="flex items-center">
-                                <div className="flex-shrink-0 h-14 w-14">
+                                <div className="flex-shrink-0 h-10 w-10">
                                   {imageUrl ? (
                                     <img
-                                      className="h-14 w-14 rounded-xl object-cover border-2 border-gray-200 shadow-md"
+                                      className="h-10 w-10 rounded-lg object-cover border border-gray-200"
                                       src={imageUrl}
                                       alt={rule?.name || mediaItem.caption || 'Media'}
                                     />
                                   ) : (
-                                    <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center border-2 border-gray-200">
-                                      <span className="text-gray-400 text-lg">📷</span>
+                                    <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center border border-gray-200">
+                                      <span className="text-gray-400 text-sm">📷</span>
                                     </div>
                                   )}
                                 </div>
-                                <div className="ml-4">
-                                  <div className="text-sm font-bold text-gray-900">
+                                <div className="ml-3">
+                                  <div className="text-sm font-semibold text-gray-900">
                                     {rule
                                       ? (rule.name || mediaItem.caption?.substring(0, 30) || `Automation ${rule.id}`)
                                       : (mediaItem.caption?.substring(0, 30) || 
@@ -928,21 +928,21 @@ export default function AutomationsPage() {
                                 </div>
                               </div>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <span className="text-sm font-bold text-gray-900">
+                            <td className="px-4 py-3 whitespace-nowrap">
+                              <span className="text-sm font-semibold text-gray-900">
                                 {(analytics?.follow_button_clicks || 0) + (analytics?.im_following_clicks || 0)}
                               </span>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
+                            <td className="px-4 py-3 whitespace-nowrap">
                               <span className="text-sm font-semibold text-gray-900">{analytics?.triggers || 0}</span>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
+                            <td className="px-4 py-3 whitespace-nowrap">
                               <span className="text-sm font-semibold text-gray-900">{analytics?.total_clicks || 0}</span>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
+                            <td className="px-4 py-3 whitespace-nowrap">
                               {rule ? (
                                 <span
-                                  className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-xl shadow-sm ${
+                                  className={`px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-lg ${
                                     rule.is_active
                                       ? 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border border-green-300'
                                       : 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800 border border-gray-300'
@@ -951,12 +951,12 @@ export default function AutomationsPage() {
                                   {rule.is_active ? 'Enabled' : 'Disabled'}
                                 </span>
                               ) : (
-                                <span className="px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-xl shadow-sm bg-gradient-to-r from-yellow-100 to-amber-100 text-yellow-800 border border-yellow-300">
+                                <span className="px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-lg bg-gradient-to-r from-yellow-100 to-amber-100 text-yellow-800 border border-yellow-300">
                                   No Rule
                                 </span>
                               )}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <td className="px-4 py-3 whitespace-nowrap text-xs text-gray-500">
                               {rule?.created_at
                                 ? new Date(rule.created_at).toLocaleString('en-US', {
                                     month: 'short',
@@ -968,7 +968,7 @@ export default function AutomationsPage() {
                                 : rule ? '-' : 'Not configured'}
                             </td>
                             {/* Actions: Edit & Delete with inline Yes/No confirmation */}
-                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
                               {rule ? (
                                 deleteConfirmRuleId === rule.id ? (
                                   <div
@@ -1054,12 +1054,12 @@ export default function AutomationsPage() {
                   </table>
                 </div>
                 {media.length > 0 && mediaHasMore && (selectedTab === 'posts' || selectedTab === 'stories' || selectedTab === 'live') && (
-                  <div className="flex justify-center py-6 border-t border-gray-200">
+                  <div className="flex justify-center py-4 border-t border-gray-200">
                     <button
                       type="button"
                       onClick={() => fetchMedia({ after: mediaNextCursor ?? undefined })}
                       disabled={isLoadingMore}
-                      className="px-6 py-2.5 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                      className="px-4 py-2 rounded-lg font-semibold text-sm text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       {isLoadingMore ? 'Loading…' : 'Load more'}
                     </button>
@@ -1070,7 +1070,7 @@ export default function AutomationsPage() {
               </div>
             ) : media.length > 0 && viewMode === 'grid' ? (
               <>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[...media]
               .sort((a, b) => {
                 // Show media with automation rules first (same as table view)
@@ -1098,10 +1098,10 @@ export default function AutomationsPage() {
               return (
               <div 
                 key={item.id} 
-                className={`bg-white rounded-2xl border-2 border-gray-200 shadow-xl overflow-hidden relative group transition-all duration-300 ${
+                className={`bg-white rounded-xl border border-gray-200 shadow overflow-hidden relative group transition-all duration-200 ${
                   !activeRule && hasReachedRulesLimit
                     ? 'opacity-60 cursor-not-allowed'
-                    : 'cursor-pointer hover:shadow-2xl hover:scale-105'
+                    : 'cursor-pointer hover:shadow-lg hover:scale-[1.02]'
                 }`}
                 onClick={() => {
                   // Only allow creating new rules if limit not reached, or if editing existing rule
@@ -1252,12 +1252,12 @@ export default function AutomationsPage() {
             })}
           </div>
           {media.length > 0 && mediaHasMore && (selectedTab === 'posts' || selectedTab === 'stories' || selectedTab === 'live') && (
-            <div className="flex justify-center py-6">
+            <div className="flex justify-center py-4">
               <button
                 type="button"
                 onClick={() => fetchMedia({ after: mediaNextCursor ?? undefined })}
                 disabled={isLoadingMore}
-                className="px-6 py-2.5 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                className="px-4 py-2 rounded-lg font-semibold text-sm text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {isLoadingMore ? 'Loading…' : 'Load more'}
               </button>
@@ -1267,10 +1267,10 @@ export default function AutomationsPage() {
               ) : null}
             {/* Show empty state only if not loading and no media */}
             {!isLoadingMedia && media.length === 0 && (
-              <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl text-center py-16 px-6">
-                <div className="bg-gradient-to-br from-gray-100 to-gray-200 rounded-full p-6 w-fit mx-auto mb-6">
+              <div className="bg-white rounded-xl border border-gray-200 shadow text-center py-12 px-6">
+                <div className="bg-gradient-to-br from-gray-100 to-gray-200 rounded-full p-4 w-fit mx-auto mb-4">
                   <svg
-                    className="mx-auto h-16 w-16 text-gray-400"
+                    className="mx-auto h-12 w-12 text-gray-400"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -1283,12 +1283,12 @@ export default function AutomationsPage() {
                     />
                   </svg>
                 </div>
-                <h3 className="mt-4 text-2xl font-bold text-gray-900">
+                <h3 className="mt-3 text-lg font-bold text-gray-900">
                   {selectedTab === 'posts' && 'No posts/reels found'}
                   {selectedTab === 'stories' && 'No stories found'}
                   {selectedTab === 'live' && 'No live videos found'}
                 </h3>
-                <p className="mt-2 text-base text-gray-600">
+                <p className="mt-1.5 text-sm text-gray-600">
                   {selectedTab === 'posts' && "We couldn't fetch any posts or reels for this account. Please try again later."}
                   {selectedTab === 'stories' && "We couldn't fetch any stories for this account. Stories are only available for 24 hours after posting."}
                   {selectedTab === 'live' && "We couldn't fetch any live videos for this account. Please try again later."}
@@ -1298,8 +1298,8 @@ export default function AutomationsPage() {
           </>
         )
       ) : (
-        <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl text-center py-16 px-6">
-          <p className="text-lg font-semibold text-gray-700">Please select an Instagram account to view content.</p>
+        <div className="bg-white rounded-xl border border-gray-200 shadow text-center py-12 px-6">
+          <p className="text-base font-semibold text-gray-700">Please select an Instagram account to view content.</p>
         </div>
       )}
 
@@ -1454,10 +1454,10 @@ export default function AutomationsPage() {
       {/* Upgrade Modal */}
       {showUpgradeModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 border-2 border-gray-200">
-            <div className="p-8">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-3xl font-bold text-gray-900">Upgrade to Pro</h2>
+          <div className="bg-white rounded-xl shadow border border-gray-200 max-w-md w-full mx-4">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-gray-900">Upgrade to Pro</h2>
                 <button
                   onClick={() => setShowUpgradeModal(false)}
                   className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -1467,11 +1467,11 @@ export default function AutomationsPage() {
                   </svg>
                 </button>
               </div>
-              <p className="text-gray-700 mb-8 text-lg">
+              <p className="text-gray-700 mb-6 text-base">
                 Stories, DMs, and IG Live automation are Pro features. Upgrade to Pro to unlock these advanced automation capabilities.
               </p>
-              <div className="bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200 rounded-xl p-6 mb-8">
-                <h3 className="font-bold text-purple-900 mb-4 text-lg">Pro Plan Includes:</h3>
+              <div className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-4 mb-6">
+                <h3 className="font-bold text-purple-900 mb-3 text-base">Pro Plan Includes:</h3>
                 <ul className="space-y-2 text-sm text-purple-800 font-medium">
                   <li className="flex items-center"><span className="mr-2">✅</span> Connect up to <strong>5</strong> Instagram Accounts</li>
                   <li className="flex items-center"><span className="mr-2">✅</span> <strong>Unlimited</strong> AutoDMs across Reels, Posts, Stories &amp; Lives</li>
@@ -1480,10 +1480,10 @@ export default function AutomationsPage() {
                   <li className="flex items-center"><span className="mr-2">✅</span> Priority Support via Dedicated Channel</li>
                 </ul>
               </div>
-              <div className="flex space-x-4">
+              <div className="flex space-x-3">
                 <button
                   onClick={() => setShowUpgradeModal(false)}
-                  className="flex-1 px-6 py-3 border-2 border-gray-300 rounded-xl text-gray-700 font-semibold hover:bg-gray-50 transition-all duration-200"
+                  className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-semibold hover:bg-gray-50 transition-colors"
                 >
                   Maybe Later
                 </button>
@@ -1492,7 +1492,7 @@ export default function AutomationsPage() {
                     setShowUpgradeModal(false);
                     window.location.href = '/dashboard/subscription';
                   }}
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl hover:from-purple-700 hover:to-pink-700 font-bold shadow-lg hover:scale-105 transition-all duration-200"
+                  className="flex-1 px-4 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 font-bold shadow hover:scale-[1.02] transition-all"
                 >
                   Upgrade to Pro
                 </button>

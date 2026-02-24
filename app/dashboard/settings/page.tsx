@@ -81,8 +81,8 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
 }) => {
   if (isLoading) {
     return (
-      <div className="py-8">
-        <div className="inline-flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-6 py-4 shadow-sm">
+      <div className="py-6">
+        <div className="inline-flex items-center gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3 shadow-sm">
           <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-blue-500" />
           <span className="text-sm text-gray-600">Loading billing details…</span>
         </div>
@@ -182,7 +182,7 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
       {/* Payment Method */}
       <section className="space-y-3">
         <h3 className="text-sm font-semibold text-gray-900">Payment Method</h3>
-        <div className="flex flex-col items-start justify-between gap-4 rounded-xl border border-gray-100 bg-white px-6 py-5 sm:flex-row sm:items-center">
+        <div className="flex flex-col items-start justify-between gap-4 rounded-lg border border-gray-100 bg-white px-4 py-4 sm:flex-row sm:items-center">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-md bg-emerald-500 text-xs font-semibold text-white">
               D
@@ -203,16 +203,16 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
             <table className="min-w-full divide-y divide-gray-100">
             <thead className="bg-gray-50/50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                   Date
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                   Amount
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                   Status
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wide text-gray-500">
+                <th className="px-4 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-gray-500">
                   Actions
                 </th>
               </tr>
@@ -220,14 +220,14 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
             <tbody className="divide-y divide-gray-100 text-sm">
               {invoicesLoading && (
                 <tr>
-                  <td colSpan={4} className="px-6 py-4 text-sm text-gray-500">
+                  <td colSpan={4} className="px-4 py-3 text-sm text-gray-500">
                     Loading invoices…
                   </td>
                 </tr>
               )}
               {!invoicesLoading && invoicesError && (
                 <tr>
-                  <td colSpan={4} className="px-6 py-4">
+                  <td colSpan={4} className="px-4 py-3">
                     <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
                       <ExclamationTriangleIcon className="h-5 w-5 shrink-0 mt-0.5" />
                       <div>
@@ -241,7 +241,7 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
               )}
               {!invoicesLoading && !invoicesError && invoices.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="px-6 py-4 text-sm text-gray-500">
+                  <td colSpan={4} className="px-4 py-3 text-sm text-gray-500">
                     No invoices available yet.
                   </td>
                 </tr>
@@ -251,13 +251,13 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
                 invoices.length > 0 &&
                 invoices.map((inv) => (
                   <tr key={inv.id}>
-                    <td className="px-6 py-3 text-gray-900">
+                    <td className="px-4 py-2.5 text-gray-900">
                       {formatDate(inv.paid_at || inv.created_at || null)}
                     </td>
-                    <td className="px-6 py-3 text-gray-900">
+                    <td className="px-4 py-2.5 text-gray-900">
                       {formatAmount(inv.amount, inv.currency)}
                     </td>
-                    <td className="px-6 py-3">
+                    <td className="px-4 py-2.5">
                       <span
                         className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium border ${
                           inv.status === 'succeeded' || inv.status === 'paid'
@@ -270,7 +270,7 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
                         {inv.status === 'succeeded' ? 'Paid' : inv.status.charAt(0).toUpperCase() + inv.status.slice(1)}
                       </span>
                     </td>
-                    <td className="px-6 py-3 text-right">
+                    <td className="px-4 py-2.5 text-right">
                       {inv.invoice_url ? (
                         <button
                           type="button"

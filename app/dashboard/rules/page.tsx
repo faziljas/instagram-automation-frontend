@@ -118,21 +118,21 @@ export default function RulesPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto w-full overflow-x-hidden">
-      {/* Hero Banner */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-yellow-500 via-amber-500 to-orange-500 rounded-2xl mb-8 shadow-xl w-full">
+    <div className="w-full overflow-x-hidden">
+      {/* Hero Banner - compact */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-yellow-500 via-amber-500 to-orange-500 rounded-xl mb-6 shadow-lg w-full">
         <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent"></div>
-        <div className="relative py-6 md:py-10 px-4 md:px-8">
-          <h1 className="text-4xl font-bold text-white mb-2">Automation Rules</h1>
-          <p className="text-lg text-white/90">Manage your Instagram automation rules</p>
+        <div className="relative py-4 md:py-5 px-4 md:px-6">
+          <h1 className="text-xl md:text-2xl font-bold text-white mb-1">Automation Rules</h1>
+          <p className="text-sm text-white/90">Manage your Instagram automation rules</p>
         </div>
       </div>
 
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Automation Rules</h1>
-          <p className="mt-2 text-gray-600">Manage your Instagram automation rules</p>
+          <h1 className="text-xl font-bold text-gray-900">Automation Rules</h1>
+          <p className="mt-1 text-sm text-gray-600">Manage your Instagram automation rules</p>
         </div>
       </div>
 
@@ -141,10 +141,10 @@ export default function RulesPage() {
 
       {/* Empty State */}
       {!isLoading && (!rules || rules.length === 0) && (
-        <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl text-center py-16 px-6">
-          <div className="bg-gradient-to-br from-yellow-100 to-amber-100 rounded-full p-6 w-fit mx-auto mb-6">
+        <div className="bg-white rounded-xl border border-gray-200 shadow text-center py-12 px-6">
+          <div className="bg-gradient-to-br from-yellow-100 to-amber-100 rounded-full p-4 w-fit mx-auto mb-4">
             <svg
-              className="mx-auto h-16 w-16 text-yellow-600"
+              className="mx-auto h-12 w-12 text-yellow-600"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -157,8 +157,8 @@ export default function RulesPage() {
               />
             </svg>
           </div>
-          <h3 className="mt-4 text-2xl font-bold text-gray-900">No automation rules</h3>
-          <p className="mt-2 text-base text-gray-600">
+          <h3 className="mt-3 text-lg font-bold text-gray-900">No automation rules</h3>
+          <p className="mt-1.5 text-sm text-gray-600">
             Get started by creating your first automation rule.
           </p>
         </div>
@@ -166,27 +166,27 @@ export default function RulesPage() {
 
       {/* Rules Table */}
       {!isLoading && rules && rules.length > 0 && (
-        <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl overflow-hidden w-full">
+        <div className="bg-white rounded-xl border border-gray-200 shadow overflow-hidden w-full">
           <div className="overflow-x-auto w-full">
             <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                   Rule Name
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                   Type
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                   Active
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                   Executions
                 </th>
-                <th className="px-6 py-4 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">
+                <th className="px-4 py-3 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -194,22 +194,22 @@ export default function RulesPage() {
             <tbody className="bg-white divide-y divide-gray-200">
               {rules.map((rule) => (
                 <tr key={rule.id} className="hover:bg-blue-50/50 transition-colors duration-150">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-bold text-gray-900">
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <div className="text-sm font-semibold text-gray-900">
                       {getRuleDisplayName(rule)}
                     </div>
                     <div className="text-xs font-medium text-gray-500">
                       Created {formatDate(rule.created_at)}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-xl bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border border-blue-300 shadow-sm">
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <span className="px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-lg bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border border-blue-300">
                       {getTypeLabel(rule.trigger_type)}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-4 py-3 whitespace-nowrap">
                     <span
-                      className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-xl shadow-sm ${
+                      className={`px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-lg ${
                         rule.is_active
                           ? 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border border-green-300'
                           : 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800 border border-gray-300'
@@ -218,7 +218,7 @@ export default function RulesPage() {
                       {rule.is_active ? 'Active' : 'Inactive'}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-4 py-3 whitespace-nowrap">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -236,14 +236,14 @@ export default function RulesPage() {
                       />
                     </button>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
                     {rule.last_triggered_at ? (
                       <span className="text-gray-900">{formatDate(rule.last_triggered_at)}</span>
                     ) : (
                       <span className="text-gray-400">Never</span>
                     )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
                     {deleteConfirm === rule.id ? (
                       <div className="flex items-center justify-end space-x-3" onClick={(e) => e.stopPropagation()}>
                         <span className="text-red-600 text-sm font-semibold">Delete?</span>

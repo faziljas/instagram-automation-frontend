@@ -237,7 +237,7 @@ export default function DashboardLayout({
           </header>
 
           {/* Page content */}
-          <main className="flex-1 py-6 px-4 sm:px-6 lg:px-8 w-full">{children}</main>
+          <main className="flex-1 py-5 px-4 sm:px-6 lg:px-8 w-full max-w-6xl mx-auto">{children}</main>
         </div>
       </div>
       </ProtectedRoute>

@@ -214,15 +214,15 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto w-full overflow-x-hidden">
-      {/* Hero Banner - More Vibrant */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 rounded-2xl mb-8 shadow-xl w-full">
+    <div className="w-full overflow-x-hidden">
+      {/* Hero Banner - compact */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 rounded-xl mb-6 shadow-lg w-full">
         <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent"></div>
-        <div className="relative py-6 md:py-10 px-4 md:px-8">
-          <h1 className="text-4xl font-bold text-white mb-2">
+        <div className="relative py-4 md:py-5 px-4 md:px-6">
+          <h1 className="text-xl md:text-2xl font-bold text-white mb-1">
             Welcome back, {user?.email?.split('@')[0]}! 👋
           </h1>
-          <p className="text-lg text-white/90">
+          <p className="text-sm text-white/90">
             Here&apos;s what&apos;s happening with your Instagram automation today.
           </p>
         </div>
@@ -230,43 +230,43 @@ export default function DashboardPage() {
 
       {/* Show content immediately - don't block on loading */}
       {data ? (
-        <div className="grid gap-6 mb-10">
+        <div className="grid gap-4 mb-8">
           {/* Row 1: Core Metrics */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Total DMs Sent */}
-            <div className="bg-white border border-gray-100 rounded-xl shadow-sm p-5 flex flex-col justify-between">
+            <div className="bg-white border border-gray-100 rounded-xl shadow-sm p-4 flex flex-col justify-between">
               <div className="flex items-start justify-between">
                 <div className="flex items-center space-x-3">
-                  <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center">
+                  <div className="h-9 w-9 rounded-full bg-blue-50 flex items-center justify-center">
                     <PaperAirplaneIcon className="h-5 w-5 text-blue-500" />
                   </div>
                   <div>
                     <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
                       Total DMs Sent
                     </p>
-                    <p className="mt-1 text-2xl font-semibold text-gray-900">
+                    <p className="mt-0.5 text-xl font-semibold text-gray-900">
                       {totalDMs === 0 ? '-' : totalDMs.toLocaleString()}
                     </p>
                   </div>
                 </div>
               </div>
-              <p className="mt-3 text-xs text-gray-500">
+              <p className="mt-2 text-xs text-gray-500">
                 Your automation has handled every DM without you needing to touch the inbox.
               </p>
             </div>
 
             {/* Leads Captured */}
-            <div className="bg-white border border-gray-100 rounded-xl shadow-sm p-5 flex flex-col justify-between">
+            <div className="bg-white border border-gray-100 rounded-xl shadow-sm p-4 flex flex-col justify-between">
               <div className="flex items-start justify-between">
                 <div className="flex items-center space-x-3">
-                  <div className="h-10 w-10 rounded-full bg-emerald-50 flex items-center justify-center">
+                  <div className="h-9 w-9 rounded-full bg-emerald-50 flex items-center justify-center">
                     <UserGroupIcon className="h-5 w-5 text-emerald-500" />
                   </div>
                   <div>
                     <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
                       Leads Captured
                     </p>
-                    <p className="mt-1 text-2xl font-semibold text-gray-900">
+                    <p className="mt-0.5 text-xl font-semibold text-gray-900">
                       {leadsCaptured}
                     </p>
                   </div>
@@ -281,66 +281,66 @@ export default function DashboardPage() {
                   {leadsCaptured > 0 ? '+ Leads' : 'No leads yet'}
                 </span>
               </div>
-              <p className="mt-3 text-xs text-gray-500">
+              <p className="mt-2 text-xs text-gray-500">
                 People who replied or clicked through from your automation flows.
               </p>
             </div>
 
             {/* Active Automations */}
-            <div className="bg-white border border-gray-100 rounded-xl shadow-sm p-5 flex flex-col justify-between">
+            <div className="bg-white border border-gray-100 rounded-xl shadow-sm p-4 flex flex-col justify-between">
               <div className="flex items-start justify-between">
                 <div className="flex items-center space-x-3">
-                  <div className="h-10 w-10 rounded-full bg-indigo-50 flex items-center justify-center">
+                  <div className="h-9 w-9 rounded-full bg-indigo-50 flex items-center justify-center">
                     <BoltIcon className="h-5 w-5 text-indigo-500" />
                   </div>
                   <div>
                     <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
                       Active Automations
                     </p>
-                    <p className="mt-1 text-2xl font-semibold text-gray-900">
+                    <p className="mt-0.5 text-xl font-semibold text-gray-900">
                       {activeRules} Active
                     </p>
                   </div>
                 </div>
               </div>
-              <p className="mt-3 text-xs text-gray-500">
+              <p className="mt-2 text-xs text-gray-500">
                 Rules currently watching your posts, stories, and inbox.
               </p>
             </div>
 
             {/* Time Saved */}
-            <div className="bg-white border border-gray-100 rounded-xl shadow-sm p-5 flex flex-col justify-between">
+            <div className="bg-white border border-gray-100 rounded-xl shadow-sm p-4 flex flex-col justify-between">
               <div className="flex items-start justify-between">
                 <div className="flex items-center space-x-3">
-                  <div className="h-10 w-10 rounded-full bg-amber-50 flex items-center justify-center">
+                  <div className="h-9 w-9 rounded-full bg-amber-50 flex items-center justify-center">
                     <ClockIcon className="h-5 w-5 text-amber-500" />
                   </div>
                   <div>
                     <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
                       Time Saved
                     </p>
-                    <p className="mt-1 text-2xl font-semibold text-gray-900">
+                    <p className="mt-0.5 text-xl font-semibold text-gray-900">
                       {timeSavedHours} Hours
                     </p>
                   </div>
                 </div>
               </div>
-              <p className="mt-3 text-xs text-gray-500">
+              <p className="mt-2 text-xs text-gray-500">
                 Based on ~2 minutes saved per DM your bot sends.
               </p>
             </div>
           </div>
 
           {/* Row 2: Engagement Overview + Live Feed */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {/* Engagement Overview (2/3 width) */}
-            <div className="lg:col-span-2 bg-white border border-gray-100 rounded-xl shadow-sm p-6">
-              <div className="flex items-center justify-between mb-4">
+            <div className="lg:col-span-2 bg-white border border-gray-100 rounded-xl shadow-sm p-4">
+              <div className="flex items-center justify-between mb-3">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
                     Engagement Overview
                   </p>
-                  <h3 className="mt-1 text-lg font-semibold text-gray-900">
+                  <h3 className="mt-0.5 text-base font-semibold text-gray-900">
                     Automation Activity (Last 7 Days)
                   </h3>
                 </div>
@@ -399,13 +399,13 @@ export default function DashboardPage() {
             </div>
 
             {/* Live Activity Feed (1/3 width) */}
-            <div className="bg-white border border-gray-100 rounded-xl shadow-sm p-6">
-              <div className="flex items-center justify-between mb-4">
+            <div className="bg-white border border-gray-100 rounded-xl shadow-sm p-4">
+              <div className="flex items-center justify-between mb-3">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
                     Live Activity Feed
                   </p>
-                  <h3 className="mt-1 text-lg font-semibold text-gray-900">
+                  <h3 className="mt-0.5 text-base font-semibold text-gray-900">
                     Recent Actions
                   </h3>
                 </div>
@@ -462,13 +462,13 @@ export default function DashboardPage() {
           </div>
 
           {/* Row 3: Top Performing Posts */}
-          <div className="bg-white border border-gray-100 rounded-xl shadow-sm p-6">
-            <div className="flex items-center justify-between mb-4">
+          <div className="bg-white border border-gray-100 rounded-xl shadow-sm p-4">
+            <div className="flex items-center justify-between mb-3">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
                   Content Performance
                 </p>
-                <h3 className="mt-1 text-lg font-semibold text-gray-900">
+                <h3 className="mt-0.5 text-base font-semibold text-gray-900">
                   Top Performing Posts
                 </h3>
               </div>
