@@ -41,11 +41,6 @@ export function useParallelFetch<T extends Record<string, any>>(
   }
 ) {
   const { session, loading: authLoading } = useAuth();
-  const [data, setData] = useState<Partial<T>>({});
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-  const endpointsRef = useRef<string>('');
-
   const enabled = options?.enabled !== false;
   const hasValidSession = !authLoading && !!session?.access_token;
   const shouldFetch = enabled && hasValidSession;
