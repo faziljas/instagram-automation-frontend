@@ -8,8 +8,6 @@ export interface User {
   plan_tier?: string;
   is_active?: boolean;
   is_verified?: boolean;
-  notifyProductUpdates?: boolean;
-  notifyBilling?: boolean;
   createdAt?: string;
   updatedAt?: string;
   subscription?: Subscription;

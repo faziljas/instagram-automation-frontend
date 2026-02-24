@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { z } from 'zod';
 import { useFetch } from '@/hooks/useFetch';
-import { usePut, usePatch, useDelete, usePost } from '@/hooks/useApi';
+import { usePut, useDelete, usePost } from '@/hooks/useApi';
 import { useAuth } from '@/hooks/useAuth';
 import { User } from '@/types';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
@@ -367,7 +367,6 @@ export default function SettingsPage() {
   // Ensure invoices is always an array - handle cases where API returns error object
   const invoices = Array.isArray(invoicesData) ? invoicesData : [];
   const { execute: updateProfile, loading: profileLoading, error: profileError } = usePut();
-  const { execute: updateNotificationPrefs, loading: notificationPrefsLoading } = usePatch();
   const { execute: updatePassword, loading: passwordLoading, error: passwordError } = usePut();
   const { execute: deleteAccount, loading: deleteLoading } = useDelete();
   const { execute: createPortalSession, loading: portalLoading } = usePost();
@@ -389,12 +388,9 @@ export default function SettingsPage() {
   const [passwordErrors, setPasswordErrors] = useState<Partial<Record<keyof PasswordFormData, string>>>({});
   const [profileSuccess, setProfileSuccess] = useState(false);
   const [passwordSuccess, setPasswordSuccess] = useState(false);
-  const [notificationPrefsSuccess, setNotificationPrefsSuccess] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showCancelConfirmModal, setShowCancelConfirmModal] = useState(false);
   const [localCancelled, setLocalCancelled] = useState(false);
-  const [notifyProductUpdates, setNotifyProductUpdates] = useState(true);
-  const [notifyBilling, setNotifyBilling] = useState(true);
   const [activeTab, setActiveTab] = useState<'general' | 'security' | 'notifications' | 'billing' | 'delete-account'>('general');
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -418,14 +414,6 @@ export default function SettingsPage() {
       setAvatarPreview(user.profilePictureUrl);
     } else {
       setAvatarPreview(null);
-    }
-  }, [user]);
-
-  // Sync notification preferences from user
-  useEffect(() => {
-    if (user) {
-      setNotifyProductUpdates(user.notifyProductUpdates ?? true);
-      setNotifyBilling(user.notifyBilling ?? true);
     }
   }, [user]);
 
@@ -950,83 +938,16 @@ export default function SettingsPage() {
     );
   };
 
-  const renderNotificationsContent = () => {
-    const handleSaveNotifications = async (e: React.FormEvent) => {
-      e.preventDefault();
-      setNotificationPrefsSuccess(false);
-      try {
-        await updateNotificationPrefs('/users/me/notification-preferences', {
-          notify_product_updates: notifyProductUpdates,
-          notify_billing: notifyBilling,
-        });
-        mutate('/users/me');
-        setNotificationPrefsSuccess(true);
-      } catch (err) {
-        console.error('Failed to update notification preferences:', err);
-      }
-    };
-
-    return (
-      <div className="space-y-6">
-        <div>
-          <h2 className="text-lg font-semibold text-gray-900">Notifications</h2>
-          <p className="mt-0.5 text-sm text-gray-500">
-            Choose which emails you want to receive. You&apos;ll always get critical account and security emails.
-          </p>
-        </div>
-
-        <form onSubmit={handleSaveNotifications} className="space-y-6">
-          <div className="space-y-4">
-            <label className="flex items-start gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={notifyProductUpdates}
-                onChange={(e) => setNotifyProductUpdates(e.target.checked)}
-                className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <div>
-                <span className="text-sm font-medium text-gray-900">Product updates</span>
-                <p className="text-xs text-gray-500 mt-0.5">
-                  New features, tips, and product news.
-                </p>
-              </div>
-            </label>
-
-            <label className="flex items-start gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={notifyBilling}
-                onChange={(e) => setNotifyBilling(e.target.checked)}
-                className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <div>
-                <span className="text-sm font-medium text-gray-900">Billing &amp; invoices</span>
-                <p className="text-xs text-gray-500 mt-0.5">
-                  Payment confirmations, invoices, and subscription updates.
-                </p>
-              </div>
-            </label>
-          </div>
-
-          {notificationPrefsSuccess && (
-            <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
-              Notification preferences saved.
-            </div>
-          )}
-
-          <div className="flex justify-end">
-            <button
-              type="submit"
-              disabled={notificationPrefsLoading}
-              className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 disabled:opacity-60"
-            >
-              {notificationPrefsLoading ? 'Saving…' : 'Save preferences'}
-            </button>
-          </div>
-        </form>
+  const renderNotificationsContent = () => (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-lg font-semibold text-gray-900">Notifications</h2>
+        <p className="mt-0.5 text-sm text-gray-500">
+          Email preferences for product updates and billing. Coming soon.
+        </p>
       </div>
-    );
-  };
+    </div>
+  );
 
   const renderBillingContent = () => {
     // Ensure subscription is a valid object (not an error response)
@@ -1145,6 +1066,9 @@ export default function SettingsPage() {
                 }`}
               >
                 <span>Notifications</span>
+                <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-800">
+                  SOON
+                </span>
               </button>
               <button
                 type="button"
