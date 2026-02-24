@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { useFetch } from '@/hooks/useFetch';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useDelete, usePost } from '@/hooks/useApi';
@@ -37,6 +38,7 @@ const PLAN_LIMITS: Record<string, { accounts: number; rules: number; dms: number
 };
 
 export default function AccountsPage() {
+  const router = useRouter();
   const { data: accountsData, error: accountsError, isLoading, mutate: mutateAccounts } = useFetch<InstagramAccountResponse[]>('/users/me/accounts');
   
   // Use subscription hook with caching to prevent pro users from appearing as free on refresh
@@ -295,7 +297,7 @@ export default function AccountsPage() {
                     <p className="mt-1 text-sm text-red-700">{connectError}</p>
                     
                     {/* Special handling for development mode error */}
-                    {connectError.includes('development mode') || connectError.includes('test users') ? (
+                    {(connectError.includes('development mode') || connectError.includes('test users')) && (
                       <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded">
                         <p className="text-sm font-medium text-amber-900 mb-2">⚠️ App in Development Mode</p>
                         <p className="text-xs text-amber-800 mb-2">
@@ -310,23 +312,19 @@ export default function AccountsPage() {
                           <li>Wait until the app is approved and published</li>
                         </ul>
                       </div>
-                    ) : (
-                      <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded">
-                        <p className="text-xs text-blue-800">
-                          <strong>💡 You can try again:</strong> Click &quot;Connect Account&quot; to retry with a different Instagram account or credentials.
-                        </p>
+                    )}
+
+                    {/* Upgrade link when backend suggests upgrading to Pro */}
+                    {connectError.toLowerCase().includes('upgrade to pro') && (
+                      <div className="mt-3">
+                        <button
+                          onClick={() => router.push('/dashboard/subscription')}
+                          className="inline-flex items-center px-3 py-1.5 rounded-md text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200"
+                        >
+                          Go to Upgrade page
+                        </button>
                       </div>
                     )}
-                    
-                    {/* Stuck? Reset Button */}
-                    <div className="mt-3">
-                      <button
-                        onClick={handleResetConnection}
-                        className="text-xs text-blue-600 hover:text-blue-800 underline font-medium"
-                      >
-                        🔄 Stuck on an error? Click here to reset and try again.
-                      </button>
-                    </div>
                   </div>
                   <button
                     onClick={() => setConnectError(null)}
