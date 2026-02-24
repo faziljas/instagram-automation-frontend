@@ -339,15 +339,17 @@ export default function AutomationsPage() {
 
     // Convert config to API format
     // Determine which mode's data to use for shared fields based on isLeadCapture
-    const activeKeywordsForShared = config.isLeadCapture 
+    const isLeadCaptureMode = !!config.isLeadCapture;
+
+    const activeKeywordsForShared = isLeadCaptureMode 
       ? (config.leadKeywords && config.leadKeywords.length > 0 ? config.leadKeywords : config.keywords)
       : (config.simpleKeywords && config.simpleKeywords.length > 0 ? config.simpleKeywords : config.keywords);
     
-    const activeCommentRepliesForShared = config.isLeadCapture
+    const activeCommentRepliesForShared = isLeadCaptureMode
       ? (config.leadCommentReplies && config.leadCommentReplies.length > 0 ? config.leadCommentReplies : config.commentReplies)
       : (config.simpleCommentReplies && config.simpleCommentReplies.length > 0 ? config.simpleCommentReplies : config.commentReplies);
     
-    const activeDmMessagesForShared = config.isLeadCapture
+    const activeDmMessagesForShared = isLeadCaptureMode
       ? (config.leadDmMessages && config.leadDmMessages.length > 0 ? config.leadDmMessages : config.dmMessages)
       : (config.simpleDmMessages && config.simpleDmMessages.length > 0 ? config.simpleDmMessages : config.dmMessages);
 
@@ -370,14 +372,17 @@ export default function AutomationsPage() {
       // per-flow toggle states: exactly one mode owns the public comment replies
       // If isLeadCapture is true → Lead Capture owns it; otherwise Simple Reply owns it.
       simple_auto_reply_to_comments:
-        config.isLeadCapture ? false : !!config.simpleAutoReplyToComments,
+        isLeadCaptureMode ? false : !!config.simpleAutoReplyToComments,
       lead_auto_reply_to_comments:
-        config.isLeadCapture ? !!config.leadAutoReplyToComments : false,
+        isLeadCaptureMode ? !!config.leadAutoReplyToComments : false,
     };
 
     // Add pre-DM actions (Simplified MVP: Single toggle)
+    // IMPORTANT: Back-end pre-DM/lead-capture flows must ONLY run when the user
+    // has selected Lead Capture in the UI. When saving from Simple Reply,
+    // we explicitly clear these flags so the rule behaves as a pure simple reply.
     // NEW: Use enable_pre_dm_engagement if set, otherwise fallback to old checkboxes (backward compatibility)
-    if (config.enablePreDmEngagement !== undefined) {
+    if (isLeadCaptureMode && config.enablePreDmEngagement !== undefined) {
       // New simplified mode: single toggle controls both
       ruleConfig.enable_pre_dm_engagement = config.enablePreDmEngagement;
       ruleConfig.ask_to_follow = config.enablePreDmEngagement;
@@ -423,7 +428,7 @@ export default function AutomationsPage() {
       ruleConfig.simple_flow_phone_message = (config.simpleFlowPhoneMessage || '').trim() || '';
       ruleConfig.simple_flow_phone_question = (config.simpleFlowPhoneQuestion || '').trim() || '';
       ruleConfig.phone_invalid_retry_message = (config.phoneInvalidRetryMessage || '').trim() || '';
-    } else {
+    } else if (isLeadCaptureMode) {
       // Backward compatibility: use old individual checkboxes, or simple flow flags so pre-DM runs first
       if (config.askToFollow !== undefined) {
         ruleConfig.ask_to_follow = config.askToFollow;
@@ -452,6 +457,16 @@ export default function AutomationsPage() {
         ruleConfig.simple_flow_phone_question = (config.simpleFlowPhoneQuestion || '').trim() || '';
         ruleConfig.phone_invalid_retry_message = (config.phoneInvalidRetryMessage || '').trim() || '';
       }
+    } else {
+      // Simple Reply mode: force all pre-DM / lead-capture flags off so backend
+      // treats this as a direct primary DM with no pre-DM sequence.
+      ruleConfig.enable_pre_dm_engagement = false;
+      ruleConfig.ask_to_follow = false;
+      ruleConfig.ask_for_email = false;
+      ruleConfig.simple_dm_flow = false;
+      ruleConfig.simple_dm_flow_phone = false;
+      // Keep message templates persisted for future Lead Capture editing,
+      // but they won't be used while isLeadCapture is false.
     }
     
     // Always save email_success_message if it's configured (even if askForEmail is disabled)
