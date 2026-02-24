@@ -88,7 +88,7 @@ export default function AnalyticsPage() {
       cacheTime: 300000, // 5 minutes cache
     }
   );
-  const { data: leadsData } = useFetch<Lead[]>('/api/leads');
+  const { data: leadsData, isLoading: leadsLoading } = useFetch<Lead[]>('/api/leads');
   // Ensure leadsData is always an array - handle cases where API returns error object
   const allLeads = Array.isArray(leadsData) ? leadsData : [];
   const totalLeads = allLeads.length;
@@ -422,7 +422,9 @@ export default function AnalyticsPage() {
       <Card className="mb-8 rounded-2xl border-2 border-gray-200 shadow-xl">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <h2 className="text-xl font-bold text-gray-900">Recent leads</h2>
-          {totalLeads > 0 && (
+          {leadsLoading && totalLeads === 0 ? (
+            <span className="text-sm text-gray-500">Loading leads…</span>
+          ) : totalLeads > 0 ? (
             <div className="flex flex-wrap items-center gap-3">
               <label className="text-sm text-gray-600 flex items-center gap-2">
                 Show
@@ -464,11 +466,13 @@ export default function AnalyticsPage() {
                 </button>
               </div>
             </div>
-          )}
+          ) : null}
         </div>
         <ul className="space-y-2 max-h-[480px] overflow-y-auto">
           {recentLeads.length === 0 ? (
-            <li className="text-sm text-gray-500">No leads yet. They appear here once captured.</li>
+            <li className="text-sm text-gray-500">
+              {leadsLoading ? 'Loading leads…' : 'No leads yet. They appear here once captured.'}
+            </li>
           ) : (
             recentLeads.map((lead) => (
               <li key={lead.id} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">

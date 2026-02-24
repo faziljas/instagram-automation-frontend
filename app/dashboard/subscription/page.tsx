@@ -431,12 +431,47 @@ export default function SubscriptionPage() {
     return 'bg-green-500';
   };
 
-  if (isLoading) {
+  if (isLoading && !subscriptionData) {
+    // Show page layout with skeletons so the page paints immediately (no full-page spinner)
     return (
       <div className="max-w-5xl mx-auto">
-        <div className="text-center py-12">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          <p className="mt-4 text-gray-600">Loading subscription...</p>
+        <div className="relative overflow-hidden bg-gradient-to-br from-green-500 via-emerald-500 to-teal-500 rounded-2xl mb-8 shadow-xl">
+          <div className="relative py-10 px-8">
+            <div className="h-10 bg-white/20 rounded w-64 mb-2 animate-pulse" />
+            <div className="h-6 bg-white/20 rounded w-96 animate-pulse" />
+          </div>
+        </div>
+        <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl p-8 mb-6">
+          <div className="h-6 bg-gray-200 rounded w-32 mb-4 animate-pulse" />
+          <div className="flex items-center space-x-4">
+            <div className="h-10 bg-gray-200 rounded w-24 animate-pulse" />
+            <div className="h-8 bg-gray-200 rounded w-28 animate-pulse" />
+          </div>
+        </div>
+        <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl p-8 mb-6">
+          <div className="h-6 bg-gray-200 rounded w-36 mb-6 animate-pulse" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-6 bg-gray-100 rounded w-full animate-pulse" />
+            ))}
+          </div>
+        </div>
+        <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl p-8 mb-6">
+          <div className="h-6 bg-gray-200 rounded w-40 mb-6 animate-pulse" />
+          <div className="space-y-6">
+            {[1, 2, 3].map((i) => (
+              <div key={i}>
+                <div className="flex justify-between mb-2">
+                  <div className="h-4 bg-gray-200 rounded w-32 animate-pulse" />
+                  <div className="h-4 bg-gray-200 rounded w-20 animate-pulse" />
+                </div>
+                <div className="h-2 bg-gray-100 rounded-full animate-pulse" />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="text-center py-4">
+          <p className="text-sm text-gray-500">Loading subscription...</p>
         </div>
       </div>
     );

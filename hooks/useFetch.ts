@@ -15,7 +15,7 @@ const CACHE_TIMES: Record<string, number> = {
   '/users/me/dashboard': 30 * 1000, // 30 seconds
   '/automation/rules': 30 * 1000, // 30 seconds
   '/api/analytics': 5 * 60 * 1000, // 5 minutes - increased for better performance
-  '/api/leads': 30 * 1000, // 30 seconds
+  '/api/leads': 60 * 1000, // 1 minute - reduce refetches on analytics page
 };
 
 export function useFetch<T = unknown>(
