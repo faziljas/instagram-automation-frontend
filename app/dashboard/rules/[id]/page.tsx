@@ -42,9 +42,10 @@ interface RuleResponse {
   name: string | null;
   trigger_type: string;
   action_type: string;
-  config: Record<string, any>;
+  config: Record<string, unknown>;
   is_active: boolean;
   created_at: string;
+  media_id?: string | null;
 }
 
 export default function EditRulePage() {

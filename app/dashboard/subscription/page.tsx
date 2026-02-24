@@ -343,7 +343,7 @@ export default function SubscriptionPage() {
       }
 
       console.log('🔄 Creating checkout session for plan:', plan);
-      const response = await createCheckoutSession('/api/dodo/create-checkout-session', { plan });
+      const response = await createCheckoutSession('/api/dodo/create-checkout-session', { plan }) as { checkout_url?: string } | undefined;
 
       if (response?.checkout_url) {
         setShowPlanModal(false);
@@ -369,7 +369,7 @@ export default function SubscriptionPage() {
 
   const handleCancelSubscription = async () => {
     try {
-      const response = await cancelSubscription('/api/dodo/cancel-subscription', {});
+      const response = await cancelSubscription('/api/dodo/cancel-subscription', {}) as { cancellation_end_date?: string } | undefined;
       setShowCancelModal(false);
       
       // Show success message with cancellation end date

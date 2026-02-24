@@ -40,7 +40,7 @@ export default function PricingPage() {
 
       const response = await createCheckoutSession('/api/dodo/create-checkout-session', {
         plan: billingCycle,
-      });
+      }) as { checkout_url?: string } | undefined;
       if (response?.checkout_url) {
         window.location.href = response.checkout_url;
       }

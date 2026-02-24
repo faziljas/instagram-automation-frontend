@@ -75,6 +75,7 @@ export interface AutomationStats {
 export interface AutomationConfig {
   // Existing fields
   keywords?: string[];
+  hashtags?: string[];
   auto_reply_to_comments?: boolean;
   comment_replies?: string[];
   message_variations?: string[];
@@ -82,12 +83,13 @@ export interface AutomationConfig {
   dmType?: 'text' | 'text_button' | 'lead_capture';
   buttons?: Array<{ text: string; url: string }>;
   delay_minutes?: number;
-  
+  maxLikesPerDay?: number;
+
   // New lead capture fields
   is_lead_capture?: boolean;
   lead_capture_flow?: LeadCaptureStep[];
   lead_capture_settings?: LeadCaptureSettings;
-  
+
   // Stats (runtime, updated by backend)
   stats?: AutomationStats;
 }

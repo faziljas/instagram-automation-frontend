@@ -238,7 +238,7 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
                   </td>
                 </tr>
               )}
-              {!invoicesLoading && !invoicesError && invoices.length === 0 && (
+              {!invoicesLoading && !invoicesError && (invoices?.length ?? 0) === 0 && (
                 <tr>
                   <td colSpan={4} className="px-4 py-3 text-sm text-gray-500">
                     No invoices available yet.
@@ -247,8 +247,8 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
               )}
               {!invoicesLoading &&
                 !invoicesError &&
-                invoices.length > 0 &&
-                invoices.map((inv) => (
+                (invoices?.length ?? 0) > 0 &&
+                (invoices ?? []).map((inv) => (
                   <tr key={inv.id}>
                     <td className="px-4 py-2.5 text-gray-900">
                       {formatDate(inv.paid_at || inv.created_at || null)}
@@ -624,11 +624,11 @@ export default function SettingsPage() {
 
   const handleOpenStripePortal = async () => {
     try {
-      const response = await createPortalSession('/api/dodo/create-portal-session', {});
+      const response = await createPortalSession('/api/dodo/create-portal-session', {}) as { portal_url?: string } | undefined;
       if (response?.portal_url) {
         // Open Dodo billing portal in a new tab so users can
         // simply close the tab to return to LogicDM settings.
-        const portalUrl = response.portal_url as string;
+        const portalUrl = response.portal_url;
         window.open(portalUrl, '_blank', 'noopener,noreferrer');
         // Trigger revalidation so invoices refresh when user returns (SWR revalidateOnFocus also helps)
         mutateInvoices(undefined, { revalidate: true });

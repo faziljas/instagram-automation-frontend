@@ -20,8 +20,7 @@ describe('ErrorBoundary Component', () => {
   });
 
   it('should render error UI when child throws error', () => {
-    // Suppress console.error for this test
-    jest.spyOn(console, 'error').mockImplementation(() => {});
+    const spy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
     render(
       <ErrorBoundary>
@@ -30,14 +29,14 @@ describe('ErrorBoundary Component', () => {
     );
 
     expect(screen.getByText(/Oops! Something went wrong/)).toBeInTheDocument();
-    console.error.mockRestore();
+    spy.mockRestore();
   });
 
   it('should show error details in development mode', () => {
+    const spy = jest.spyOn(console, 'error').mockImplementation(() => {});
     const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'development';
-
-    jest.spyOn(console, 'error').mockImplementation(() => {});
+    const env = process.env as Record<string, string | undefined>;
+    env.NODE_ENV = 'development';
 
     render(
       <ErrorBoundary>
@@ -47,12 +46,12 @@ describe('ErrorBoundary Component', () => {
 
     expect(screen.getByText(/Error Details/)).toBeInTheDocument();
 
-    process.env.NODE_ENV = originalEnv;
-    console.error.mockRestore();
+    env.NODE_ENV = originalEnv as string;
+    spy.mockRestore();
   });
 
   it('should render custom fallback when provided', () => {
-    jest.spyOn(console, 'error').mockImplementation(() => {});
+    const spy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
     render(
       <ErrorBoundary fallback={<div>Custom error UI</div>}>
@@ -61,11 +60,11 @@ describe('ErrorBoundary Component', () => {
     );
 
     expect(screen.getByText('Custom error UI')).toBeInTheDocument();
-    console.error.mockRestore();
+    spy.mockRestore();
   });
 
   it('should show refresh button', () => {
-    jest.spyOn(console, 'error').mockImplementation(() => {});
+    const spy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
     render(
       <ErrorBoundary>
@@ -74,11 +73,11 @@ describe('ErrorBoundary Component', () => {
     );
 
     expect(screen.getByText(/Refresh Page/)).toBeInTheDocument();
-    console.error.mockRestore();
+    spy.mockRestore();
   });
 
   it('should show go to dashboard button', () => {
-    jest.spyOn(console, 'error').mockImplementation(() => {});
+    const spy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
     render(
       <ErrorBoundary>
@@ -87,7 +86,7 @@ describe('ErrorBoundary Component', () => {
     );
 
     expect(screen.getByText(/Go to Dashboard/)).toBeInTheDocument();
-    console.error.mockRestore();
+    spy.mockRestore();
   });
 });
 
@@ -102,7 +101,7 @@ describe('SectionErrorBoundary Component', () => {
   });
 
   it('should render error UI for section', () => {
-    jest.spyOn(console, 'error').mockImplementation(() => {});
+    const spy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
     render(
       <SectionErrorBoundary sectionName="test section">
@@ -111,11 +110,11 @@ describe('SectionErrorBoundary Component', () => {
     );
 
     expect(screen.getByText(/Failed to load test section/)).toBeInTheDocument();
-    console.error.mockRestore();
+    spy.mockRestore();
   });
 
   it('should show retry button', () => {
-    jest.spyOn(console, 'error').mockImplementation(() => {});
+    const spy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
     render(
       <SectionErrorBoundary>
@@ -124,6 +123,6 @@ describe('SectionErrorBoundary Component', () => {
     );
 
     expect(screen.getByText(/Retry/)).toBeInTheDocument();
-    console.error.mockRestore();
+    spy.mockRestore();
   });
 });

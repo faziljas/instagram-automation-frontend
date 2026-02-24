@@ -48,7 +48,7 @@ export function useParallelFetch<T extends Record<string, any>>(
 
   const initialCached = useMemo(() => {
     const entries = Object.entries(endpoints).filter(
-      ([, u]): u is string => u != null
+      (entry): entry is [keyof T, string] => entry[1] != null
     ) as Array<[keyof T, string]>;
     const out: Partial<T> = {};
     entries.forEach(([key, url]) => {

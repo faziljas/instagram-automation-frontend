@@ -1298,13 +1298,13 @@ export default function AutomationsPage() {
                 keywords: cfg.keywords || [],
                 autoReplyToComments: cfg.auto_reply_to_comments || false,
                 // Ensure comment_replies has at least 3 items, filter out empty strings
-                commentReplies: (cfg.comment_replies && cfg.comment_replies.length > 0 && cfg.comment_replies.some(r => r.trim())) 
-                  ? cfg.comment_replies.filter(r => r.trim()).slice(0, 3)
+                commentReplies: (cfg.comment_replies && cfg.comment_replies.length > 0 && cfg.comment_replies.some((r: string) => r.trim())) 
+                  ? cfg.comment_replies.filter((r: string) => r.trim()).slice(0, 3)
                   : ['Thanks! Please see DMs.', 'Sent you a message! Check it out!', 'Nice! Check your DMs!'],
                 dmType: (cfg.dm_type || cfg.dmType) === 'text_button' ? 'text_button' : 'text',
                 // Ensure message_variations has at least 3 items, filter out empty strings
-                dmMessages: (cfg.message_variations && cfg.message_variations.length > 0 && cfg.message_variations.some(m => m.trim()))
-                  ? cfg.message_variations.filter(m => m.trim()).slice(0, 3)
+                dmMessages: (cfg.message_variations && cfg.message_variations.length > 0 && cfg.message_variations.some((m: string) => m.trim()))
+                  ? cfg.message_variations.filter((m: string) => m.trim()).slice(0, 3)
                   : ['Thanks for your interest! Check out our latest updates.', 'Hey! We have something special for you. Check it out!', 'Awesome! We sent you a message with more details.'],
                 buttons: cfg.buttons || [{ text: 'Click me', url: '' }],
                 delayMinutes: cfg.delay_minutes || 0,
@@ -1321,41 +1321,41 @@ export default function AutomationsPage() {
                   : (cfg.lead_keywords || []),
 
                 simpleCommentReplies: isLead
-                  ? ((cfg.simple_comment_replies && cfg.simple_comment_replies.length > 0 && cfg.simple_comment_replies.some(r => r.trim()))
-                      ? cfg.simple_comment_replies.filter(r => r.trim()).slice(0, 3)
+                  ? ((cfg.simple_comment_replies && cfg.simple_comment_replies.length > 0 && cfg.simple_comment_replies.some((r: string) => r.trim()))
+                      ? cfg.simple_comment_replies.filter((r: string) => r.trim()).slice(0, 3)
                       : ['Thanks! Please see DMs.', 'Sent you a message! Check it out!', 'Nice! Check your DMs!'])
-                  : ((cfg.simple_comment_replies && cfg.simple_comment_replies.length > 0 && cfg.simple_comment_replies.some(r => r.trim()))
-                      ? cfg.simple_comment_replies.filter(r => r.trim()).slice(0, 3)
-                      : ((cfg.comment_replies && cfg.comment_replies.length > 0 && cfg.comment_replies.some(r => r.trim()))
-                          ? cfg.comment_replies.filter(r => r.trim()).slice(0, 3)
+                  : ((cfg.simple_comment_replies && cfg.simple_comment_replies.length > 0 && cfg.simple_comment_replies.some((r: string) => r.trim()))
+                      ? cfg.simple_comment_replies.filter((r: string) => r.trim()).slice(0, 3)
+                      : ((cfg.comment_replies && cfg.comment_replies.length > 0 && cfg.comment_replies.some((r: string) => r.trim()))
+                          ? cfg.comment_replies.filter((r: string) => r.trim()).slice(0, 3)
                           : ['Thanks! Please see DMs.', 'Sent you a message! Check it out!', 'Nice! Check your DMs!'])),
                 leadCommentReplies: isLead
-                  ? ((cfg.lead_comment_replies && cfg.lead_comment_replies.length > 0 && cfg.lead_comment_replies.some(r => r.trim()))
-                      ? cfg.lead_comment_replies.filter(r => r.trim()).slice(0, 3)
-                      : ((cfg.comment_replies && cfg.comment_replies.length > 0 && cfg.comment_replies.some(r => r.trim()))
-                          ? cfg.comment_replies.filter(r => r.trim()).slice(0, 3)
+                  ? ((cfg.lead_comment_replies && cfg.lead_comment_replies.length > 0 && cfg.lead_comment_replies.some((r: string) => r.trim()))
+                      ? cfg.lead_comment_replies.filter((r: string) => r.trim()).slice(0, 3)
+                      : ((cfg.comment_replies && cfg.comment_replies.length > 0 && cfg.comment_replies.some((r: string) => r.trim()))
+                          ? cfg.comment_replies.filter((r: string) => r.trim()).slice(0, 3)
                           : ['Thanks! Please see DMs.', 'Sent you a message! Check it out!', 'Nice! Check your DMs!']))
-                  : ((cfg.lead_comment_replies && cfg.lead_comment_replies.length > 0 && cfg.lead_comment_replies.some(r => r.trim()))
-                      ? cfg.lead_comment_replies.filter(r => r.trim()).slice(0, 3)
+                  : ((cfg.lead_comment_replies && cfg.lead_comment_replies.length > 0 && cfg.lead_comment_replies.some((r: string) => r.trim()))
+                      ? cfg.lead_comment_replies.filter((r: string) => r.trim()).slice(0, 3)
                       : ['Thanks! Please see DMs.', 'Sent you a message! Check it out!', 'Nice! Check your DMs!']),
 
                 simpleDmMessages: isLead
-                  ? ((cfg.simple_dm_messages && cfg.simple_dm_messages.length > 0 && cfg.simple_dm_messages.some(m => m.trim()))
-                      ? cfg.simple_dm_messages.filter(m => m.trim()).slice(0, 3)
+                  ? ((cfg.simple_dm_messages && cfg.simple_dm_messages.length > 0 && cfg.simple_dm_messages.some((m: string) => m.trim()))
+                      ? cfg.simple_dm_messages.filter((m: string) => m.trim()).slice(0, 3)
                       : ['Thanks for your interest! Check out our latest updates.', 'Hey! We have something special for you. Check it out!', 'Awesome! We sent you a message with more details.'])
-                  : ((cfg.simple_dm_messages && cfg.simple_dm_messages.length > 0 && cfg.simple_dm_messages.some(m => m.trim()))
-                      ? cfg.simple_dm_messages.filter(m => m.trim()).slice(0, 3)
-                      : ((cfg.message_variations && cfg.message_variations.length > 0 && cfg.message_variations.some(m => m.trim()))
-                          ? cfg.message_variations.filter(m => m.trim()).slice(0, 3)
+                  : ((cfg.simple_dm_messages && cfg.simple_dm_messages.length > 0 && cfg.simple_dm_messages.some((m: string) => m.trim()))
+                      ? cfg.simple_dm_messages.filter((m: string) => m.trim()).slice(0, 3)
+                      : ((cfg.message_variations && cfg.message_variations.length > 0 && cfg.message_variations.some((m: string) => m.trim()))
+                          ? cfg.message_variations.filter((m: string) => m.trim()).slice(0, 3)
                           : ['Thanks for your interest! Check out our latest updates.', 'Hey! We have something special for you. Check it out!', 'Awesome! We sent you a message with more details.'])),
                 leadDmMessages: isLead
-                  ? ((cfg.lead_dm_messages && cfg.lead_dm_messages.length > 0 && cfg.lead_dm_messages.some(m => m.trim()))
-                      ? cfg.lead_dm_messages.filter(m => m.trim()).slice(0, 3)
-                      : ((cfg.message_variations && cfg.message_variations.length > 0 && cfg.message_variations.some(m => m.trim()))
-                          ? cfg.message_variations.filter(m => m.trim()).slice(0, 3)
+                  ? ((cfg.lead_dm_messages && cfg.lead_dm_messages.length > 0 && cfg.lead_dm_messages.some((m: string) => m.trim()))
+                      ? cfg.lead_dm_messages.filter((m: string) => m.trim()).slice(0, 3)
+                      : ((cfg.message_variations && cfg.message_variations.length > 0 && cfg.message_variations.some((m: string) => m.trim()))
+                          ? cfg.message_variations.filter((m: string) => m.trim()).slice(0, 3)
                           : ['Thanks for your interest! Check out our latest updates.', 'Hey! We have something special for you. Check it out!', 'Awesome! We sent you a message with more details.']))
-                  : ((cfg.lead_dm_messages && cfg.lead_dm_messages.length > 0 && cfg.lead_dm_messages.some(m => m.trim()))
-                      ? cfg.lead_dm_messages.filter(m => m.trim()).slice(0, 3)
+                  : ((cfg.lead_dm_messages && cfg.lead_dm_messages.length > 0 && cfg.lead_dm_messages.some((m: string) => m.trim()))
+                      ? cfg.lead_dm_messages.filter((m: string) => m.trim()).slice(0, 3)
                       : ['Thanks for your interest! Check out our latest updates.', 'Hey! We have something special for you. Check it out!', 'Awesome! We sent you a message with more details.']),
 
                 // Per‑flow toggle states.
