@@ -109,11 +109,11 @@ export default function AutomationsPage() {
   const [selectedAccount, setSelectedAccount] = useState<number | null>(null);
   const [selectedAccountUsername, setSelectedAccountUsername] = useState<string>('');
   const [selectedTab, setSelectedTab] = useState<'posts' | 'stories' | 'dms' | 'live'>('posts');
-  const [media, setMedia] = useState<MediaItem[]>([]);
-  const [mediaNextCursor, setMediaNextCursor] = useState<string | null>(null);
-  const [mediaHasMore, setMediaHasMore] = useState(false);
-  const [isLoadingMedia, setIsLoadingMedia] = useState(false);
+  const [loadMoreMedia, setLoadMoreMedia] = useState<MediaItem[]>([]);
+  const [loadMoreNextCursor, setLoadMoreNextCursor] = useState<string | null>(null);
+  const [loadMoreHasMore, setLoadMoreHasMore] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [isLoadingDMs, setIsLoadingDMs] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<MediaItem | null>(null);
   const [showSetupModal, setShowSetupModal] = useState(false);
   const [showDrawer, setShowDrawer] = useState(false);
@@ -141,15 +141,39 @@ export default function AutomationsPage() {
   
   const mediaAnalytics = mediaAnalyticsData ?? [];
   
-  // PERFORMANCE: Cache media data per tab to avoid refetching when switching tabs
-  const [mediaCache, setMediaCache] = useState<Record<string, {
+  // PERFORMANCE: useFetch for first page of media (like Analytics) - cached by SWR + localStorage for instant show on revisit
+  const mediaTypeParam = selectedTab === 'stories' ? 'stories' : selectedTab === 'live' ? 'live' : 'posts';
+  const initialMediaUrl = selectedAccount && (selectedTab === 'posts' || selectedTab === 'stories' || selectedTab === 'live')
+    ? `/api/instagram/media?account_id=${selectedAccount}&media_type=${mediaTypeParam}&limit=20`
+    : null;
+  const { data: initialMediaData, isLoading: isLoadingInitialMedia, mutate: mutateInitialMedia } = useFetch<{
     media: MediaItem[];
-    nextCursor: string | null;
-    hasMore: boolean;
-    accountId: number;
-  }>>({});
+    next_cursor?: string | null;
+    has_more?: boolean;
+  }>(initialMediaUrl, {
+    dedupingInterval: 60 * 1000,
+    revalidateOnFocus: false,
+  });
 
-  // Check if user has reached automation rules limit
+  // Base (first page) media filtered by tab; full media = base + load-more
+  const baseMedia = useMemo(() => {
+    const raw = initialMediaData?.media ?? [];
+    if (selectedTab === 'stories') return raw.filter((item: MediaItem) => item.media_product_type === 'STORY');
+    if (selectedTab === 'posts') return raw.filter((item: MediaItem) => item.media_product_type !== 'STORY');
+    return raw;
+  }, [initialMediaData?.media, selectedTab]);
+  const media = useMemo(() => [...baseMedia, ...loadMoreMedia], [baseMedia, loadMoreMedia]);
+  const mediaNextCursorValue = loadMoreMedia.length > 0 ? loadMoreNextCursor : (initialMediaData?.next_cursor ?? null);
+  const mediaHasMoreValue = loadMoreMedia.length > 0 ? loadMoreHasMore : Boolean(initialMediaData?.has_more);
+
+  // Clear load-more when account or tab changes (new first page from useFetch)
+  useEffect(() => {
+    setLoadMoreMedia([]);
+    setLoadMoreNextCursor(null);
+    setLoadMoreHasMore(false);
+  }, [selectedAccount, selectedTab]);
+
+  // OPTIMIZED: Memoize fetchDMs function
   // Use subscription hook's computed values (already handles caching and fallbacks)
   const planTier = subscriptionPlanTier;
   const rulesLimit = PLAN_LIMITS[planTier]?.rules ?? -1;
@@ -157,124 +181,44 @@ export default function AutomationsPage() {
   // -1 means unlimited, so never reached
   const hasReachedRulesLimit = subscriptionData ? (rulesLimit !== -1 && currentRulesCount >= rulesLimit) : false;
 
-  // OPTIMIZED: Memoize fetchMedia function to prevent recreation (must be defined before useEffect)
-  const fetchMedia = useCallback(async (opts?: { after?: string | null }): Promise<{ media: MediaItem[]; nextCursor: string | null; hasMore: boolean } | undefined> => {
-    if (!selectedAccount) return;
-    if (!session?.access_token) {
-      console.warn('[AutomationsPage] No session token available, skipping fetchMedia');
-      return;
-    }
-
-    const loadMore = Boolean(opts?.after);
-    if (loadMore) setIsLoadingMore(true);
-    else setIsLoadingMedia(true);
-
+  // Load more: fetch next page and append to loadMoreMedia (first page comes from useFetch)
+  const fetchMediaLoadMore = useCallback(async () => {
+    if (!selectedAccount || !mediaNextCursorValue || !session?.access_token) return;
+    const mediaType = selectedTab === 'stories' ? 'stories' : selectedTab === 'live' ? 'live' : 'posts';
+    const url = `/api/instagram/media?account_id=${selectedAccount}&media_type=${mediaType}&limit=20&after=${encodeURIComponent(mediaNextCursorValue)}`;
+    setIsLoadingMore(true);
     try {
-      let mediaType = 'posts';
-      if (selectedTab === 'stories') mediaType = 'stories';
-      else if (selectedTab === 'live') mediaType = 'live';
-
-      // Reduce initial load - fetch 20 items first, user can load more
-      let url = `/api/instagram/media?account_id=${selectedAccount}&media_type=${mediaType}&limit=20`;
-      if (opts?.after) url += `&after=${encodeURIComponent(opts.after)}`;
-
       const data = await get<{ media: MediaItem[]; next_cursor?: string | null; has_more?: boolean }>(url);
-      let fetchedMedia = data.media || [];
-
-      if (selectedTab === 'stories') {
-        fetchedMedia = fetchedMedia.filter((item: MediaItem) => item.media_product_type === 'STORY');
-      } else if (selectedTab === 'posts') {
-        fetchedMedia = fetchedMedia.filter((item: MediaItem) => item.media_product_type !== 'STORY');
-      }
-
-      if (loadMore) {
-        setMedia((prev) => [...prev, ...fetchedMedia]);
-      } else {
-        setMedia(fetchedMedia);
-      }
-      const result = {
-        media: fetchedMedia,
-        nextCursor: data.next_cursor ?? null,
-        hasMore: Boolean(data.has_more),
-      };
-      setMediaNextCursor(result.nextCursor);
-      setMediaHasMore(result.hasMore);
-      return result;
-    } catch (error: any) {
-      console.error('Error fetching media:', error);
-      if (error?.response?.status !== 403) {
-        alert(`Error: ${error?.message || 'Failed to fetch media. Please check console for details.'}`);
-      }
-      if (!loadMore) setMedia([]);
-      return undefined;
+      let fetched = data.media || [];
+      if (selectedTab === 'stories') fetched = fetched.filter((item: MediaItem) => item.media_product_type === 'STORY');
+      else if (selectedTab === 'posts') fetched = fetched.filter((item: MediaItem) => item.media_product_type !== 'STORY');
+      setLoadMoreMedia((prev) => [...prev, ...fetched]);
+      setLoadMoreNextCursor(data.next_cursor ?? null);
+      setLoadMoreHasMore(Boolean(data.has_more));
+    } catch (err: unknown) {
+      console.error('Error loading more media:', err);
     } finally {
-      setIsLoadingMedia(false);
       setIsLoadingMore(false);
     }
-  }, [selectedAccount, selectedTab, session?.access_token]);
+  }, [selectedAccount, selectedTab, mediaNextCursorValue, session?.access_token]);
 
-  // PERFORMANCE: Fetch media when account or tab is selected, with caching
-  useEffect(() => {
-    if (!selectedAccount) {
-      setMedia([]);
-      setMediaNextCursor(null);
-      setMediaHasMore(false);
-      return;
+  // Refetch first page after save (like Analytics revalidate)
+  const refetchMedia = useCallback(() => {
+    mutateInitialMedia(undefined, { revalidate: true });
+    setLoadMoreMedia([]);
+    setLoadMoreNextCursor(null);
+    setLoadMoreHasMore(false);
+  }, [mutateInitialMedia]);
+
+  // Wrapper for callers: Load more uses fetchMediaLoadMore; refetch uses refetchMedia (like Analytics mutate)
+  const fetchMedia = useCallback(async (opts?: { after?: string | null }) => {
+    if (opts?.after) {
+      await fetchMediaLoadMore();
+      return undefined;
     }
-
-    // Create cache key: tab + accountId
-    const cacheKey = `${selectedTab}_${selectedAccount}`;
-    const cached = mediaCache[cacheKey];
-    
-    // If we have cached data for this tab+account combo, use it immediately
-    if (cached && cached.accountId === selectedAccount) {
-      setMedia(cached.media);
-      setMediaNextCursor(cached.nextCursor);
-      setMediaHasMore(cached.hasMore);
-      // Still fetch in background to refresh data, but don't block UI
-      if (selectedTab === 'posts' || selectedTab === 'stories' || selectedTab === 'live') {
-        fetchMedia().then((result) => {
-          // Update cache with fresh data
-          if (result && selectedAccount) {
-            setMediaCache(prev => ({
-              ...prev,
-              [cacheKey]: {
-                media: result.media,
-                nextCursor: result.nextCursor,
-                hasMore: result.hasMore,
-                accountId: selectedAccount,
-              }
-            }));
-          }
-        }).catch(() => {
-          // If fetch fails, keep cached data
-        });
-      }
-    } else {
-      // No cache, fetch immediately
-      setMedia([]);
-      setMediaNextCursor(null);
-      setMediaHasMore(false);
-
-      if (selectedTab === 'posts' || selectedTab === 'stories' || selectedTab === 'live') {
-        fetchMedia().then((result) => {
-          // Cache the result
-          if (result && selectedAccount) {
-            setMediaCache(prev => ({
-              ...prev,
-              [cacheKey]: {
-                media: result.media,
-                nextCursor: result.nextCursor,
-                hasMore: result.hasMore,
-                accountId: selectedAccount,
-              }
-            }));
-          }
-        });
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedAccount, selectedTab]);
+    refetchMedia();
+    return undefined;
+  }, [fetchMediaLoadMore, refetchMedia]);
 
   // OPTIMIZED: Memoize fetchDMs function
   const fetchDMs = useCallback(async () => {
@@ -286,7 +230,7 @@ export default function AutomationsPage() {
       return;
     }
 
-    setIsLoadingMedia(true);
+    setIsLoadingDMs(true);
     try {
       // Fetch DM automation rules (rules with trigger_type 'new_message' or 'keyword' and no media_id)
       const allRules = await get<AutomationRuleResponse[]>('/automation/rules');
@@ -328,7 +272,7 @@ export default function AutomationsPage() {
       alert(error?.message || 'Failed to fetch DM automation rules. Please try again.');
       setMedia([]);
     } finally {
-      setIsLoadingMedia(false);
+      setIsLoadingDMs(false);
     }
   }, [selectedAccount, session?.access_token]);
 
@@ -604,8 +548,6 @@ export default function AutomationsPage() {
         const firstAccount = accounts[0];
         setSelectedAccount(firstAccount.id);
         setSelectedAccountUsername(firstAccount.username);
-        // Clear cache when account changes
-        setMediaCache({});
       }
     }
   }, [accounts, selectedAccount]);
@@ -821,7 +763,7 @@ export default function AutomationsPage() {
         ) : (
           <>
             {/* Show loading skeleton only if no media at all */}
-            {isLoadingMedia && media.length === 0 && (
+            {isLoadingInitialMedia && media.length === 0 && (
               <TableSkeleton rows={6} columns={3} />
             )}
             {/* Show content immediately if we have media, even if still loading more */}
@@ -1053,11 +995,11 @@ export default function AutomationsPage() {
                     </tbody>
                   </table>
                 </div>
-                {media.length > 0 && mediaHasMore && (selectedTab === 'posts' || selectedTab === 'stories' || selectedTab === 'live') && (
+                {media.length > 0 && mediaHasMoreValue && (selectedTab === 'posts' || selectedTab === 'stories' || selectedTab === 'live') && (
                   <div className="flex justify-center py-4 border-t border-gray-200">
                     <button
                       type="button"
-                      onClick={() => fetchMedia({ after: mediaNextCursor ?? undefined })}
+                      onClick={() => fetchMedia({ after: mediaNextCursorValue ?? undefined })}
                       disabled={isLoadingMore}
                       className="px-4 py-2 rounded-lg font-semibold text-sm text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
@@ -1251,11 +1193,11 @@ export default function AutomationsPage() {
               );
             })}
           </div>
-          {media.length > 0 && mediaHasMore && (selectedTab === 'posts' || selectedTab === 'stories' || selectedTab === 'live') && (
+          {media.length > 0 && mediaHasMoreValue && (selectedTab === 'posts' || selectedTab === 'stories' || selectedTab === 'live') && (
             <div className="flex justify-center py-4">
               <button
                 type="button"
-                onClick={() => fetchMedia({ after: mediaNextCursor ?? undefined })}
+                onClick={() => fetchMedia({ after: mediaNextCursorValue ?? undefined })}
                 disabled={isLoadingMore}
                 className="px-4 py-2 rounded-lg font-semibold text-sm text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
@@ -1266,7 +1208,7 @@ export default function AutomationsPage() {
                 </>
               ) : null}
             {/* Show empty state only if not loading and no media */}
-            {!isLoadingMedia && media.length === 0 && (
+            {!isLoadingInitialMedia && media.length === 0 && (
               <div className="bg-white rounded-xl border border-gray-200 shadow text-center py-12 px-6">
                 <div className="bg-gradient-to-br from-gray-100 to-gray-200 rounded-full p-4 w-fit mx-auto mb-4">
                   <svg

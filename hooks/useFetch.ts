@@ -16,6 +16,7 @@ const CACHE_TIMES: Record<string, number> = {
   '/users/me/dashboard': 2 * 60 * 1000, // 2 min - show last data immediately on refresh
   '/automation/rules': 30 * 1000, // 30 seconds
   '/api/analytics': 5 * 60 * 1000, // 5 minutes
+  '/api/instagram/media': 2 * 60 * 1000, // 2 minutes - show posts/reels/stories immediately on revisit
   '/api/leads': 60 * 1000, // 1 minute
 };
 
