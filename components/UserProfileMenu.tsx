@@ -66,7 +66,15 @@ export default function UserProfileMenu() {
           className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-all duration-200"
         >
           <div className="flex items-center space-x-3 flex-1 min-w-0">
-            <UserCircleIcon className="h-5 w-5 flex-shrink-0" />
+            {user?.profilePictureUrl ? (
+              <img
+                src={user.profilePictureUrl}
+                alt="Profile"
+                className="h-8 w-8 flex-shrink-0 rounded-full object-cover bg-gray-600"
+              />
+            ) : (
+              <UserCircleIcon className="h-5 w-5 flex-shrink-0" />
+            )}
             <span className="truncate">{displayName}</span>
           </div>
           <ChevronDownIcon
