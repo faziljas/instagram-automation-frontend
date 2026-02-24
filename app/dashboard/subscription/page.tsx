@@ -556,7 +556,7 @@ export default function SubscriptionPage() {
                   className="w-full flex items-center justify-between px-4 py-4 rounded-lg border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50/50 transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <span className="font-semibold text-gray-900">Monthly</span>
-                  <span className="text-gray-600">$9/month</span>
+                  <span className="text-gray-600">$9 USD/month</span>
                 </button>
                 <button
                   onClick={() => handleUpgradeWithPlan('yearly')}
@@ -567,7 +567,7 @@ export default function SubscriptionPage() {
                     <span className="font-semibold text-gray-900">Yearly</span>
                     <span className="text-xs text-green-600 font-medium">Save 2 months</span>
                   </div>
-                  <span className="text-gray-600">$84/year</span>
+                  <span className="text-gray-600">$84 USD/year</span>
                 </button>
               </div>
               {checkoutLoading && (
