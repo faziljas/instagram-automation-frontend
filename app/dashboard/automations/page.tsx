@@ -117,12 +117,29 @@ export default function AutomationsPage() {
   const [selectedMedia, setSelectedMedia] = useState<MediaItem | null>(null);
   const [showSetupModal, setShowSetupModal] = useState(false);
   const [showDrawer, setShowDrawer] = useState(false);
-  const [automationRules, setAutomationRules] = useState<Record<string, AutomationRuleResponse[]>>({});
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('table'); // Default to table view
-  const [mediaAnalytics, setMediaAnalytics] = useState<MediaAnalytics[]>([]);
-  const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(false);
   const [deleteConfirmRuleId, setDeleteConfirmRuleId] = useState<number | null>(null);
+  
+  // PERFORMANCE: useFetch so we get localStorage cache and show stats immediately on refresh
+  const { data: allRulesData } = useFetch<AutomationRuleResponse[]>('/automation/rules');
+  const { data: mediaAnalyticsData, isLoading: isLoadingAnalytics } = useFetch<MediaAnalytics[]>(
+    selectedAccount ? `/api/analytics/media?days=30&instagram_account_id=${selectedAccount}` : null
+  );
+  
+  const automationRules = useMemo(() => {
+    if (!allRulesData || !selectedAccount) return {};
+    const rulesByMedia: Record<string, AutomationRuleResponse[]> = {};
+    allRulesData.forEach((rule: AutomationRuleResponse) => {
+      if (rule.media_id && rule.instagram_account_id === selectedAccount) {
+        if (!rulesByMedia[rule.media_id]) rulesByMedia[rule.media_id] = [];
+        rulesByMedia[rule.media_id].push(rule);
+      }
+    });
+    return rulesByMedia;
+  }, [allRulesData, selectedAccount]);
+  
+  const mediaAnalytics = mediaAnalyticsData ?? [];
   
   // PERFORMANCE: Cache media data per tab to avoid refetching when switching tabs
   const [mediaCache, setMediaCache] = useState<Record<string, {
@@ -139,92 +156,6 @@ export default function AutomationsPage() {
   const currentRulesCount = subscriptionData?.usage?.rules ?? 0;
   // -1 means unlimited, so never reached
   const hasReachedRulesLimit = subscriptionData ? (rulesLimit !== -1 && currentRulesCount >= rulesLimit) : false;
-
-  // Fetch automation rules for stats - lazy load after media loads
-  useEffect(() => {
-    const fetchRules = async () => {
-      if (!selectedAccount) return;
-      
-      // CRITICAL: Wait for session token before making API call
-      if (!session?.access_token) {
-        console.warn('[AutomationsPage] No session token available, skipping fetchRules');
-        return;
-      }
-
-      // Only fetch rules after media has loaded to prioritize media display
-      if (media.length === 0 && isLoadingMedia) {
-        return;
-      }
-
-      try {
-        const allRules = await get<AutomationRuleResponse[]>('/automation/rules');
-        // Group rules by media_id; only include rules for the selected account
-        const rulesByMedia: Record<string, AutomationRuleResponse[]> = {};
-        allRules.forEach((rule: AutomationRuleResponse) => {
-          if (rule.media_id && rule.instagram_account_id === selectedAccount) {
-            if (!rulesByMedia[rule.media_id]) {
-              rulesByMedia[rule.media_id] = [];
-            }
-            rulesByMedia[rule.media_id].push(rule);
-          }
-        });
-        setAutomationRules(rulesByMedia);
-      } catch (error) {
-        console.error('Failed to fetch automation rules:', error);
-      }
-    };
-
-    if (selectedAccount && session?.access_token) {
-      // Delay rules fetch slightly to prioritize media loading
-      const timer = setTimeout(() => {
-        fetchRules();
-      }, 200);
-      return () => clearTimeout(timer);
-    }
-  }, [selectedAccount, session, media.length, isLoadingMedia]);
-
-  // Fetch media analytics - lazy load after media and rules are loaded
-  useEffect(() => {
-    const fetchAnalytics = async () => {
-      if (!selectedAccount) {
-        setMediaAnalytics([]);
-        return;
-      }
-
-      // CRITICAL: Wait for session token before making API call
-      if (!session?.access_token) {
-        console.warn('[AutomationsPage] No session token available, skipping fetchAnalytics');
-        setMediaAnalytics([]);
-        return;
-      }
-
-      // Only fetch analytics after media has loaded to prioritize content display
-      if (media.length === 0 && isLoadingMedia) {
-        return;
-      }
-
-      setIsLoadingAnalytics(true);
-      try {
-        const analytics = await get<MediaAnalytics[]>(
-          `/api/analytics/media?days=30&instagram_account_id=${selectedAccount}`
-        );
-        setMediaAnalytics(analytics);
-      } catch (error) {
-        console.error('Error fetching media analytics:', error);
-        setMediaAnalytics([]);
-      } finally {
-        setIsLoadingAnalytics(false);
-      }
-    };
-
-    if (session?.access_token) {
-      // Delay analytics fetch to prioritize media and rules loading
-      const timer = setTimeout(() => {
-        fetchAnalytics();
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-  }, [selectedAccount, session, media.length, isLoadingMedia]);
 
   // OPTIMIZED: Memoize fetchMedia function to prevent recreation (must be defined before useEffect)
   const fetchMedia = useCallback(async (opts?: { after?: string | null }): Promise<{ media: MediaItem[]; nextCursor: string | null; hasMore: boolean } | undefined> => {
@@ -643,22 +574,7 @@ export default function AutomationsPage() {
       } else {
         fetchMedia();
       }
-      // Refresh automation rules state to show active badge
-      try {
-        const allRules = await get<AutomationRuleResponse[]>('/automation/rules');
-        const rulesMap: Record<string, AutomationRuleResponse[]> = {};
-        allRules.forEach((rule: AutomationRuleResponse) => {
-          if (rule.media_id && rule.instagram_account_id === selectedAccount) {
-            if (!rulesMap[rule.media_id]) {
-              rulesMap[rule.media_id] = [];
-            }
-            rulesMap[rule.media_id].push(rule);
-          }
-        });
-        setAutomationRules(rulesMap);
-      } catch (error) {
-        console.error('Failed to refresh automation rules:', error);
-      }
+      // Refresh rules so useFetch data updates (automationRules is derived from it)
       mutate('/automation/rules');
       handleCloseDrawer();
     } catch (error: any) {
@@ -1068,29 +984,14 @@ export default function AutomationsPage() {
                                         try {
                                           await del(`/automation/rules/${rule.id}`);
 
-                                          // Remove rule from local automationRules state
-                                          setAutomationRules((prev) => {
-                                            const next = { ...prev };
-                                            const rulesForMedia = (next[mediaItem.id] || []).filter(
-                                              (r) => r.id !== rule.id,
-                                            );
-                                            if (rulesForMedia.length > 0) {
-                                              next[mediaItem.id] = rulesForMedia;
-                                            } else {
-                                              delete next[mediaItem.id];
-                                            }
-                                            return next;
-                                          });
-
-                                          // Refresh analytics + limits (rules count)
+                                          // Refresh rules and subscription (automationRules is derived from useFetch)
                                           void mutate('/automation/rules');
                                           void mutate('/users/subscription');
-                                          // Clear subscription cache to force refresh
                                           if (typeof window !== 'undefined') {
                                             try {
                                               localStorage.removeItem('logicdm_subscription_cache');
                                             } catch (e) {
-                                              // Ignore cache errors
+                                              // Ignore
                                             }
                                           }
                                         } catch (error: any) {
