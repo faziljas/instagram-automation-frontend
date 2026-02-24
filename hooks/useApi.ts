@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { post, put, del } from '@/utils/api';
+import { post, put, patch, del } from '@/utils/api';
 
 interface UseApiState<T> {
   data: T | null;
@@ -12,7 +12,7 @@ interface UseApiReturn<T> extends UseApiState<T> {
   reset: () => void;
 }
 
-type ApiMethod = 'POST' | 'PUT' | 'DELETE';
+type ApiMethod = 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 function useApiMethod<T = unknown>(method: ApiMethod): UseApiReturn<T> {
   const [state, setState] = useState<UseApiState<T>>({
@@ -33,6 +33,9 @@ function useApiMethod<T = unknown>(method: ApiMethod): UseApiReturn<T> {
           break;
         case 'PUT':
           response = await put<T>(url, data);
+          break;
+        case 'PATCH':
+          response = await patch<T>(url, data);
           break;
         case 'DELETE':
           response = await del<T>(url);
@@ -65,6 +68,10 @@ export function usePost<T = unknown>(): UseApiReturn<T> {
 
 export function usePut<T = unknown>(): UseApiReturn<T> {
   return useApiMethod<T>('PUT');
+}
+
+export function usePatch<T = unknown>(): UseApiReturn<T> {
+  return useApiMethod<T>('PATCH');
 }
 
 export function useDelete<T = unknown>(): UseApiReturn<T> {
