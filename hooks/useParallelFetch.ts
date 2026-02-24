@@ -2,7 +2,8 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { useAuth } from './useAuth';
 
 const CACHE_KEY_PREFIX = 'swr_';
-const CACHE_DURATION_MS = 2 * 60 * 1000; // 2 min - show last data on refresh
+// Keep dashboard + secondary data feeling fresh without spamming the API
+const CACHE_DURATION_MS = 45 * 1000; // 45s - short-lived localStorage cache
 
 function getStorageKey(url: string): string {
   return CACHE_KEY_PREFIX + encodeURIComponent(url).slice(0, 180);
