@@ -390,8 +390,8 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden max-w-full overflow-x-hidden">
-      {/* Backdrop - ignore clicks right after opening file picker so drawer doesn't close */}
+    <div className="fixed inset-0 z-50 overflow-hidden flex items-center justify-center p-3 sm:p-4">
+      {/* Backdrop - ignore clicks right after opening file picker so modal doesn't close */}
       <div
         className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
         onClick={() => {
@@ -400,17 +400,17 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
         }}
       />
 
-      {/* Drawer - always 100vw so zoom doesn't shift page left; max 80rem on very wide screens */}
+      {/* Modal - centered popup (competitor-style) with max width */}
       <div
-        className="fixed right-0 top-0 h-full w-full max-w-full min-w-0 md:w-[min(100vw,80rem)] shadow-xl overflow-x-hidden"
+        className="relative z-10 flex flex-col w-full max-w-5xl max-h-[90vh] min-h-0 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex flex-col md:flex-row h-full w-full min-w-0 bg-slate-50 overflow-x-hidden">
-          {/* Left Side: Settings Form - min width uses vw so zoom doesn't cause horizontal overflow */}
-          <div className="flex-1 min-w-[min(280px,45vw)] overflow-y-auto border-r-0 md:border-r border-slate-200 max-w-full overflow-x-hidden">
-            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-700 bg-slate-800 px-4 md:px-6 py-3">
+        <div className="flex flex-1 min-h-0 flex-col md:flex-row overflow-hidden">
+          {/* Left Side: Settings Form - scrollable */}
+          <div className="flex-1 min-w-[min(280px,100%)] overflow-y-auto overflow-x-hidden border-r-0 md:border-r border-slate-200 flex flex-col bg-slate-50">
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-slate-800 px-4 md:px-6 py-3 flex-shrink-0">
               <h2 className="text-lg font-semibold text-white">
-                Automation Builder
+                Create Automation
               </h2>
               <div className="flex items-center gap-2">
                 {/* Mobile Preview Toggle */}
@@ -433,7 +433,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
               </div>
             </div>
 
-            <div className="px-4 md:px-6 py-3 md:py-4 space-y-4 max-w-full overflow-x-hidden">
+            <div className="px-4 md:px-6 py-3 md:py-4 space-y-4 max-w-full overflow-x-hidden flex-1">
               {/* DM Flow Type: For stories show "Default DM" / "Keyword DM"; for posts/reels show "Simple Reply" / "Lead Capture" */}
               {(() => {
                 const isStory = media.media_product_type === 'STORY';
@@ -1131,8 +1131,8 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
             </div>
           </div>
 
-          {/* Right Side: Live Preview - min width uses vw so zoom doesn't cause horizontal overflow */}
-          <div className="flex-1 min-w-[min(300px,45vw)] overflow-y-auto bg-slate-100 max-w-full overflow-x-hidden hidden md:block">
+          {/* Right Side: Live Preview - visible on desktop inside modal */}
+          <div className="flex-1 min-w-[min(300px,45%)] overflow-y-auto bg-slate-100 max-w-full hidden md:block">
             <div className="sticky top-0 z-10 bg-slate-200 px-4 md:px-6 py-3 border-b border-slate-300">
               <h3 className="text-lg font-semibold text-slate-800">
                 Live Preview
@@ -1148,9 +1148,9 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
             </div>
           </div>
 
-          {/* Mobile Preview - Toggleable */}
+          {/* Mobile Preview - Toggleable (below form on small screens) */}
           {showPreviewMobile && (
-            <div className="md:hidden border-t border-slate-200 bg-slate-100 max-w-full overflow-x-hidden">
+            <div className="md:hidden border-t border-slate-200 bg-slate-100 max-w-full overflow-x-hidden flex-shrink-0">
               <div className="sticky top-0 z-10 bg-slate-200 px-4 py-3 border-b border-slate-300 flex items-center justify-between">
                 <h3 className="text-base font-semibold text-slate-800">
                   Live Preview
@@ -1162,7 +1162,7 @@ const AutomationDrawer: React.FC<AutomationDrawerProps> = ({
                   <XMarkIcon className="h-5 w-5" />
                 </button>
               </div>
-              <div className="p-4 max-h-[60vh] overflow-y-auto">
+              <div className="p-4 max-h-[50vh] overflow-y-auto">
                 <MobilePreview
                   media={media}
                   config={config as React.ComponentProps<typeof MobilePreview>['config']}
