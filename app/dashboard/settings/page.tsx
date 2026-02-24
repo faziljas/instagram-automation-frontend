@@ -101,7 +101,6 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
 
   // Derived subscription state for the billing UI
   const isPro = subscription.plan_tier === 'pro' || subscription.plan_tier === 'enterprise';
-  const planName = isPro ? 'Pro' : 'Free';
 
   // Try to use the server-provided end date for the current billing period if available
   const currentPeriodEnd = subscription.cancellation_end_date
@@ -392,7 +391,7 @@ export default function SettingsPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showCancelConfirmModal, setShowCancelConfirmModal] = useState(false);
   const [localCancelled, setLocalCancelled] = useState(false);
-  const [activeTab, setActiveTab] = useState<'general' | 'security' | 'notifications' | 'billing'>('general');
+  const [activeTab, setActiveTab] = useState<'general' | 'security' | 'notifications' | 'billing' | 'delete-account'>('general');
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -459,14 +458,11 @@ export default function SettingsPage() {
 
     // Submit profile update
     try {
-      // Convert camelCase to snake_case for backend
-      const updatePayload: any = {
+      const updatePayload: Record<string, string | null> = {
         first_name: profileData.firstName,
         last_name: profileData.lastName,
         email: profileData.email,
       };
-      
-      // Include profile picture if it exists
       if (avatarPreview) {
         updatePayload.profile_picture_url = avatarPreview;
       }
@@ -988,11 +984,38 @@ export default function SettingsPage() {
     );
   };
 
+  const renderDeleteAccountContent = () => (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-lg font-semibold text-gray-900">Delete account</h2>
+        <p className="mt-0.5 text-sm text-gray-500">
+          Permanently remove your account and all associated data. This cannot be undone.
+        </p>
+      </div>
+      <div className="rounded-xl border border-red-100 bg-red-50 p-4">
+        <h3 className="text-base font-semibold text-red-800">Danger Zone</h3>
+        <p className="mt-1.5 text-sm text-red-700">
+          Deleting your account is permanent and will remove all of your data. This action cannot be undone.
+        </p>
+        <div className="mt-3">
+          <button
+            type="button"
+            onClick={() => setShowDeleteModal(true)}
+            className="inline-flex items-center justify-center rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700"
+          >
+            Delete Account
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
   const renderContent = () => {
     if (activeTab === 'general') return renderGeneralContent();
     if (activeTab === 'security') return renderSecurityContent();
     if (activeTab === 'notifications') return renderNotificationsContent();
     if (activeTab === 'billing') return renderBillingContent();
+    if (activeTab === 'delete-account') return renderDeleteAccountContent();
     return null;
   };
 
@@ -1049,34 +1072,33 @@ export default function SettingsPage() {
               <button
                 type="button"
                 onClick={() => setActiveTab('billing')}
-                className="flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100"
+                className={`flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-sm font-medium ${
+                  activeTab === 'billing'
+                    ? 'bg-gray-900 text-white'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
               >
                 <span>Billing</span>
                 <span className="rounded-full bg-blue-50 px-1.5 py-0.5 text-[10px] font-semibold text-blue-700">
                   Manage
                 </span>
               </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('delete-account')}
+                className={`flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-sm font-medium ${
+                  activeTab === 'delete-account'
+                    ? 'bg-gray-900 text-white'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                <span>Delete account</span>
+              </button>
             </nav>
           </aside>
 
           {/* Right content */}
           <section className="flex-1 p-4 md:p-6">{renderContent()}</section>
-        </div>
-      </div>
-
-      {/* Danger Zone */}
-      <div className="mt-6 rounded-xl border border-red-100 bg-red-50 p-4">
-        <h2 className="text-base font-semibold text-red-800">Danger Zone</h2>
-        <p className="mt-1.5 text-sm text-red-700">
-          Deleting your account is permanent and will remove all of your data. This action cannot be undone.
-        </p>
-        <div className="mt-3">
-          <button
-            onClick={() => setShowDeleteModal(true)}
-            className="inline-flex items-center justify-center rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700"
-          >
-            Delete Account
-          </button>
         </div>
       </div>
 
