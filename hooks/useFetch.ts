@@ -1,6 +1,7 @@
 import useSWR, { SWRConfiguration } from 'swr';
 import { get } from '@/utils/api';
 import { useAuth } from '@/hooks/useAuth';
+import { useMemo, useEffect } from 'react';
 
 interface UseFetchOptions<T> extends SWRConfiguration<T> {
   enabled?: boolean;
@@ -12,11 +13,51 @@ const CACHE_TIMES: Record<string, number> = {
   '/users/subscription': 5 * 60 * 1000, // 5 minutes (already cached in useSubscription)
   '/users/me': 2 * 60 * 1000, // 2 minutes
   '/users/me/accounts': 1 * 60 * 1000, // 1 minute
-  '/users/me/dashboard': 30 * 1000, // 30 seconds
+  '/users/me/dashboard': 2 * 60 * 1000, // 2 min - show last data immediately on refresh
   '/automation/rules': 30 * 1000, // 30 seconds
-  '/api/analytics': 5 * 60 * 1000, // 5 minutes - increased for better performance
-  '/api/leads': 60 * 1000, // 1 minute - reduce refetches on analytics page
+  '/api/analytics': 5 * 60 * 1000, // 5 minutes
+  '/api/leads': 60 * 1000, // 1 minute
 };
+
+const CACHE_KEY_PREFIX = 'swr_';
+
+function getCacheTtlForUrl(url: string | null): number {
+  if (!url) return 30000;
+  for (const [pattern, time] of Object.entries(CACHE_TIMES)) {
+    if (url.includes(pattern)) return time;
+  }
+  return 30000;
+}
+
+function getStorageKey(url: string): string {
+  return CACHE_KEY_PREFIX + encodeURIComponent(url).slice(0, 180);
+}
+
+function readCache<T>(url: string): T | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(getStorageKey(url));
+    if (!raw) return null;
+    const { data, timestamp } = JSON.parse(raw) as { data: T; timestamp: number };
+    const ttl = getCacheTtlForUrl(url);
+    if (Date.now() - timestamp > ttl) return null;
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+function writeCache<T>(url: string, data: T): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(
+      getStorageKey(url),
+      JSON.stringify({ data, timestamp: Date.now() })
+    );
+  } catch {
+    // Ignore quota / private mode
+  }
+}
 
 export function useFetch<T = unknown>(
   url: string | null,
@@ -45,6 +86,11 @@ export function useFetch<T = unknown>(
     return cacheTime || 30000; // Default 30 seconds
   };
 
+  const cachedData = useMemo(
+    () => (url && typeof window !== 'undefined' ? readCache<T>(url) : null),
+    [url]
+  );
+
   const response = useSWR<T, Error>(
     shouldFetch ? url : null,
     async (url: string) => {
@@ -65,10 +111,16 @@ export function useFetch<T = unknown>(
     }
   );
 
+  useEffect(() => {
+    if (url && response.data != null) writeCache(url, response.data);
+  }, [url, response.data]);
+
+  const dataToShow = response.data ?? cachedData;
+
   return {
-    data: response.data,
+    data: dataToShow,
     error: response.error,
-    isLoading: (!response.error && !response.data) || authLoading || !hasValidSession,
+    isLoading: !dataToShow && !response.error,
     isValidating: response.isValidating,
     mutate: response.mutate,
   };

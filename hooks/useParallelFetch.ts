@@ -1,13 +1,37 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useAuth } from './useAuth';
 
-/**
- * Hook to fetch multiple API endpoints in parallel
- * This significantly improves performance by reducing sequential wait times
- * Includes request deduplication to prevent duplicate calls
- */
+const CACHE_KEY_PREFIX = 'swr_';
+const CACHE_DURATION_MS = 2 * 60 * 1000; // 2 min - show last data on refresh
+
+function getStorageKey(url: string): string {
+  return CACHE_KEY_PREFIX + encodeURIComponent(url).slice(0, 180);
+}
+
+function readCached<T>(url: string): T | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(getStorageKey(url));
+    if (!raw) return null;
+    const { data, timestamp } = JSON.parse(raw) as { data: T; timestamp: number };
+    if (Date.now() - timestamp > CACHE_DURATION_MS) return null;
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+function writeCached<T>(url: string, data: T): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(getStorageKey(url), JSON.stringify({ data, timestamp: Date.now() }));
+  } catch {
+    // Ignore
+  }
+}
+
 const requestCache = new Map<string, { data: any; timestamp: number; promise?: Promise<any> }>();
-const CACHE_DURATION = 2000; // 2 seconds cache for deduplication
+const CACHE_DURATION = 2000; // 2 seconds in-memory deduplication
 
 export function useParallelFetch<T extends Record<string, any>>(
   endpoints: Partial<Record<keyof T, string | null>>,
@@ -25,6 +49,23 @@ export function useParallelFetch<T extends Record<string, any>>(
   const enabled = options?.enabled !== false;
   const hasValidSession = !authLoading && !!session?.access_token;
   const shouldFetch = enabled && hasValidSession;
+
+  const initialCached = useMemo(() => {
+    const entries = Object.entries(endpoints).filter(
+      ([, u]): u is string => u != null
+    ) as Array<[keyof T, string]>;
+    const out: Partial<T> = {};
+    entries.forEach(([key, url]) => {
+      const c = readCached(url);
+      if (c != null) (out as Record<string, unknown>)[key as string] = c;
+    });
+    return out;
+  }, [JSON.stringify(endpoints)]);
+
+  const [data, setData] = useState<Partial<T>>(initialCached);
+  const [isLoading, setIsLoading] = useState(Object.keys(initialCached).length === 0);
+  const [error, setError] = useState<Error | null>(null);
+  const endpointsRef = useRef<string>('');
 
   useEffect(() => {
     if (!shouldFetch) {
@@ -51,7 +92,7 @@ export function useParallelFetch<T extends Record<string, any>>(
     }
     
     endpointsRef.current = cacheKey;
-    setIsLoading(true);
+    if (Object.keys(initialCached).length === 0) setIsLoading(true);
     setError(null);
 
     // Fetch all endpoints in parallel with deduplication
@@ -130,6 +171,8 @@ export function useParallelFetch<T extends Record<string, any>>(
             resultData[key] = null as any;
           } else {
             resultData[key] = data;
+            const url = validEndpoints.find(([k]) => k === key)?.[1];
+            if (url && data != null) writeCached(url, data);
           }
         });
 
@@ -161,9 +204,11 @@ export function useParallelFetch<T extends Record<string, any>>(
     isLoading,
     error,
     refetch: () => {
-      // Clear cache and trigger re-fetch
       Object.values(endpoints).forEach(url => {
-        if (url) requestCache.delete(url);
+        if (url) {
+          requestCache.delete(url);
+          if (typeof window !== 'undefined') try { localStorage.removeItem(getStorageKey(url)); } catch { /* ignore */ }
+        }
       });
       setData({});
       setIsLoading(true);
