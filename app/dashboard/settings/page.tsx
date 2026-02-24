@@ -81,10 +81,10 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
 }) => {
   if (isLoading) {
     return (
-      <div className="py-6">
-        <div className="inline-flex items-center gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3 shadow-sm">
-          <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-blue-500" />
-          <span className="text-sm text-gray-600">Loading billing details…</span>
+      <div className="py-4">
+        <div className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 shadow-sm">
+          <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-gray-300 border-t-blue-500" />
+          <span className="text-sm text-gray-600">Loading billing…</span>
         </div>
       </div>
     );
@@ -92,8 +92,8 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
 
   if (!subscription) {
     return (
-      <div className="space-y-4">
-        <h2 className="text-xl font-semibold text-gray-900">Billing</h2>
+      <div className="space-y-3">
+        <h2 className="text-base font-semibold text-gray-900">Billing</h2>
         <p className="text-sm text-red-600">Unable to load subscription details right now.</p>
       </div>
     );
@@ -655,27 +655,39 @@ export default function SettingsPage() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="max-w-6xl mx-auto py-16">
-        <div className="flex justify-center">
-          <div className="inline-flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-6 py-4 shadow-sm">
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-blue-500" />
-            <span className="text-sm text-gray-600">Loading your settings…</span>
+  // Show page shell + tabs immediately (like Analytics); only content area shows loading when needed
+  const showGeneralSkeleton = isLoading && activeTab === 'general';
+
+  const renderGeneralContent = () => {
+    if (showGeneralSkeleton) {
+      return (
+        <div className="space-y-6 animate-pulse">
+          <div className="h-5 bg-gray-200 rounded w-40" />
+          <div className="h-4 bg-gray-100 rounded w-72" />
+          <div className="flex items-center gap-4 border-b border-gray-100 pb-4">
+            <div className="h-14 w-14 rounded-full bg-gray-200" />
+            <div className="flex-1 space-y-2">
+              <div className="h-4 bg-gray-200 rounded w-24" />
+              <div className="h-3 bg-gray-100 rounded w-56" />
+            </div>
           </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="h-10 bg-gray-100 rounded-lg w-full" />
+            <div className="h-10 bg-gray-100 rounded-lg w-full" />
+          </div>
+          <div className="h-10 bg-gray-100 rounded-lg max-w-md" />
+          <div className="h-9 bg-gray-200 rounded-lg w-28" />
         </div>
-      </div>
-    );
-  }
-
-  const renderGeneralContent = () => (
-    <div className="space-y-10">
+      );
+    }
+    return (
+    <div className="space-y-8">
       <div>
-        <h2 className="text-xl font-semibold text-gray-900">General Settings</h2>
-        <p className="mt-1 text-sm text-gray-500">Manage your personal information and profile details.</p>
+        <h2 className="text-lg font-semibold text-gray-900">General Settings</h2>
+        <p className="mt-0.5 text-sm text-gray-500">Manage your personal information and profile details.</p>
       </div>
 
-      <section className="space-y-8">
+      <section className="space-y-6">
         {/* Avatar row */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-gray-100 pb-6">
           <div className="flex items-center gap-4">
@@ -808,15 +820,16 @@ export default function SettingsPage() {
         </form>
       </section>
     </div>
-  );
+    );
+  };
 
   const renderSecurityContent = () => {
     if (isGoogleUser) {
       return (
         <div className="space-y-6">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">Security</h2>
-            <p className="mt-1 text-sm text-gray-500">
+            <h2 className="text-lg font-semibold text-gray-900">Security</h2>
+            <p className="mt-0.5 text-sm text-gray-500">
               Your account is managed by Google. To keep your account secure, continue using the
               {' '}
               <span className="font-semibold">Sign in with Google</span>
@@ -833,10 +846,10 @@ export default function SettingsPage() {
     }
 
     return (
-      <div className="space-y-8">
+      <div className="space-y-6">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900">Security</h2>
-          <p className="mt-1 text-sm text-gray-500">Update your password to keep your account secure.</p>
+          <h2 className="text-lg font-semibold text-gray-900">Security</h2>
+          <p className="mt-0.5 text-sm text-gray-500">Update your password to keep your account secure.</p>
         </div>
 
         <section>
@@ -930,8 +943,8 @@ export default function SettingsPage() {
   };
 
   const renderNotificationsContent = () => (
-    <div className="space-y-4">
-      <h2 className="text-xl font-semibold text-gray-900">Notifications</h2>
+    <div className="space-y-3">
+      <h2 className="text-lg font-semibold text-gray-900">Notifications</h2>
       <p className="text-sm text-gray-500">
         Notification preferences will be configurable soon. For now, you&apos;ll receive important product and billing
         updates by email.
@@ -984,23 +997,23 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto py-10">
-      <div className="mb-8">
-        <h1 className="text-3xl font-semibold text-gray-900">Account Settings</h1>
-        <p className="mt-1 text-sm text-gray-500">
+    <div className="w-full max-w-4xl mx-auto py-6">
+      <div className="mb-6">
+        <h1 className="text-xl font-semibold text-gray-900">Account Settings</h1>
+        <p className="mt-0.5 text-sm text-gray-500">
           Fine-tune your profile, security, and preferences in one place.
         </p>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white/80 shadow-lg">
+      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow">
         <div className="flex flex-col md:flex-row">
           {/* Left navigation */}
-          <aside className="w-full border-b border-gray-100 bg-gray-50/80 p-4 md:w-64 md:border-b-0 md:border-r">
-            <nav className="space-y-1">
+          <aside className="w-full border-b border-gray-100 bg-gray-50/80 p-3 md:w-56 md:border-b-0 md:border-r">
+            <nav className="space-y-0.5">
               <button
                 type="button"
                 onClick={() => setActiveTab('general')}
-                className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium ${
+                className={`flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-sm font-medium ${
                   activeTab === 'general'
                     ? 'bg-gray-900 text-white'
                     : 'text-gray-700 hover:bg-gray-100'
@@ -1011,7 +1024,7 @@ export default function SettingsPage() {
               <button
                 type="button"
                 onClick={() => setActiveTab('security')}
-                className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium ${
+                className={`flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-sm font-medium ${
                   activeTab === 'security'
                     ? 'bg-gray-900 text-white'
                     : 'text-gray-700 hover:bg-gray-100'
@@ -1022,24 +1035,24 @@ export default function SettingsPage() {
               <button
                 type="button"
                 onClick={() => setActiveTab('notifications')}
-                className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium ${
+                className={`flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-sm font-medium ${
                   activeTab === 'notifications'
                     ? 'bg-gray-900 text-white'
                     : 'text-gray-500 hover:bg-gray-100'
                 }`}
               >
                 <span>Notifications</span>
-                <span className="rounded-full bg-gray-200 px-2 py-0.5 text-[10px] font-semibold text-gray-600">
+                <span className="rounded-full bg-gray-200 px-1.5 py-0.5 text-[10px] font-semibold text-gray-600">
                   SOON
                 </span>
               </button>
               <button
                 type="button"
                 onClick={() => setActiveTab('billing')}
-                className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100"
+                className="flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100"
               >
                 <span>Billing</span>
-                <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-blue-700">
+                <span className="rounded-full bg-blue-50 px-1.5 py-0.5 text-[10px] font-semibold text-blue-700">
                   Manage
                 </span>
               </button>
@@ -1047,17 +1060,17 @@ export default function SettingsPage() {
           </aside>
 
           {/* Right content */}
-          <section className="flex-1 p-6 md:p-8">{renderContent()}</section>
+          <section className="flex-1 p-4 md:p-6">{renderContent()}</section>
         </div>
       </div>
 
       {/* Danger Zone */}
-      <div className="mt-8 rounded-2xl border border-red-100 bg-red-50 p-6">
-        <h2 className="text-lg font-semibold text-red-800">Danger Zone</h2>
-        <p className="mt-2 text-sm text-red-700">
+      <div className="mt-6 rounded-xl border border-red-100 bg-red-50 p-4">
+        <h2 className="text-base font-semibold text-red-800">Danger Zone</h2>
+        <p className="mt-1.5 text-sm text-red-700">
           Deleting your account is permanent and will remove all of your data. This action cannot be undone.
         </p>
-        <div className="mt-4">
+        <div className="mt-3">
           <button
             onClick={() => setShowDeleteModal(true)}
             className="inline-flex items-center justify-center rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700"
@@ -1075,7 +1088,7 @@ export default function SettingsPage() {
               className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
               onClick={() => setShowDeleteModal(false)}
             />
-            <div className="relative bg-white rounded-2xl px-6 pt-6 pb-6 text-center shadow-2xl sm:p-8 max-w-md border-2 border-gray-200">
+            <div className="relative bg-white rounded-xl px-4 pt-4 pb-4 text-center shadow sm:p-6 max-w-md border border-gray-200">
               <div className="mx-auto flex items-center justify-center h-14 w-14 rounded-full bg-gradient-to-br from-red-100 to-rose-100 mb-4">
                 <ExclamationTriangleIcon className="h-7 w-7 text-red-600" />
               </div>
@@ -1089,14 +1102,14 @@ export default function SettingsPage() {
               <div className="mt-6 flex justify-center space-x-4">
                 <button
                   onClick={() => setShowDeleteModal(false)}
-                  className="px-6 py-3 text-sm font-bold text-gray-700 bg-white border-2 border-gray-300 rounded-xl hover:bg-gray-50 transition-all duration-200"
+                  className="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleDeleteAccount}
                   disabled={deleteLoading}
-                  className="px-6 py-3 text-sm font-bold text-white bg-gradient-to-r from-red-600 to-rose-600 rounded-xl hover:from-red-700 hover:to-rose-700 disabled:opacity-50 transition-all duration-200 hover:scale-105"
+                  className="px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-red-600 to-rose-600 rounded-lg hover:from-red-700 hover:to-rose-700 disabled:opacity-50"
                 >
                   {deleteLoading ? 'Deleting...' : 'Delete Account'}
                 </button>
@@ -1114,7 +1127,7 @@ export default function SettingsPage() {
               className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
               onClick={() => !cancelLoading && setShowCancelConfirmModal(false)}
             />
-            <div className="relative bg-white rounded-2xl px-6 pt-6 pb-6 text-center shadow-2xl sm:p-8 max-w-md border-2 border-gray-200">
+            <div className="relative bg-white rounded-xl px-4 pt-4 pb-4 text-center shadow sm:p-6 max-w-md border border-gray-200">
               <div className="mx-auto flex items-center justify-center h-14 w-14 rounded-full bg-gradient-to-br from-orange-100 to-amber-100 mb-4">
                 <ExclamationTriangleIcon className="h-7 w-7 text-orange-600" />
               </div>
@@ -1128,14 +1141,14 @@ export default function SettingsPage() {
                 <button
                   onClick={() => setShowCancelConfirmModal(false)}
                   disabled={cancelLoading}
-                  className="px-6 py-3 text-sm font-bold text-gray-700 bg-white border-2 border-gray-300 rounded-xl hover:bg-gray-50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   No, Keep Subscription
                 </button>
                 <button
                   onClick={confirmCancelSubscription}
                   disabled={cancelLoading}
-                  className="px-6 py-3 text-sm font-bold text-white bg-gradient-to-r from-orange-600 to-amber-600 rounded-xl hover:from-orange-700 hover:to-amber-700 disabled:opacity-50 transition-all duration-200 hover:scale-105"
+                  className="px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-orange-600 to-amber-600 rounded-lg hover:from-orange-700 hover:to-amber-700 disabled:opacity-50"
                 >
                   {cancelLoading ? 'Canceling...' : 'Yes, Cancel Subscription'}
                 </button>
