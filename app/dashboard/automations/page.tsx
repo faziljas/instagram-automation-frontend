@@ -1280,7 +1280,11 @@ export default function AutomationsPage() {
             const existingRule = automationRules[selectedMedia.id]?.[0];
             if (existingRule && existingRule.config) {
               const cfg = existingRule.config;
-              const isLead = !!cfg.is_lead_capture;
+              // For Stories we never persist is_lead_capture (backend uses it only for posts/reels).
+              // Infer "Keyword DM" vs "Default DM" from stored lead_keywords so the correct tab shows when editing.
+              const isStoryMedia = selectedMedia.media_product_type === 'STORY';
+              const hasLeadKeywords = !!(cfg.lead_keywords && cfg.lead_keywords.length > 0 && cfg.lead_keywords.some((k: string) => k && String(k).trim()));
+              const isLead = !!cfg.is_lead_capture || (isStoryMedia && hasLeadKeywords);
 
               return {
                 // active flow values (what the backend currently treats as primary)
