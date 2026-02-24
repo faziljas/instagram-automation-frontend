@@ -92,12 +92,22 @@ export default function AccountsPage() {
       }
       // Clear URL params immediately to allow retry
       window.history.replaceState({}, '', window.location.pathname);
-      // Auto-clear error after timeout (longer for "already connected" since it's informational)
-      const isAlreadyConnected = decodedError.includes('already connected to another user') || decodedError.includes('already connected to a different user');
-      const clearTimeout = isAlreadyConnected ? 20000 : 15000; // 20 seconds for already connected, 15 for errors
+      // Auto-clear error after timeout:
+      // - "already connected" info: 20s
+      // - upgrade to Pro / plan limit messages: ~3 minutes (180s) so user has time to decide
+      // - other errors: 15s
+      const isAlreadyConnected =
+        decodedError.includes('already connected to another user') ||
+        decodedError.includes('already connected to a different user');
+      const isUpgradeOrLimit =
+        decodedError.toLowerCase().includes('upgrade to pro') ||
+        decodedError.toLowerCase().includes('connect more accounts') ||
+        decodedError.toLowerCase().includes('rule limit') ||
+        decodedError.toLowerCase().includes('dm limit');
+      const clearTimeoutMs = isUpgradeOrLimit ? 180000 : isAlreadyConnected ? 20000 : 15000;
       setTimeout(() => {
         setConnectError(null);
-      }, clearTimeout);
+      }, clearTimeoutMs);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connectSuccess]);
