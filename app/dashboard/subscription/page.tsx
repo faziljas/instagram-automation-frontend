@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useFetch } from '@/hooks/useFetch';
 import { usePost } from '@/hooks/useApi';
 import { useAuth } from '@/hooks/useAuth';
@@ -73,10 +73,23 @@ export default function SubscriptionPage() {
   const { execute: cancelSubscription, loading: cancelLoading } = usePost();
   const { execute: createCheckoutSession, loading: checkoutLoading } = usePost();
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showPlanModal, setShowPlanModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isPolling, setIsPolling] = useState(false);
   const pollingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const searchParams = useSearchParams();
+
+  // Open plan selection when arriving with ?choosePlan=1 (e.g. from sidebar or automations)
+  useEffect(() => {
+    if (searchParams.get('choosePlan') === '1') {
+      setShowPlanModal(true);
+      // Clean URL without reload
+      const url = new URL(window.location.href);
+      url.searchParams.delete('choosePlan');
+      window.history.replaceState({}, '', url.pathname + (url.search || ''));
+    }
+  }, [searchParams]);
 
   // Poll for subscription updates when polling is active
   useEffect(() => {
@@ -304,12 +317,13 @@ export default function SubscriptionPage() {
     };
   }, [refetchSubscription, router]);
 
-  const handleUpgrade = async () => {
+  type BillingPlan = 'monthly' | 'yearly';
+
+  const handleUpgradeWithPlan = async (plan: BillingPlan) => {
     try {
       setErrorMessage(null);
       setSuccessMessage(null);
 
-      // Ensure we have a valid auth session before calling the backend
       if (!session?.access_token) {
         console.warn('⚠️ No valid session found when trying to upgrade plan');
         setErrorMessage('Your session has expired. Please log in again to upgrade your plan.');
@@ -318,52 +332,33 @@ export default function SubscriptionPage() {
         }, 2000);
         return;
       }
-      
-      // If subscription data hasn't loaded yet, refetch it first
-      // This ensures user exists in backend before creating checkout session
+
       if (!subscriptionData) {
         console.log('🔄 Subscription data not loaded, refetching before upgrade...');
         try {
           await refetchSubscription(undefined, { revalidate: true });
         } catch (refetchError) {
           console.warn('⚠️ Failed to refetch subscription data:', refetchError);
-          // Continue anyway - backend will handle missing user
         }
       }
-      
-      console.log('🔄 Creating Stripe checkout session...');
-      console.log('API URL:', process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000');
-      
-      const response = await createCheckoutSession('/api/dodo/create-checkout-session', {});
-      
-      console.log('✅ Checkout session response:', response);
-      
+
+      console.log('🔄 Creating checkout session for plan:', plan);
+      const response = await createCheckoutSession('/api/dodo/create-checkout-session', { plan });
+
       if (response?.checkout_url) {
-        // Redirect to Stripe Checkout
-        console.log('🔗 Redirecting to Stripe Checkout:', response.checkout_url);
+        setShowPlanModal(false);
         window.location.href = response.checkout_url;
       } else {
-        console.error('❌ No checkout_url in response:', response);
         setErrorMessage('Unable to start the upgrade process. Please try again in a moment.');
       }
     } catch (error) {
       console.error('❌ Failed to create checkout session:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to create checkout session';
-      console.error('Error details:', {
-        message: errorMessage,
-        apiUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
-      });
-
-      // Friendlier error handling:
-      // - Treat auth/token errors as session expiry
-      // - Treat Dodo API errors as payment service issues
       if (errorMessage.includes('Missing authorization header') ||
           errorMessage.includes('Invalid token') ||
           errorMessage.toLowerCase().includes('session expired')) {
         setErrorMessage('Your session has expired. Please log in again to upgrade your plan.');
-        setTimeout(() => {
-          router.push('/login?redirect=/dashboard/subscription');
-        }, 2000);
+        setTimeout(() => router.push('/login?redirect=/dashboard/subscription'), 2000);
       } else if (errorMessage.startsWith('Dodo API error')) {
         setErrorMessage('Our payment provider temporarily rejected the request. Please try again or contact support if this keeps happening.');
       } else {
@@ -536,6 +531,53 @@ export default function SubscriptionPage() {
         </div>
       )}
 
+      {/* Plan selection modal: Monthly vs Yearly */}
+      {showPlanModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl border border-gray-200 max-w-md w-full">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-gray-900">Choose your plan</h2>
+                <button
+                  onClick={() => setShowPlanModal(false)}
+                  className="text-gray-400 hover:text-gray-600 transition-colors p-1"
+                  aria-label="Close"
+                >
+                  <XCircleIcon className="w-6 h-6" />
+                </button>
+              </div>
+              <p className="text-gray-600 text-sm mb-6">
+                Select monthly billing or save with a yearly subscription.
+              </p>
+              <div className="space-y-3">
+                <button
+                  onClick={() => handleUpgradeWithPlan('monthly')}
+                  disabled={checkoutLoading}
+                  className="w-full flex items-center justify-between px-4 py-4 rounded-lg border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50/50 transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <span className="font-semibold text-gray-900">Monthly</span>
+                  <span className="text-gray-600">$9/month</span>
+                </button>
+                <button
+                  onClick={() => handleUpgradeWithPlan('yearly')}
+                  disabled={checkoutLoading}
+                  className="w-full flex items-center justify-between px-4 py-4 rounded-lg border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50/50 transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <div className="flex flex-col items-end">
+                    <span className="font-semibold text-gray-900">Yearly</span>
+                    <span className="text-xs text-green-600 font-medium">Save 2 months</span>
+                  </div>
+                  <span className="text-gray-600">$84/year</span>
+                </button>
+              </div>
+              {checkoutLoading && (
+                <p className="mt-3 text-sm text-gray-500 text-center">Processing...</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Current Plan Card */}
       <div className="bg-white rounded-xl border border-gray-200 shadow p-6 mb-4">
         <div className="flex items-center justify-between mb-4">
@@ -569,12 +611,11 @@ export default function SubscriptionPage() {
           {displayPlan === 'free' && subscriptionData.status !== 'cancelled' && (
             <div>
               <button
-                onClick={handleUpgrade}
-                disabled={checkoutLoading}
-                className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                onClick={() => setShowPlanModal(true)}
+                className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
               >
                 <ArrowUpIcon className="h-5 w-5 mr-2" />
-                {checkoutLoading ? 'Processing...' : 'Upgrade Plan'}
+                Upgrade to Pro
               </button>
               <p className="mt-2 text-xs text-gray-500">
                 Secure payments powered by Dodo Payments. International cards accepted.

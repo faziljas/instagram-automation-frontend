@@ -1444,7 +1444,7 @@ export default function AutomationsPage() {
                 <button
                   onClick={() => {
                     setShowUpgradeModal(false);
-                    window.location.href = '/dashboard/subscription';
+                    window.location.href = '/dashboard/subscription?choosePlan=1';
                   }}
                   className="flex-1 px-4 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 font-bold shadow hover:scale-[1.02] transition-all"
                 >
