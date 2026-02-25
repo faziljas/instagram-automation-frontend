@@ -392,18 +392,31 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
 
 export default function SettingsPage() {
   const router = useRouter();
-  const { updateUser, logout, supabaseUser } = useAuth();
-  const { data: user, isLoading } = useFetch<User>('/users/me');
+  const {
+    user: authUser,
+    updateUser,
+    logout,
+    supabaseUser,
+    loading: authLoading,
+  } = useAuth();
+  const [activeTab, setActiveTab] = useState<'general' | 'security' | 'notifications' | 'billing' | 'delete-account'>('general');
+
+  // Use the already-loaded auth user for profile/general settings to avoid
+  // duplicate /users/me requests and show data as soon as auth context is ready.
+  const user = authUser;
+  const isUserLoading = authLoading && !authUser;
+
+  // Lazy-load billing data only when the Billing tab is active
   const {
     data: subscription,
     isLoading: isSubscriptionLoading,
-  } = useFetch<SubscriptionSummary>('/users/subscription');
+  } = useFetch<SubscriptionSummary>(activeTab === 'billing' ? '/users/subscription' : null);
   const {
     data: invoicesData,
     error: invoicesError,
     isLoading: isInvoicesLoading,
     mutate: mutateInvoices,
-  } = useFetch<Invoice[]>('/users/invoices');
+  } = useFetch<Invoice[]>(activeTab === 'billing' ? '/users/invoices' : null);
   
   // Ensure invoices is always an array - handle cases where API returns error object
   const invoices = Array.isArray(invoicesData) ? invoicesData : [];
@@ -432,7 +445,6 @@ export default function SettingsPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showCancelConfirmModal, setShowCancelConfirmModal] = useState(false);
   const [localCancelled, setLocalCancelled] = useState(false);
-  const [activeTab, setActiveTab] = useState<'general' | 'security' | 'notifications' | 'billing' | 'delete-account'>('general');
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -707,7 +719,7 @@ export default function SettingsPage() {
   };
 
   // Show page shell + tabs immediately (like Analytics); only content area shows loading when needed
-  const showGeneralSkeleton = isLoading && activeTab === 'general';
+  const showGeneralSkeleton = isUserLoading && activeTab === 'general';
 
   const renderGeneralContent = () => {
     if (showGeneralSkeleton) {

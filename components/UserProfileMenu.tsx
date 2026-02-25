@@ -13,7 +13,7 @@ import {
 import ReportIssueModal from '@/components/ReportIssueModal';
 
 export default function UserProfileMenu() {
-  const { user, logout } = useAuth();
+  const { user, supabaseUser, logout } = useAuth();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
@@ -50,9 +50,23 @@ export default function UserProfileMenu() {
     setShowReportModal(true);
   };
 
-  const userName = user?.firstName && user?.lastName
-    ? `${user.firstName} ${user.lastName}`
-    : user?.email?.split('@')[0] || 'User';
+  // Prefer backend user name, then Supabase metadata, then email username as a fallback.
+  const fullNameFromBackend =
+    user?.firstName && user?.lastName
+      ? `${user.firstName} ${user.lastName}`
+      : null;
+
+  const fullNameFromSupabase =
+    (supabaseUser?.user_metadata as Record<string, unknown> | undefined)?.full_name as string | undefined ||
+    (supabaseUser?.user_metadata as Record<string, unknown> | undefined)?.name as string | undefined ||
+    undefined;
+
+  const userName =
+    fullNameFromBackend ||
+    fullNameFromSupabase ||
+    user?.email?.split('@')[0] ||
+    supabaseUser?.email?.split('@')[0] ||
+    'User';
 
   const displayName = userName.length > 20 ? `${userName.substring(0, 17)}...` : userName;
 
