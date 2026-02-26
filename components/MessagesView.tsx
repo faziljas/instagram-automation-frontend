@@ -70,6 +70,7 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
   const fetchConversations = useCallback(async (loadMore?: boolean, silent?: boolean) => {
     if (!accountId) return;
     const offset = loadMore ? nextConversationsOffset : 0;
+    const limit = 30; // Smaller page for faster load + render
     // Only show loading state if not silent refresh
     if (!silent) {
       if (loadMore) setIsLoadingMoreConversations(true);
@@ -82,7 +83,9 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
         count: number;
         has_more?: boolean;
         next_offset?: number | null;
-      }>(`/api/instagram/conversations?account_id=${accountId}&limit=100&offset=${offset}`);
+      }>(
+        `/api/instagram/conversations?account_id=${accountId}&limit=${limit}&offset=${offset}&auto_sync=false`
+      );
       const list = data?.conversations ?? [];
       if (loadMore) {
         setConversations((prev) => [...prev, ...list]);
