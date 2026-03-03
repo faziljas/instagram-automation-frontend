@@ -91,11 +91,12 @@ export default function HomePage() {
       {/* Sticky Glassy Navigation */}
       <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-3">
             <Link href="/">
               <Logo size="md" variant="dark" />
             </Link>
-            <div className="flex items-center gap-6">
+            {/* Desktop navigation */}
+            <div className="hidden sm:flex items-center gap-4">
               <Link
                 href="/pricing"
                 className="text-gray-600 hover:text-gray-900 font-medium transition-colors text-sm"
@@ -115,17 +116,26 @@ export default function HomePage() {
                 Get Started
               </Link>
             </div>
+            {/* Mobile primary action */}
+            <div className="sm:hidden flex-shrink-0">
+              <Link
+                href="/register"
+                className="inline-flex items-center px-3 py-2 bg-gray-900 text-white rounded-lg font-semibold text-xs hover:bg-gray-800 transition-colors"
+              >
+                Get Started
+              </Link>
+            </div>
           </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32 overflow-hidden">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 md:py-32 overflow-hidden">
         {/* Gradient Blob Background */}
-        <div className="absolute top-[-20%] left-[50%] w-[600px] h-[600px] bg-purple-500/30 rounded-full blur-[100px] -translate-x-1/2 pointer-events-none" />
+        <div className="absolute top-[-20%] left-1/2 w-[320px] h-[320px] sm:w-[480px] sm:h-[480px] md:w-[600px] md:h-[600px] bg-purple-500/30 rounded-full blur-[100px] -translate-x-1/2 pointer-events-none" />
         
         <div className="relative text-center">
-          <h1 className="text-6xl md:text-7xl font-extrabold tracking-tight text-gray-900 mb-6">
+          <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-gray-900 mb-6">
             <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               Automate
             </span>{' '}
