@@ -491,8 +491,8 @@ function RegisterPageContent() {
         </div>
       </div>
 
-      {/* Right Column - Visual Area */}
-      <div className="w-full lg:w-[55%] bg-slate-900 relative overflow-hidden min-h-[320px] sm:min-h-[420px] lg:min-h-screen">
+      {/* Right Column - Visual Area (desktop only) */}
+      <div className="hidden lg:flex lg:w-[55%] bg-slate-900 relative overflow-hidden min-h-screen">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div
