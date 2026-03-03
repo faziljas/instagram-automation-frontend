@@ -228,7 +228,7 @@ function UpdatePasswordPageContent() {
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-slate-900" />
           <p className="mt-4 text-gray-600">Loading...</p>
         </div>
-        <div className="hidden lg:flex lg:w-[55%] bg-slate-900 min-h-screen" />
+        <div className="w-full lg:w-[55%] bg-slate-900 min-h-[260px] lg:min-h-screen mt-8 lg:mt-0" />
       </div>
     );
   }
@@ -262,7 +262,7 @@ function UpdatePasswordPageContent() {
             </div>
           </div>
         </div>
-        <div className="hidden lg:flex lg:w-[55%] bg-slate-900 min-h-screen" />
+        <div className="w-full lg:w-[55%] bg-slate-900 min-h-[260px] lg:min-h-screen mt-8 lg:mt-0" />
       </div>
     );
   }
@@ -287,7 +287,7 @@ function UpdatePasswordPageContent() {
           <UpdatePasswordForm />
         </div>
       </div>
-      <div className="hidden lg:flex lg:w-[55%] bg-slate-900 relative overflow-hidden min-h-screen">
+      <div className="w-full lg:w-[55%] bg-slate-900 relative overflow-hidden min-h-[260px] sm:min-h-[360px] lg:min-h-screen mt-8 lg:mt-0">
         <div className="absolute inset-0 opacity-10">
           <div
             className="w-full h-full"

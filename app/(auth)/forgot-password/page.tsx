@@ -251,8 +251,8 @@ function ForgotPasswordPageContent() {
         </div>
       </div>
 
-      {/* Right Column - Visual Area (desktop only) */}
-      <div className="hidden lg:flex lg:w-[55%] bg-slate-900 relative overflow-hidden min-h-screen">
+      {/* Right Column - Visual Area */}
+      <div className="w-full lg:w-[55%] bg-slate-900 relative overflow-hidden min-h-[260px] sm:min-h-[360px] lg:min-h-screen mt-8 lg:mt-0">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div
