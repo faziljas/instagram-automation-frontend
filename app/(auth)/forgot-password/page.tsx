@@ -215,11 +215,11 @@ function ForgotPasswordForm() {
 
 function ForgotPasswordPageContent() {
   return (
-    <div className="min-h-screen w-full flex">
+    <div className="min-h-screen w-full flex flex-col lg:flex-row">
       {/* Left Column - Form Area */}
-      <div className="w-full lg:w-[45%] bg-white flex flex-col justify-center px-8 lg:px-24 relative">
+      <div className="w-full lg:w-[45%] bg-white flex flex-col justify-center px-6 sm:px-8 lg:px-24 relative py-10 sm:py-16 lg:py-0">
         {/* Logo */}
-        <div className="absolute top-8 left-8 lg:left-24">
+        <div className="absolute top-6 left-6 sm:top-8 sm:left-8 lg:left-24">
           <Link href="/login">
             <Logo size="md" variant="dark" />
           </Link>
@@ -252,7 +252,7 @@ function ForgotPasswordPageContent() {
       </div>
 
       {/* Right Column - Visual Area (same as register/login) */}
-      <div className="hidden lg:flex lg:w-[55%] bg-slate-900 relative overflow-hidden">
+      <div className="w-full lg:w-[55%] bg-slate-900 relative overflow-hidden min-h-[320px] sm:min-h-[420px] lg:min-h-screen mt-8 lg:mt-0">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div

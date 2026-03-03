@@ -223,21 +223,21 @@ function UpdatePasswordPageContent() {
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen w-full flex">
-        <div className="w-full lg:w-[45%] bg-white flex flex-col justify-center items-center px-8 lg:px-24">
+      <div className="min-h-screen w-full flex flex-col lg:flex-row">
+        <div className="w-full lg:w-[45%] bg-white flex flex-col justify-center items-center px-6 sm:px-8 lg:px-24 py-10 sm:py-16 lg:py-0">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-slate-900" />
           <p className="mt-4 text-gray-600">Loading...</p>
         </div>
-        <div className="hidden lg:flex lg:w-[55%] bg-slate-900" />
+        <div className="w-full lg:w-[55%] bg-slate-900 min-h-[260px] lg:min-h-screen mt-8 lg:mt-0" />
       </div>
     );
   }
 
   if (status === 'error') {
     return (
-      <div className="min-h-screen w-full flex">
-        <div className="w-full lg:w-[45%] bg-white flex flex-col justify-center px-8 lg:px-24 relative">
-          <div className="absolute top-8 left-8 lg:left-24">
+      <div className="min-h-screen w-full flex flex-col lg:flex-row">
+        <div className="w-full lg:w-[45%] bg-white flex flex-col justify-center px-6 sm:px-8 lg:px-24 relative py-10 sm:py-16 lg:py-0">
+          <div className="absolute top-6 left-6 sm:top-8 sm:left-8 lg:left-24">
             <Link href="/login">
               <Logo size="md" variant="dark" />
             </Link>
@@ -262,15 +262,15 @@ function UpdatePasswordPageContent() {
             </div>
           </div>
         </div>
-        <div className="hidden lg:flex lg:w-[55%] bg-slate-900" />
+        <div className="w-full lg:w-[55%] bg-slate-900 min-h-[260px] lg:min-h-screen mt-8 lg:mt-0" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen w-full flex">
-      <div className="w-full lg:w-[45%] bg-white flex flex-col justify-center px-8 lg:px-24 relative">
-        <div className="absolute top-8 left-8 lg:left-24">
+    <div className="min-h-screen w-full flex flex-col lg:flex-row">
+      <div className="w-full lg:w-[45%] bg-white flex flex-col justify-center px-6 sm:px-8 lg:px-24 relative py-10 sm:py-16 lg:py-0">
+        <div className="absolute top-6 left-6 sm:top-8 sm:left-8 lg:left-24">
           <Link href="/login">
             <Logo size="md" variant="dark" />
           </Link>
@@ -287,7 +287,7 @@ function UpdatePasswordPageContent() {
           <UpdatePasswordForm />
         </div>
       </div>
-      <div className="hidden lg:flex lg:w-[55%] bg-slate-900 relative overflow-hidden">
+      <div className="w-full lg:w-[55%] bg-slate-900 relative overflow-hidden min-h-[320px] lg:min-h-screen mt-8 lg:mt-0">
         <div className="absolute inset-0 opacity-10">
           <div
             className="w-full h-full"

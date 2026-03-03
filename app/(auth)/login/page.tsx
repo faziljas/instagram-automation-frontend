@@ -285,9 +285,9 @@ function LoginPageContent() {
   return (
     <div className="min-h-screen w-full flex flex-col lg:flex-row">
       {/* Left Column - Form Area */}
-      <div className="w-full lg:w-[45%] bg-white flex flex-col px-8 lg:px-24 relative min-h-screen">
+      <div className="w-full lg:w-[45%] bg-white flex flex-col px-6 sm:px-8 lg:px-24 relative py-10 sm:py-16 lg:py-0 min-h-[60vh] lg:min-h-screen">
         {/* Logo */}
-        <div className="absolute top-8 left-8 lg:left-24">
+        <div className="absolute top-6 left-6 sm:top-8 sm:left-8 lg:left-24">
           <Logo size="md" variant="dark" />
         </div>
 
@@ -687,7 +687,7 @@ function LoginPageContent() {
       </div>
 
       {/* Right Column - Visual Area */}
-      <div className="hidden lg:flex lg:w-[55%] bg-slate-900 relative overflow-hidden min-h-screen">
+      <div className="w-full lg:w-[55%] bg-slate-900 relative overflow-hidden min-h-[320px] sm:min-h-[420px] lg:min-h-screen mt-8 lg:mt-0">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div
