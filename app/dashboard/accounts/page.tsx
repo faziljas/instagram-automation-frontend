@@ -464,10 +464,10 @@ export default function AccountsPage() {
                 <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider hidden md:table-cell">
+                <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                   Date Connected
                 </th>
-                <th className="px-4 py-3 text-right text-xs font-bold text-gray-700 uppercase tracking-wider hidden md:table-cell">
+                <th className="px-4 py-3 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -486,22 +486,6 @@ export default function AccountsPage() {
                         <div className="text-sm font-semibold text-gray-900">
                           @{account.username}
                         </div>
-                        {/* Mobile-only extra info so columns aren't lost */}
-                        <div className="mt-1 space-y-0.5 text-[11px] text-gray-500 block md:hidden">
-                          {account.created_at && (
-                            <div>
-                              <span className="font-semibold text-gray-700">Connected:</span>{' '}
-                              {formatDate(account.created_at)}
-                            </div>
-                          )}
-                          <button
-                            type="button"
-                            onClick={() => setDeleteConfirm(account.id)}
-                            className="text-red-600 font-semibold"
-                          >
-                            Delete
-                          </button>
-                        </div>
                       </div>
                     </div>
                   </td>
@@ -516,10 +500,10 @@ export default function AccountsPage() {
                       {account.is_active ? 'Active' : 'Inactive'}
                     </span>
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
                     {account.created_at ? formatDate(account.created_at) : 'N/A'}
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium hidden md:table-cell">
+                  <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
                     {deleteConfirm === account.id ? (
                       <div className="flex items-center justify-end space-x-3">
                         <span className="text-red-600 text-sm font-semibold">Delete?</span>

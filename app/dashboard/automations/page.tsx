@@ -776,24 +776,24 @@ export default function AutomationsPage() {
                           <div className="w-full text-center">Automation</div>
                         </th>
                         <th
-                          className="px-4 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider hidden md:table-cell"
+                          className="px-4 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider"
                           title="Increases when users click &quot;Follow Me&quot; / &quot;I&#39;m following&quot; in DMs"
                         >
                           <div className="w-full text-center">NEW FOLLOWERS</div>
                         </th>
-                        <th className="px-4 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider hidden md:table-cell">
+                        <th className="px-4 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider">
                           <div className="w-full text-center">RUNS</div>
                         </th>
-                        <th className="px-4 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider hidden md:table-cell">
+                        <th className="px-4 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider">
                           <div className="w-full text-center">CLICKS</div>
                         </th>
-                        <th className="px-4 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider hidden md:table-cell">
+                        <th className="px-4 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider">
                           <div className="w-full text-center">STATUS</div>
                         </th>
-                        <th className="px-4 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider hidden md:table-cell">
+                        <th className="px-4 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider">
                           <div className="w-full text-center">LAST MODIFIED</div>
                         </th>
-                        <th className="px-4 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider hidden md:table-cell">
+                        <th className="px-4 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider">
                           <div className="w-full text-center">Action</div>
                         </th>
                       </tr>
@@ -855,49 +855,21 @@ export default function AutomationsPage() {
                                     {mediaItem.media_product_type === 'STORY' && 'Story'}
                                     {!mediaItem.media_product_type && 'Post'}
                                   </div>
-                                  {/* Mobile-only meta so important columns are visible without horizontal scroll */}
-                                  <div className="mt-1 space-y-0.5 text-[11px] text-gray-500 block md:hidden">
-                                    {rule?.created_at && (
-                                      <div>
-                                        <span className="font-semibold text-gray-700">Last:</span>{' '}
-                                        {new Date(rule.created_at).toLocaleDateString('en-US', {
-                                          month: 'short',
-                                          day: 'numeric',
-                                          year: 'numeric',
-                                        })}
-                                      </div>
-                                    )}
-                                    {analytics && (
-                                      <div>
-                                        <span className="font-semibold text-gray-700">Runs:</span>{' '}
-                                        {analytics.triggers || 0}
-                                        {' · '}
-                                        <span className="font-semibold text-gray-700">Clicks:</span>{' '}
-                                        {analytics.total_clicks || 0}
-                                      </div>
-                                    )}
-                                    {rule && (
-                                      <div>
-                                        <span className="font-semibold text-gray-700">Status:</span>{' '}
-                                        {rule.is_active ? 'Enabled' : 'Disabled'}
-                                      </div>
-                                    )}
-                                  </div>
                                 </div>
                               </div>
                             </td>
-                            <td className="px-4 py-3 whitespace-nowrap hidden md:table-cell">
+                            <td className="px-4 py-3 whitespace-nowrap">
                               <span className="text-sm font-semibold text-gray-900">
                                 {(analytics?.follow_button_clicks || 0) + (analytics?.im_following_clicks || 0)}
                               </span>
                             </td>
-                            <td className="px-4 py-3 whitespace-nowrap hidden md:table-cell">
+                            <td className="px-4 py-3 whitespace-nowrap">
                               <span className="text-sm font-semibold text-gray-900">{analytics?.triggers || 0}</span>
                             </td>
-                            <td className="px-4 py-3 whitespace-nowrap hidden md:table-cell">
+                            <td className="px-4 py-3 whitespace-nowrap">
                               <span className="text-sm font-semibold text-gray-900">{analytics?.total_clicks || 0}</span>
                             </td>
-                            <td className="px-4 py-3 whitespace-nowrap hidden md:table-cell">
+                            <td className="px-4 py-3 whitespace-nowrap">
                               {rule ? (
                                 <span
                                   className={`px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-lg ${
@@ -914,7 +886,7 @@ export default function AutomationsPage() {
                                 </span>
                               )}
                             </td>
-                            <td className="px-4 py-3 whitespace-nowrap text-xs text-gray-500 hidden md:table-cell">
+                            <td className="px-4 py-3 whitespace-nowrap text-xs text-gray-500">
                               {rule?.created_at
                                 ? new Date(rule.created_at).toLocaleString('en-US', {
                                     month: 'short',
@@ -926,7 +898,7 @@ export default function AutomationsPage() {
                                 : rule ? '-' : 'Not configured'}
                             </td>
                             {/* Actions: Edit & Delete with inline Yes/No confirmation */}
-                            <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium hidden md:table-cell">
+                            <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
                               {rule ? (
                                 deleteConfirmRuleId === rule.id ? (
                                   <div
