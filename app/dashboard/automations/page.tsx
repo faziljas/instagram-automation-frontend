@@ -551,7 +551,7 @@ export default function AutomationsPage() {
   }, [accounts, selectedAccount]);
 
   return (
-    <div className="w-full mx-auto overflow-x-hidden">
+    <div className="w-full mx-auto">
       {/* Hero Banner - compact like competitor */}
       <div className="relative overflow-hidden bg-gradient-to-br from-purple-500 via-pink-500 to-rose-600 rounded-xl mb-6 shadow-lg w-full">
         <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent"></div>

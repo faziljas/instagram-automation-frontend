@@ -215,7 +215,7 @@ export default function AccountsPage() {
   };
 
   return (
-    <div className="w-full overflow-x-hidden">
+    <div className="w-full">
       {/* Hero Banner - compact */}
       <div className="relative overflow-hidden bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 rounded-xl mb-6 shadow-lg w-full">
         <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent"></div>
