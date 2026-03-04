@@ -494,13 +494,34 @@ export default function AccountsPage() {
                               {formatDate(account.created_at)}
                             </div>
                           )}
-                          <button
-                            type="button"
-                            onClick={() => setDeleteConfirm(account.id)}
-                            className="text-red-600 font-semibold"
-                          >
-                            Delete
-                          </button>
+                          {deleteConfirm === account.id ? (
+                            <div className="flex items-center space-x-3 mt-0.5">
+                              <span className="text-red-600 text-xs font-semibold">Delete?</span>
+                              <button
+                                type="button"
+                                onClick={() => handleDelete(account.id)}
+                                disabled={deleteLoading}
+                                className="px-2 py-1 text-[11px] text-red-600 hover:text-white hover:bg-red-600 font-semibold rounded-md border border-red-300 transition-all duration-200"
+                              >
+                                Yes
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setDeleteConfirm(null)}
+                                className="px-2 py-1 text-[11px] text-gray-600 hover:text-white hover:bg-gray-600 rounded-md border border-gray-300 transition-all duration-200"
+                              >
+                                No
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => setDeleteConfirm(account.id)}
+                              className="text-red-600 font-semibold"
+                            >
+                              Delete
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>

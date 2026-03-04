@@ -882,6 +882,80 @@ export default function AutomationsPage() {
                                         {rule.is_active ? 'Enabled' : 'Disabled'}
                                       </div>
                                     )}
+                                    {/* Mobile-only actions (Edit/Delete with inline confirmation) */}
+                                    {rule && (
+                                      <div className="pt-0.5">
+                                        {deleteConfirmRuleId === rule.id ? (
+                                          <div className="flex items-center space-x-3">
+                                            <span className="text-red-600 text-xs font-semibold">Delete?</span>
+                                            <button
+                                              type="button"
+                                              onClick={async (e) => {
+                                                e.stopPropagation();
+                                                try {
+                                                  await del(`/automation/rules/${rule.id}`);
+
+                                                  // Refresh rules and subscription (automationRules is derived from useFetch)
+                                                  void mutate('/automation/rules');
+                                                  void mutate('/users/subscription');
+                                                  if (typeof window !== 'undefined') {
+                                                    try {
+                                                      localStorage.removeItem('logicdm_subscription_cache');
+                                                    } catch {
+                                                      // Ignore
+                                                    }
+                                                  }
+                                                } catch (error: unknown) {
+                                                  console.error('Failed to delete automation rule:', error);
+                                                  alert(
+                                                    (error as Error)?.message ||
+                                                      'Failed to delete automation rule. Please try again.',
+                                                  );
+                                                } finally {
+                                                  setDeleteConfirmRuleId(null);
+                                                }
+                                              }}
+                                              className="px-2 py-1 text-[11px] text-red-600 hover:text-white hover:bg-red-600 font-semibold rounded-md border border-red-300 transition-all duration-200"
+                                            >
+                                              Yes
+                                            </button>
+                                            <button
+                                              type="button"
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                setDeleteConfirmRuleId(null);
+                                              }}
+                                              className="px-2 py-1 text-[11px] text-gray-600 hover:text-white hover:bg-gray-600 rounded-md border border-gray-300 transition-all duration-200"
+                                            >
+                                              No
+                                            </button>
+                                          </div>
+                                        ) : (
+                                          <div className="flex items-center space-x-3">
+                                            <button
+                                              type="button"
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleSetupAutomation(mediaItem);
+                                              }}
+                                              className="text-blue-600 font-semibold"
+                                            >
+                                              Edit
+                                            </button>
+                                            <button
+                                              type="button"
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                setDeleteConfirmRuleId(rule.id);
+                                              }}
+                                              className="text-red-600 font-semibold"
+                                            >
+                                              Delete
+                                            </button>
+                                          </div>
+                                        )}
+                                      </div>
+                                    )}
                                   </div>
                                 </div>
                               </div>
