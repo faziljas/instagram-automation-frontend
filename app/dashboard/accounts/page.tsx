@@ -486,6 +486,22 @@ export default function AccountsPage() {
                         <div className="text-sm font-semibold text-gray-900">
                           @{account.username}
                         </div>
+                        {/* Mobile-only extra info so columns aren't lost */}
+                        <div className="mt-1 space-y-0.5 text-[11px] text-gray-500 block md:hidden">
+                          {account.created_at && (
+                            <div>
+                              <span className="font-semibold text-gray-700">Connected:</span>{' '}
+                              {formatDate(account.created_at)}
+                            </div>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => setDeleteConfirm(account.id)}
+                            className="text-red-600 font-semibold"
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </td>

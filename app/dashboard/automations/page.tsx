@@ -855,6 +855,34 @@ export default function AutomationsPage() {
                                     {mediaItem.media_product_type === 'STORY' && 'Story'}
                                     {!mediaItem.media_product_type && 'Post'}
                                   </div>
+                                  {/* Mobile-only meta so important columns are visible without horizontal scroll */}
+                                  <div className="mt-1 space-y-0.5 text-[11px] text-gray-500 block md:hidden">
+                                    {rule?.created_at && (
+                                      <div>
+                                        <span className="font-semibold text-gray-700">Last:</span>{' '}
+                                        {new Date(rule.created_at).toLocaleDateString('en-US', {
+                                          month: 'short',
+                                          day: 'numeric',
+                                          year: 'numeric',
+                                        })}
+                                      </div>
+                                    )}
+                                    {analytics && (
+                                      <div>
+                                        <span className="font-semibold text-gray-700">Runs:</span>{' '}
+                                        {analytics.triggers || 0}
+                                        {' · '}
+                                        <span className="font-semibold text-gray-700">Clicks:</span>{' '}
+                                        {analytics.total_clicks || 0}
+                                      </div>
+                                    )}
+                                    {rule && (
+                                      <div>
+                                        <span className="font-semibold text-gray-700">Status:</span>{' '}
+                                        {rule.is_active ? 'Enabled' : 'Disabled'}
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
                             </td>
