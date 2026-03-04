@@ -776,18 +776,18 @@ export default function AutomationsPage() {
                           <div className="w-full text-center">Automation</div>
                         </th>
                         <th
-                          className="px-4 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider"
+                          className="px-4 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider hidden md:table-cell"
                           title="Increases when users click &quot;Follow Me&quot; / &quot;I&#39;m following&quot; in DMs"
                         >
                           <div className="w-full text-center">NEW FOLLOWERS</div>
                         </th>
-                        <th className="px-4 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        <th className="px-4 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider hidden md:table-cell">
                           <div className="w-full text-center">RUNS</div>
                         </th>
-                        <th className="px-4 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        <th className="px-4 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider hidden md:table-cell">
                           <div className="w-full text-center">CLICKS</div>
                         </th>
-                        <th className="px-4 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        <th className="px-4 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider hidden md:table-cell">
                           <div className="w-full text-center">STATUS</div>
                         </th>
                         <th className="px-4 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider">
@@ -858,15 +858,15 @@ export default function AutomationsPage() {
                                 </div>
                               </div>
                             </td>
-                            <td className="px-4 py-3 whitespace-nowrap">
+                            <td className="px-4 py-3 whitespace-nowrap hidden md:table-cell">
                               <span className="text-sm font-semibold text-gray-900">
                                 {(analytics?.follow_button_clicks || 0) + (analytics?.im_following_clicks || 0)}
                               </span>
                             </td>
-                            <td className="px-4 py-3 whitespace-nowrap">
+                            <td className="px-4 py-3 whitespace-nowrap hidden md:table-cell">
                               <span className="text-sm font-semibold text-gray-900">{analytics?.triggers || 0}</span>
                             </td>
-                            <td className="px-4 py-3 whitespace-nowrap">
+                            <td className="px-4 py-3 whitespace-nowrap hidden md:table-cell">
                               <span className="text-sm font-semibold text-gray-900">{analytics?.total_clicks || 0}</span>
                             </td>
                             <td className="px-4 py-3 whitespace-nowrap">
@@ -886,7 +886,7 @@ export default function AutomationsPage() {
                                 </span>
                               )}
                             </td>
-                            <td className="px-4 py-3 whitespace-nowrap text-xs text-gray-500">
+                            <td className="px-4 py-3 whitespace-nowrap text-xs text-gray-500 hidden md:table-cell">
                               {rule?.created_at
                                 ? new Date(rule.created_at).toLocaleString('en-US', {
                                     month: 'short',
@@ -898,7 +898,7 @@ export default function AutomationsPage() {
                                 : rule ? '-' : 'Not configured'}
                             </td>
                             {/* Actions: Edit & Delete with inline Yes/No confirmation */}
-                            <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+                            <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium hidden md:table-cell">
                               {rule ? (
                                 deleteConfirmRuleId === rule.id ? (
                                   <div

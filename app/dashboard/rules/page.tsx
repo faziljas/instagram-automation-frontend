@@ -178,15 +178,15 @@ export default function RulesPage() {
                   Type
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                   Active
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider hidden md:table-cell">
+                  Status
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider hidden md:table-cell">
                   Executions
                 </th>
-                <th className="px-4 py-3 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">
+                <th className="px-4 py-3 text-right text-xs font-bold text-gray-700 uppercase tracking-wider hidden md:table-cell">
                   Actions
                 </th>
               </tr>
@@ -194,7 +194,7 @@ export default function RulesPage() {
             <tbody className="bg-white divide-y divide-gray-200">
               {rules.map((rule) => (
                 <tr key={rule.id} className="hover:bg-blue-50/50 transition-colors duration-150">
-                  <td className="px-4 py-3 whitespace-nowrap">
+                  <td className="px-4 py-3 whitespace-nowrap hidden md:table-cell">
                     <div className="text-sm font-semibold text-gray-900">
                       {getRuleDisplayName(rule)}
                     </div>
@@ -236,14 +236,14 @@ export default function RulesPage() {
                       />
                     </button>
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
                     {rule.last_triggered_at ? (
                       <span className="text-gray-900">{formatDate(rule.last_triggered_at)}</span>
                     ) : (
                       <span className="text-gray-400">Never</span>
                     )}
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+                  <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium hidden md:table-cell">
                     {deleteConfirm === rule.id ? (
                       <div className="flex items-center justify-end space-x-3" onClick={(e) => e.stopPropagation()}>
                         <span className="text-red-600 text-sm font-semibold">Delete?</span>

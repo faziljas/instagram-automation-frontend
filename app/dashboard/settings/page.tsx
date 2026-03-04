@@ -249,10 +249,10 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
                 <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                   Amount
                 </th>
-                <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 hidden md:table-cell">
                   Status
                 </th>
-                <th className="px-4 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-gray-500">
+                <th className="px-4 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-gray-500 hidden md:table-cell">
                   Actions
                 </th>
               </tr>
@@ -297,7 +297,7 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
                     <td className="px-4 py-2.5 text-gray-900">
                       {formatAmount(inv.amount, inv.currency)}
                     </td>
-                    <td className="px-4 py-2.5">
+                    <td className="px-4 py-2.5 hidden md:table-cell">
                       <span
                         className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium border ${
                           inv.status === 'succeeded' || inv.status === 'paid'
@@ -310,7 +310,7 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
                         {inv.status === 'succeeded' ? 'Paid' : inv.status.charAt(0).toUpperCase() + inv.status.slice(1)}
                       </span>
                     </td>
-                    <td className="px-4 py-2.5 text-right">
+                    <td className="px-4 py-2.5 text-right hidden md:table-cell">
                       {inv.invoice_url ? (
                         <button
                           type="button"
