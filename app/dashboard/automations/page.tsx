@@ -790,10 +790,10 @@ export default function AutomationsPage() {
                         <th className="px-4 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider hidden md:table-cell">
                           <div className="w-full text-center">STATUS</div>
                         </th>
-                        <th className="px-4 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        <th className="px-4 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider hidden md:table-cell">
                           <div className="w-full text-center">LAST MODIFIED</div>
                         </th>
-                        <th className="px-4 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        <th className="px-4 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider hidden md:table-cell">
                           <div className="w-full text-center">Action</div>
                         </th>
                       </tr>
@@ -810,7 +810,7 @@ export default function AutomationsPage() {
                         className="transition-colors duration-150 hover:bg-blue-50/50"
                       >
                             <td
-                              className={`px-4 py-3 whitespace-nowrap ${
+                              className={`px-4 py-3 whitespace-normal md:whitespace-nowrap align-top ${
                                 !rule && hasReachedRulesLimit
                                   ? 'opacity-60 cursor-not-allowed'
                                   : 'cursor-pointer'
@@ -897,7 +897,7 @@ export default function AutomationsPage() {
                             <td className="px-4 py-3 whitespace-nowrap hidden md:table-cell">
                               <span className="text-sm font-semibold text-gray-900">{analytics?.total_clicks || 0}</span>
                             </td>
-                            <td className="px-4 py-3 whitespace-nowrap">
+                            <td className="px-4 py-3 whitespace-nowrap hidden md:table-cell">
                               {rule ? (
                                 <span
                                   className={`px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-lg ${

@@ -475,7 +475,7 @@ export default function AccountsPage() {
             <tbody className="bg-white divide-y divide-gray-200">
               {accounts.map((account) => (
                 <tr key={account.id} className="hover:bg-blue-50/50 transition-colors duration-150">
-                  <td className="px-4 py-3 whitespace-nowrap">
+                  <td className="px-4 py-3 whitespace-normal md:whitespace-nowrap align-top">
                     <div className="flex items-center">
                       <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-sm">
                         <span className="text-white font-bold text-sm">
