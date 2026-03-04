@@ -769,7 +769,7 @@ export default function AutomationsPage() {
                 ) : (
                 <>
                 <div className="overflow-x-auto w-full">
-                  <table className="min-w-full divide-y divide-gray-200">
+                  <table className="min-w-[900px] md:min-w-full divide-y divide-gray-200">
                     <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
                       <tr>
                         <th className="px-4 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider">

@@ -455,7 +455,7 @@ export default function AccountsPage() {
           </div>
         <div className="bg-white rounded-xl border border-gray-200 shadow overflow-hidden w-full">
           <div className="overflow-x-auto w-full">
-            <table className="min-w-full divide-y divide-gray-200">
+            <table className="min-w-[700px] md:min-w-full divide-y divide-gray-200">
             <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
