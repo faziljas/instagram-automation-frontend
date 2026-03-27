@@ -9,6 +9,7 @@ import { getCanonicalBase } from '@/lib/canonical';
 import { useAuth } from '@/hooks/useAuth';
 import { z } from 'zod';
 import Logo from '@/components/Logo';
+import { markOnboardingPending } from '@/utils/onboarding';
 
 // Zod validation schema
 const registerSchema = z
@@ -56,6 +57,7 @@ function RegisterPageContent() {
     setIsGoogleLoading(true);
     setError(null);
     try {
+      markOnboardingPending();
       // Get the current origin (ngrok URL or localhost)
       const currentOrigin = typeof window !== 'undefined' ? window.location.origin : '';
       
@@ -108,6 +110,7 @@ function RegisterPageContent() {
     setIsLoading(true);
 
     try {
+      markOnboardingPending();
       // Normalize email to lowercase before sending to Supabase
       const normalizedEmail = formData.email.trim().toLowerCase();
 

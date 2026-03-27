@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { markOnboardingPending } from '@/utils/onboarding';
 
 /**
  * Supabase auth callback page for email confirmation (signup verify).
@@ -53,6 +54,8 @@ export default function AuthCallbackPage() {
       for (let i = 0; i < maxAttempts; i++) {
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
+          // If the user came from email verification, ensure we still show the getting started guide.
+          markOnboardingPending();
           router.replace('/dashboard');
           return;
         }

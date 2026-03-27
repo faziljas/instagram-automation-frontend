@@ -7,12 +7,13 @@ import {
   Cog6ToothIcon,
   ArrowRightOnRectangleIcon,
   ExclamationTriangleIcon,
+  QuestionMarkCircleIcon,
   ChevronDownIcon,
   UserCircleIcon,
 } from '@heroicons/react/24/outline';
 import ReportIssueModal from '@/components/ReportIssueModal';
 
-export default function UserProfileMenu() {
+export default function UserProfileMenu({ onStartTour }: { onStartTour?: () => void }) {
   const { user, supabaseUser, logout } = useAuth();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
@@ -48,6 +49,11 @@ export default function UserProfileMenu() {
   const handleReportIssue = () => {
     setIsOpen(false);
     setShowReportModal(true);
+  };
+
+  const handleStartTour = () => {
+    setIsOpen(false);
+    onStartTour?.();
   };
 
   // Prefer backend user name, then Supabase metadata, then email username as a fallback.
@@ -100,6 +106,17 @@ export default function UserProfileMenu() {
         {/* Dropdown Menu */}
         {isOpen && (
           <div className="absolute bottom-full left-0 right-0 mb-2 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
+            {/* Getting started */}
+            {onStartTour && (
+              <button
+                onClick={handleStartTour}
+                className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                <QuestionMarkCircleIcon className="h-5 w-5 mr-3 text-blue-600" />
+                Getting started
+              </button>
+            )}
+
             {/* Account Settings */}
             <button
               onClick={handleAccountSettings}

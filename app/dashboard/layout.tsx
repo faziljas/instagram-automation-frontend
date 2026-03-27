@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
@@ -10,6 +10,8 @@ import { ProtectedRoute } from '@/components/ProtectedRoute';
 import UserProfileMenu from '@/components/UserProfileMenu';
 import Logo from '@/components/Logo';
 import { ToastProvider } from '@/components/Toast';
+import GettingStartedModal from '@/components/GettingStartedModal';
+import { markOnboardingCompleted, shouldShowOnboarding } from '@/utils/onboarding';
 import {
   Bars3Icon,
   XMarkIcon,
@@ -42,6 +44,7 @@ export default function DashboardLayout({
   const { user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [showGettingStarted, setShowGettingStarted] = useState(false);
   
   // Use subscription hook with caching to prevent pro users from appearing as free on refresh
   const { hasProPlan: isProOrEnterprise } = useSubscription();
@@ -49,10 +52,22 @@ export default function DashboardLayout({
   // Upgrade hook for sidebar upgrade button
   const { handleUpgrade, checkoutLoading } = useUpgrade();
 
+  useEffect(() => {
+    setShowGettingStarted(shouldShowOnboarding());
+  }, []);
+
   return (
     <ToastProvider>
       <ProtectedRoute>
       <div className="dashboard-main-bg w-full overflow-x-hidden flex flex-col flex-1 min-h-screen" style={{ backgroundColor: 'rgb(243 244 246)' }}>
+        <GettingStartedModal
+          isOpen={showGettingStarted}
+          onClose={() => setShowGettingStarted(false)}
+          onFinish={() => {
+            markOnboardingCompleted();
+            setShowGettingStarted(false);
+          }}
+        />
         {/* Mobile sidebar overlay */}
         {sidebarOpen && (
           <div
@@ -135,7 +150,7 @@ export default function DashboardLayout({
             
             {/* User Profile Menu */}
             <div className="px-4 pb-6 border-t border-gray-800 pt-4">
-              <UserProfileMenu />
+              <UserProfileMenu onStartTour={() => setShowGettingStarted(true)} />
             </div>
         </div>
 
@@ -206,7 +221,7 @@ export default function DashboardLayout({
             
             {/* User Profile Menu */}
             <div className="px-4 pb-6 border-t border-gray-800 pt-4">
-              <UserProfileMenu />
+              <UserProfileMenu onStartTour={() => setShowGettingStarted(true)} />
             </div>
           </div>
         </div>
