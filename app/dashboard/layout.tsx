@@ -11,7 +11,12 @@ import UserProfileMenu from '@/components/UserProfileMenu';
 import Logo from '@/components/Logo';
 import { ToastProvider } from '@/components/Toast';
 import GettingStartedModal from '@/components/GettingStartedModal';
-import { markOnboardingCompleted, shouldShowOnboarding } from '@/utils/onboarding';
+import { useFetch } from '@/hooks/useFetch';
+import {
+  markOnboardingCompleted,
+  markOnboardingEngagementDismissed,
+  shouldShowOnboardingAuto,
+} from '@/utils/onboarding';
 import {
   Bars3Icon,
   XMarkIcon,
@@ -52,8 +57,11 @@ export default function DashboardLayout({
   // Upgrade hook for sidebar upgrade button
   const { handleUpgrade, checkoutLoading } = useUpgrade();
 
+  const { data: accounts } = useFetch<{ id: number }[]>('/users/me/accounts');
+  const hasConnectedAccount = Array.isArray(accounts) && accounts.length > 0;
+
   useEffect(() => {
-    setShowGettingStarted(shouldShowOnboarding());
+    setShowGettingStarted(shouldShowOnboardingAuto());
   }, []);
 
   return (
@@ -67,6 +75,8 @@ export default function DashboardLayout({
             markOnboardingCompleted();
             setShowGettingStarted(false);
           }}
+          hasConnectedAccount={hasConnectedAccount}
+          onEngagementNavigate={markOnboardingEngagementDismissed}
         />
         {/* Mobile sidebar overlay */}
         {sidebarOpen && (
