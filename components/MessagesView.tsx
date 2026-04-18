@@ -105,13 +105,17 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
     }
   }, [accountId, nextConversationsOffset]);
 
+  const [syncPending, setSyncPending] = useState(false);
+
   useEffect(() => {
     if (!accountId) {
       setConversations([]);
       setHasMoreConversations(false);
       setNextConversationsOffset(0);
+      setSyncPending(false);
       return;
     }
+    setSyncPending(false);
     fetchConversations();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accountId]);
@@ -225,39 +229,79 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
 
   const [isSyncing, setIsSyncing] = useState(false);
 
+  const fetchMessagesRef = useRef(fetchMessages);
+  fetchMessagesRef.current = fetchMessages;
+
+  // After async sync starts, poll the API so the UI updates without blocking 1–2 minutes on the request.
+  useEffect(() => {
+    if (!syncPending || !accountId) return;
+
+    let attempts = 0;
+    const maxAttempts = 40;
+
+    const tick = () => {
+      attempts += 1;
+      refreshStats();
+      fetchConversations(false, true);
+      if (selectedConversation) {
+        fetchMessagesRef.current(false, true);
+      }
+      if (attempts >= maxAttempts) {
+        setSyncPending(false);
+      }
+    };
+
+    tick();
+    const id = setInterval(tick, 3000);
+    return () => clearInterval(id);
+  }, [syncPending, accountId, selectedConversation, refreshStats, fetchConversations]);
+
   const handleSync = useCallback(async () => {
-    if (!accountId || isSyncing) return;
-    
+    if (!accountId || isSyncing || syncPending) return;
+
     // CRITICAL: Wait for session token before making API call
     if (!session?.access_token) {
       console.warn('[MessagesView] No session token available, cannot sync conversations');
       alert('Session expired. Please refresh the page and try again.');
       return;
     }
-    
+
     setIsSyncing(true);
     try {
-      console.log(`🔄 Syncing conversations for account ${accountId}...`);
-      
-      // Use dedicated sync endpoint (like competitors)
-      await post(`/api/instagram/conversations/sync?account_id=${accountId}`, {});
-      
-      console.log('✅ Sync completed');
-      
-      // Wait a moment for database to update
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      console.log('🔄 Refreshing conversations list...');
-      refreshStats();
-      fetchConversations();
-      if (selectedConversation) fetchMessages();
+      console.log(`🔄 Starting sync for account ${accountId}...`);
+
+      const data = await post<{
+        success?: boolean;
+        async?: boolean;
+        message?: string;
+      }>(`/api/instagram/conversations/sync?account_id=${accountId}`, {});
+
+      if (data?.async === true) {
+        console.log('✅ Sync running in background');
+        setSyncPending(true);
+      } else {
+        console.log('✅ Sync completed (blocking mode)');
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        refreshStats();
+        fetchConversations();
+        if (selectedConversation) fetchMessages();
+      }
     } catch (error: unknown) {
       console.error('❌ Error syncing conversations:', error);
       alert((error as Error)?.message || 'Failed to sync conversations. Please try again.');
     } finally {
       setIsSyncing(false);
     }
-  }, [accountId, selectedConversation, refreshStats, fetchConversations, fetchMessages, isSyncing, session]);
+  }, [
+    accountId,
+    selectedConversation,
+    refreshStats,
+    fetchConversations,
+    fetchMessages,
+    isSyncing,
+    syncPending,
+    session,
+  ]);
 
   // Intentionally no auto-sync on mount: full Instagram sync is slow (many sequential API
   // calls + rate-limit retries) and hurts first impression. Users can tap "Sync Conversations"
@@ -347,12 +391,20 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
           <div className="flex items-center space-x-2 flex-shrink-0">
             <button
               onClick={handleSync}
-              disabled={isSyncing}
+              disabled={isSyncing || syncPending}
               className="px-3 md:px-4 py-2 bg-blue-600 text-white text-xs md:text-sm font-medium rounded-md hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed whitespace-nowrap"
-              title="If messages are not showing, click to sync conversations from Instagram."
+              title="Pulls threads and recent messages from Instagram. Runs in the background so the page stays responsive."
             >
-              {isSyncing ? 'Syncing...' : <span className="hidden sm:inline">Sync Conversations</span>}
-              {isSyncing ? '' : <span className="sm:hidden">Sync</span>}
+              {isSyncing ? (
+                'Starting…'
+              ) : syncPending ? (
+                'Sync running…'
+              ) : (
+                <>
+                  <span className="hidden sm:inline">Sync Conversations</span>
+                  <span className="sm:hidden">Sync</span>
+                </>
+              )}
             </button>
             <button
               onClick={handleRefresh}
@@ -363,6 +415,19 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
             </button>
           </div>
         </div>
+
+        {syncPending && (
+          <div
+            className="mb-4 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2.5 text-sm text-blue-900"
+            role="status"
+          >
+            <p className="font-medium">Instagram sync is running in the background</p>
+            <p className="mt-1 text-xs text-blue-800/90">
+              This usually takes up to a couple of minutes because we talk to Instagram for each thread. Your stats
+              and conversation list refresh automatically — you can keep using this page.
+            </p>
+          </div>
+        )}
 
         {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
@@ -462,13 +527,14 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
                 );
               }
 
-              if (isSyncing && allConversations.length === 0) {
+              if ((isSyncing || syncPending) && allConversations.length === 0) {
                 return (
                   <div className="flex flex-col justify-center items-center h-40 gap-2 px-4 text-center text-sm text-gray-600">
                     <Spinner />
                     <span className="font-medium text-gray-800">Syncing from Instagram</span>
                     <span className="text-xs text-gray-500 max-w-xs">
-                      This can take a minute while we fetch your threads. You can leave this page open.
+                      Sync runs in the background. This list will fill in when data is ready — no need to wait on a
+                      loading spinner for the whole page.
                     </span>
                   </div>
                 );
