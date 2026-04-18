@@ -13,68 +13,132 @@ import {
   UserGroupIcon,
 } from '@heroicons/react/24/outline';
 
-export const metadata: Metadata = {
-  title: 'LogicDM - Instagram Automation & Marketing Made Easy',
-  description: 'Automate your Instagram DMs, replies, and engagement with powerful automation rules. Get 1,000 free DMs per month. No credit card required. Grow your audience effortlessly.',
-  keywords: ['Instagram automation', 'Instagram DM automation', 'Instagram marketing', 'social media automation', 'Instagram growth', 'auto reply', 'Instagram engagement', 'lead generation'],
-  openGraph: {
-    title: 'LogicDM - Instagram Automation & Marketing Made Easy',
-    description: 'Automate your Instagram DMs and engagement with powerful automation rules. Get 1,000 free DMs per month.',
-    type: 'website',
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'LogicDM Instagram Automation',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'LogicDM - Instagram Automation & Marketing Made Easy',
-    description: 'Automate your Instagram DMs and engagement with powerful automation rules. Start free today.',
-  },
-  alternates: {
-    canonical: `${getCanonicalBase()}/`,
-  },
-};
-
 const siteUrl = getCanonicalBase();
 
-// Structured data for SEO
-const structuredData = {
-  '@context': 'https://schema.org',
-  '@type': 'SoftwareApplication',
-  name: 'LogicDM',
-  applicationCategory: 'BusinessApplication',
-  operatingSystem: 'Web',
-  offers: {
-    '@type': 'Offer',
-    price: '0',
-    priceCurrency: 'USD',
-    priceValidUntil: '2026-12-31',
-    availability: 'https://schema.org/InStock',
-    description: '1,000 free DMs per month',
-  },
-  aggregateRating: {
-    '@type': 'AggregateRating',
-    ratingValue: '4.8',
-    ratingCount: '127',
-  },
-  description: 'Automate your Instagram marketing and engagement with powerful automation rules, scheduled posts, and analytics.',
-  url: siteUrl,
-  screenshot: `${siteUrl}/og-image.png`,
-  featureList: [
-    '1,000 Free DMs per month',
-    'Unlimited automation rules',
-    'Instagram API compliant',
-    'Real-time analytics',
-    'Lead capture tools',
-  ],
-};
+/** When `NEXT_PUBLIC_SHOW_HOME_PRICING=true`, home shows Pricing links and offer-focused copy/SEO. */
+function showHomePricing(): boolean {
+  return process.env.NEXT_PUBLIC_SHOW_HOME_PRICING === 'true';
+}
+
+export function generateMetadata(): Metadata {
+  const canonical = `${getCanonicalBase()}/`;
+  const title = 'LogicDM - Instagram Automation & Marketing Made Easy';
+  const keywords = [
+    'Instagram automation',
+    'Instagram DM automation',
+    'Instagram marketing',
+    'social media automation',
+    'Instagram growth',
+    'auto reply',
+    'Instagram engagement',
+    'lead generation',
+  ];
+  const images = [
+    {
+      url: '/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'LogicDM Instagram Automation',
+    },
+  ];
+
+  if (showHomePricing()) {
+    return {
+      title,
+      description:
+        'Automate your Instagram DMs, replies, and engagement with powerful automation rules. Get 1,000 free DMs per month. No credit card required. Grow your audience effortlessly.',
+      keywords,
+      openGraph: {
+        title,
+        description:
+          'Automate your Instagram DMs and engagement with powerful automation rules. Get 1,000 free DMs per month.',
+        type: 'website',
+        images,
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title,
+        description:
+          'Automate your Instagram DMs and engagement with powerful automation rules. Start free today.',
+      },
+      alternates: { canonical },
+    };
+  }
+
+  return {
+    title,
+    description:
+      'Automate your Instagram DMs, replies, and engagement with powerful automation rules. Grow your audience effortlessly.',
+    keywords,
+    openGraph: {
+      title,
+      description: 'Automate your Instagram DMs and engagement with powerful automation rules.',
+      type: 'website',
+      images,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description: 'Automate your Instagram DMs and engagement with powerful automation rules.',
+    },
+    alternates: { canonical },
+  };
+}
+
+function getHomeStructuredData(siteUrlParam: string, pricingVisible: boolean) {
+  const common = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'LogicDM',
+    applicationCategory: 'BusinessApplication',
+    operatingSystem: 'Web',
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: '4.8',
+      ratingCount: '127',
+    },
+    description:
+      'Automate your Instagram marketing and engagement with powerful automation rules, scheduled posts, and analytics.',
+    url: siteUrlParam,
+    screenshot: `${siteUrlParam}/og-image.png`,
+  };
+
+  if (pricingVisible) {
+    return {
+      ...common,
+      offers: {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'USD',
+        priceValidUntil: '2026-12-31',
+        availability: 'https://schema.org/InStock',
+        description: '1,000 free DMs per month',
+      },
+      featureList: [
+        '1,000 Free DMs per month',
+        'Unlimited automation rules',
+        'Instagram API compliant',
+        'Real-time analytics',
+        'Lead capture tools',
+      ],
+    };
+  }
+
+  return {
+    ...common,
+    featureList: [
+      'DM and reply automation',
+      'Automation rules',
+      'Instagram API compliant',
+      'Real-time analytics',
+      'Lead capture tools',
+    ],
+  };
+}
 
 export default function HomePage() {
+  const pricingVisible = showHomePricing();
+  const structuredData = getHomeStructuredData(siteUrl, pricingVisible);
 
   return (
     <>
@@ -97,12 +161,14 @@ export default function HomePage() {
             </Link>
             {/* Desktop navigation */}
             <div className="hidden sm:flex items-center gap-4">
-              <Link
-                href="/pricing"
-                className="text-gray-600 hover:text-gray-900 font-medium transition-colors text-sm"
-              >
-                Pricing
-              </Link>
+              {pricingVisible && (
+                <Link
+                  href="/pricing"
+                  className="text-gray-600 hover:text-gray-900 font-medium transition-colors text-sm"
+                >
+                  Pricing
+                </Link>
+              )}
               <Link
                 href="/login"
                 className="text-gray-600 hover:text-gray-900 font-medium transition-colors text-sm"
@@ -116,8 +182,22 @@ export default function HomePage() {
                 Get Started
               </Link>
             </div>
-            {/* Mobile primary action */}
-            <div className="sm:hidden flex-shrink-0">
+            {/* Mobile primary actions */}
+            <div className="sm:hidden flex-shrink-0 flex items-center gap-2">
+              {pricingVisible && (
+                <Link
+                  href="/pricing"
+                  className="text-gray-600 hover:text-gray-900 font-medium text-xs px-1 py-2"
+                >
+                  Pricing
+                </Link>
+              )}
+              <Link
+                href="/login"
+                className="text-gray-600 hover:text-gray-900 font-medium text-xs px-2 py-2"
+              >
+                Sign In
+              </Link>
               <Link
                 href="/register"
                 className="inline-flex items-center px-3 py-2 bg-gray-900 text-white rounded-lg font-semibold text-xs hover:bg-gray-800 transition-colors"
@@ -149,15 +229,24 @@ export default function HomePage() {
               href="/register"
               className="inline-flex items-center px-8 py-4 bg-gray-900 text-white rounded-xl font-semibold text-lg hover:bg-gray-800 transition-all shadow-lg hover:shadow-xl"
             >
-              Start Free Trial
+              {pricingVisible ? 'Start Free Trial' : 'Get Started'}
               <ArrowRightIcon className="ml-2 h-5 w-5" />
             </Link>
-            <Link
-              href="/pricing"
-              className="inline-flex items-center px-8 py-4 border-2 border-gray-200 text-gray-700 rounded-xl font-semibold text-lg hover:bg-gray-50 transition-all"
-            >
-              View Pricing
-            </Link>
+            {pricingVisible ? (
+              <Link
+                href="/pricing"
+                className="inline-flex items-center px-8 py-4 border-2 border-gray-200 text-gray-700 rounded-xl font-semibold text-lg hover:bg-gray-50 transition-all"
+              >
+                View Pricing
+              </Link>
+            ) : (
+              <Link
+                href="/login"
+                className="inline-flex items-center px-8 py-4 border-2 border-gray-200 text-gray-700 rounded-xl font-semibold text-lg hover:bg-gray-50 transition-all"
+              >
+                Sign In
+              </Link>
+            )}
           </div>
 
           {/* Creative Dashboard Preview - Business Tips */}
@@ -286,7 +375,17 @@ export default function HomePage() {
                 {/* Call to Action */}
                 <div className="mt-8 text-center">
                   <p className="text-white text-lg font-medium">
-                    Ready to transform your Instagram business? <span className="font-bold">Start free today</span> • No credit card required
+                    {pricingVisible ? (
+                      <>
+                        Ready to transform your Instagram business?{' '}
+                        <span className="font-bold">Start free today</span> • No credit card required
+                      </>
+                    ) : (
+                      <>
+                        Ready to transform your Instagram business?{' '}
+                        <span className="font-bold">Get started</span> and explore the product.
+                      </>
+                    )}
                   </p>
                 </div>
               </div>
@@ -303,9 +402,13 @@ export default function HomePage() {
             <div className="bg-blue-50 p-3 rounded-lg w-fit mb-4">
               <ChatBubbleLeftRightIcon className="h-6 w-6 text-blue-600" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">1,000 Free DMs</h3>
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">
+              {pricingVisible ? '1,000 Free DMs' : 'DM automation'}
+            </h3>
             <p className="text-gray-600">
-              Get started with 1,000 auto-replies per month completely free. No credit card required.
+              {pricingVisible
+                ? 'Get started with 1,000 auto-replies per month completely free. No credit card required.'
+                : 'Reply faster with automation that keeps conversations moving and your audience engaged.'}
             </p>
           </div>
 
@@ -340,22 +443,44 @@ export default function HomePage() {
             Ready to grow your Instagram?
           </h2>
           <p className="text-xl mb-8 text-blue-100">
-            Start for free. No credit card required.
+            {pricingVisible
+              ? 'Start for free. No credit card required.'
+              : 'Create an account and see what LogicDM can do for your workflow.'}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              href="/pricing"
-              className="inline-flex items-center px-8 py-4 bg-white text-blue-600 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all shadow-lg hover:shadow-xl"
-            >
-              View Pricing Plans
-              <ArrowRightIcon className="ml-2 h-5 w-5" />
-            </Link>
-            <Link
-              href="/register"
-              className="inline-flex items-center px-8 py-4 border-2 border-white text-white rounded-xl font-semibold text-lg hover:bg-white/10 transition-all"
-            >
-              Get Started Free
-            </Link>
+            {pricingVisible ? (
+              <>
+                <Link
+                  href="/pricing"
+                  className="inline-flex items-center px-8 py-4 bg-white text-blue-600 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all shadow-lg hover:shadow-xl"
+                >
+                  View Pricing Plans
+                  <ArrowRightIcon className="ml-2 h-5 w-5" />
+                </Link>
+                <Link
+                  href="/register"
+                  className="inline-flex items-center px-8 py-4 border-2 border-white text-white rounded-xl font-semibold text-lg hover:bg-white/10 transition-all"
+                >
+                  Get Started Free
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/register"
+                  className="inline-flex items-center px-8 py-4 bg-white text-blue-600 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all shadow-lg hover:shadow-xl"
+                >
+                  Get Started
+                  <ArrowRightIcon className="ml-2 h-5 w-5" />
+                </Link>
+                <Link
+                  href="/login"
+                  className="inline-flex items-center px-8 py-4 border-2 border-white text-white rounded-xl font-semibold text-lg hover:bg-white/10 transition-all"
+                >
+                  Sign In
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>
