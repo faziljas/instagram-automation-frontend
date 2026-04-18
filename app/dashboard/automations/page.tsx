@@ -11,6 +11,13 @@ import MessagesView from '@/components/MessagesView';
 import { get, post, put, del } from '@/utils/api';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/components/Toast';
+import {
+  AUTOMATIONS_TOUR_DOM_EVENT,
+  consumeAutomationsTourRunPending,
+  peekAutomationsTourRunPending,
+  primeAutomationsTourFromUrlIfPresent,
+} from '@/utils/automationsSpotlightTour';
+import { startAutomationsSpotlightTour } from '@/lib/startAutomationsSpotlightTour';
 
 interface InstagramAccountResponse {
   id: number;
@@ -550,10 +557,33 @@ export default function AutomationsPage() {
     }
   }, [accounts, selectedAccount]);
 
+  useEffect(() => {
+    primeAutomationsTourFromUrlIfPresent();
+  }, []);
+
+  useEffect(() => {
+    const run = () => {
+      window.setTimeout(() => startAutomationsSpotlightTour(), 250);
+    };
+    window.addEventListener(AUTOMATIONS_TOUR_DOM_EVENT, run);
+    return () => window.removeEventListener(AUTOMATIONS_TOUR_DOM_EVENT, run);
+  }, []);
+
+  useEffect(() => {
+    if (accountsLoading) return;
+    if (!peekAutomationsTourRunPending()) return;
+    consumeAutomationsTourRunPending();
+    const id = window.setTimeout(() => startAutomationsSpotlightTour(), 400);
+    return () => window.clearTimeout(id);
+  }, [accountsLoading]);
+
   return (
     <div className="w-full mx-auto">
       {/* Hero Banner - compact like competitor */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-purple-500 via-pink-500 to-rose-600 rounded-xl mb-6 shadow-lg w-full">
+      <div
+        className="relative overflow-hidden bg-gradient-to-br from-purple-500 via-pink-500 to-rose-600 rounded-xl mb-6 shadow-lg w-full"
+        data-tour="automations-hero"
+      >
         <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent"></div>
         <div className="relative py-4 md:py-5 px-4 md:px-6">
           <h1 className="text-xl md:text-2xl font-bold text-white mb-1">Automations</h1>
@@ -567,7 +597,7 @@ export default function AutomationsPage() {
           <div className="h-10 bg-gray-200 animate-pulse rounded-lg w-56"></div>
         </div>
       ) : accounts && accounts.length > 0 ? (
-        <div className="mb-4">
+        <div className="mb-4" data-tour="automations-account">
           <label htmlFor="account-select" className="block text-sm font-semibold text-gray-900 mb-1.5">
             Instagram Account
           </label>
@@ -585,7 +615,10 @@ export default function AutomationsPage() {
           </select>
         </div>
       ) : (
-        <div className="mb-4 p-4 bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-200 rounded-lg shadow-sm">
+        <div
+          className="mb-4 p-4 bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-200 rounded-lg shadow-sm"
+          data-tour="automations-account-empty"
+        >
           <p className="text-sm font-semibold text-yellow-800">
             No Instagram accounts connected. Please{' '}
             <a href="/dashboard/accounts/connect" className="text-blue-600 underline font-bold hover:text-blue-800">
@@ -597,7 +630,7 @@ export default function AutomationsPage() {
       )}
 
       {/* Content Type Tabs */}
-      <div className="mb-4 border-b border-gray-200 overflow-x-auto">
+      <div className="mb-4 border-b border-gray-200 overflow-x-auto" data-tour="automations-tabs">
         <nav className="-mb-px flex space-x-2 md:space-x-6 min-w-max md:min-w-0">
           <button
             onClick={() => setSelectedTab('posts')}
@@ -676,7 +709,7 @@ export default function AutomationsPage() {
         <div className="mb-4">
           {/* View Toggle */}
           <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2" data-tour="automations-view-toggle">
               <button
                 onClick={() => setViewMode('table')}
                 className={`px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors whitespace-nowrap ${
@@ -709,7 +742,10 @@ export default function AutomationsPage() {
             const totalFollowersGained = mediaAnalytics.reduce((sum, m) => sum + (m.follow_button_clicks || 0) + (m.im_following_clicks || 0), 0);
             
             return (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 mb-4">
+              <div
+                className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 mb-4"
+                data-tour="automations-stats"
+              >
                 <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200 shadow-sm p-3 md:p-4 hover:shadow transition-all duration-200">
                   <div className="text-xs font-semibold text-blue-700 mb-0.5">DMs Sent</div>
                   <div className="text-xl md:text-2xl font-bold text-blue-900">
@@ -742,7 +778,9 @@ export default function AutomationsPage() {
         selectedTab === 'dms' ? (
           // Messages View - Always show this for DMs tab, regardless of media length
           selectedAccount ? (
-            <MessagesView accountId={selectedAccount} />
+            <div data-tour="automations-dms-panel">
+              <MessagesView accountId={selectedAccount} />
+            </div>
           ) : (
             <div className="bg-white rounded-lg shadow text-center py-12 px-6">
               <p className="text-gray-500">Please select an Instagram account to view messages</p>
@@ -756,7 +794,10 @@ export default function AutomationsPage() {
             )}
             {/* Show content immediately if we have media, even if still loading more */}
             {media.length > 0 && viewMode === 'table' ? (
-              <div className="bg-white rounded-xl border border-gray-200 shadow overflow-hidden w-full">
+              <div
+                className="bg-white rounded-xl border border-gray-200 shadow overflow-hidden w-full"
+                data-tour="automations-table"
+              >
                 <div className="px-4 md:px-5 py-2.5 md:py-3 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
                   <h3 className="text-sm md:text-base font-bold text-gray-900">AUTOMATIONS</h3>
                 </div>
@@ -1101,7 +1142,7 @@ export default function AutomationsPage() {
                 )}
               </div>
             ) : media.length > 0 && viewMode === 'grid' ? (
-              <>
+              <div data-tour="automations-table">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[...media]
               .sort((a, b) => {
@@ -1295,7 +1336,7 @@ export default function AutomationsPage() {
               </button>
             </div>
           )}
-                </>
+              </div>
               ) : null}
             {/* Show empty state only if not loading and no media */}
             {!isLoadingInitialMedia && media.length === 0 && (

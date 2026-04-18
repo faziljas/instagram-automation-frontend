@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useTransition } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
@@ -10,13 +10,18 @@ import { ProtectedRoute } from '@/components/ProtectedRoute';
 import UserProfileMenu from '@/components/UserProfileMenu';
 import Logo from '@/components/Logo';
 import { ToastProvider } from '@/components/Toast';
-import GettingStartedModal from '@/components/GettingStartedModal';
+import GettingStartedModal, { type AutomationGuideStatus } from '@/components/GettingStartedModal';
 import { useFetch } from '@/hooks/useFetch';
 import {
   markOnboardingCompleted,
   markOnboardingEngagementDismissed,
   shouldShowOnboardingAuto,
 } from '@/utils/onboarding';
+import {
+  AUTOMATIONS_TOUR_DOM_EVENT,
+  AUTOMATIONS_TOUR_QUERY,
+  markAutomationsTourRunPending,
+} from '@/utils/automationsSpotlightTour';
 import {
   Bars3Icon,
   XMarkIcon,
@@ -57,12 +62,47 @@ export default function DashboardLayout({
   // Upgrade hook for sidebar upgrade button
   const { handleUpgrade, checkoutLoading } = useUpgrade();
 
-  const { data: accounts } = useFetch<{ id: number }[]>('/users/me/accounts');
+  const { data: accounts, isLoading: accountsLoading } = useFetch<{ id: number }[]>('/users/me/accounts');
+  const { data: rules, isLoading: rulesLoading } = useFetch<{ id: number }[]>('/automation/rules');
   const hasConnectedAccount = Array.isArray(accounts) && accounts.length > 0;
 
+  const automationGuideStatus: AutomationGuideStatus = useMemo(() => {
+    if (rulesLoading && rules === undefined) return 'loading';
+    if (Array.isArray(rules) && rules.length > 0) return 'has_rules';
+    return 'empty';
+  }, [rulesLoading, rules]);
+
+  const automationCount = Array.isArray(rules) ? rules.length : 0;
+
+  /** Wait for account + rules before auto-opening so copy matches reality (and skip if already fully set up). */
+  const autoOnboardingIntent = useRef(shouldShowOnboardingAuto());
+  const autoOnboardingResolved = useRef(false);
+
   useEffect(() => {
-    setShowGettingStarted(shouldShowOnboardingAuto());
-  }, []);
+    if (!autoOnboardingIntent.current || autoOnboardingResolved.current) return;
+    if (accountsLoading || rulesLoading) return;
+
+    const hasAcc = Array.isArray(accounts) && accounts.length > 0;
+    const hasAutomation = Array.isArray(rules) && rules.length > 0;
+
+    autoOnboardingResolved.current = true;
+
+    if (hasAcc && hasAutomation) {
+      markOnboardingEngagementDismissed();
+      return;
+    }
+    setShowGettingStarted(true);
+  }, [accountsLoading, rulesLoading, accounts, rules]);
+
+  const launchAutomationsSpotlightTour = useCallback(() => {
+    setSidebarOpen(false);
+    if (pathname === '/dashboard/automations') {
+      window.dispatchEvent(new CustomEvent(AUTOMATIONS_TOUR_DOM_EVENT));
+    } else {
+      markAutomationsTourRunPending();
+      router.push(`/dashboard/automations?tour=${AUTOMATIONS_TOUR_QUERY}`);
+    }
+  }, [pathname, router]);
 
   return (
     <ToastProvider>
@@ -76,7 +116,10 @@ export default function DashboardLayout({
             setShowGettingStarted(false);
           }}
           hasConnectedAccount={hasConnectedAccount}
+          automationGuideStatus={automationGuideStatus}
+          automationCount={automationCount}
           onEngagementNavigate={markOnboardingEngagementDismissed}
+          onRequestAutomationsSpotlightTour={launchAutomationsSpotlightTour}
         />
         {/* Mobile sidebar overlay */}
         {sidebarOpen && (
@@ -160,7 +203,10 @@ export default function DashboardLayout({
             
             {/* User Profile Menu */}
             <div className="px-4 pb-6 border-t border-gray-800 pt-4">
-              <UserProfileMenu onStartTour={() => setShowGettingStarted(true)} />
+              <UserProfileMenu
+              onStartTour={() => setShowGettingStarted(true)}
+              onStartAutomationsSpotlightTour={launchAutomationsSpotlightTour}
+            />
             </div>
         </div>
 
@@ -231,7 +277,10 @@ export default function DashboardLayout({
             
             {/* User Profile Menu */}
             <div className="px-4 pb-6 border-t border-gray-800 pt-4">
-              <UserProfileMenu onStartTour={() => setShowGettingStarted(true)} />
+              <UserProfileMenu
+              onStartTour={() => setShowGettingStarted(true)}
+              onStartAutomationsSpotlightTour={launchAutomationsSpotlightTour}
+            />
             </div>
           </div>
         </div>

@@ -10,10 +10,17 @@ import {
   QuestionMarkCircleIcon,
   ChevronDownIcon,
   UserCircleIcon,
+  CursorArrowRaysIcon,
 } from '@heroicons/react/24/outline';
 import ReportIssueModal from '@/components/ReportIssueModal';
 
-export default function UserProfileMenu({ onStartTour }: { onStartTour?: () => void }) {
+export default function UserProfileMenu({
+  onStartTour,
+  onStartAutomationsSpotlightTour,
+}: {
+  onStartTour?: () => void;
+  onStartAutomationsSpotlightTour?: () => void;
+}) {
   const { user, supabaseUser, logout } = useAuth();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
@@ -54,6 +61,11 @@ export default function UserProfileMenu({ onStartTour }: { onStartTour?: () => v
   const handleStartTour = () => {
     setIsOpen(false);
     onStartTour?.();
+  };
+
+  const handleAutomationsSpotlightTour = () => {
+    setIsOpen(false);
+    onStartAutomationsSpotlightTour?.();
   };
 
   // Prefer backend user name, then Supabase metadata, then email username as a fallback.
@@ -114,6 +126,16 @@ export default function UserProfileMenu({ onStartTour }: { onStartTour?: () => v
               >
                 <QuestionMarkCircleIcon className="h-5 w-5 mr-3 text-blue-600" />
                 Getting started
+              </button>
+            )}
+
+            {onStartAutomationsSpotlightTour && (
+              <button
+                onClick={handleAutomationsSpotlightTour}
+                className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                <CursorArrowRaysIcon className="h-5 w-5 mr-3 text-indigo-600" />
+                Automations spotlight tour
               </button>
             )}
 
