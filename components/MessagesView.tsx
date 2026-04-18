@@ -136,11 +136,26 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
   const [isLoadingOlderMessages, setIsLoadingOlderMessages] = useState(false);
   const messagesContainerRef = useRef<HTMLDivElement | null>(null);
   const didLoadOlderRef = useRef(false);
+  /** Keeps the “current thread” key so in-flight fetches from a previous selection are ignored (fixes wrong pane after rapid switches / sync polling). */
+  const messagesSelectionKeyRef = useRef('');
+  /** Bumped on each non-silent fetch so stale requests do not clear loading spinners for the active request. */
+  const messagesLoadGenerationRef = useRef(0);
+
+  useEffect(() => {
+    messagesSelectionKeyRef.current = [
+      accountId,
+      selectedConversation ?? '',
+      selectedConvDetails?.user_id ?? '',
+    ].join('|');
+  }, [accountId, selectedConversation, selectedConvDetails?.user_id]);
 
   const fetchMessages = useCallback(async (loadOlder?: boolean, silent?: boolean) => {
     if (!selectedConversation || !accountId) return;
+    const requestKeyAtStart = messagesSelectionKeyRef.current;
     const offset = loadOlder ? nextMessagesOffset : 0;
+    let loadGen = 0;
     if (!silent) {
+      loadGen = ++messagesLoadGenerationRef.current;
       if (loadOlder) {
         didLoadOlderRef.current = true;
         setIsLoadingOlderMessages(true);
@@ -158,6 +173,12 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
         has_more?: boolean;
         next_offset?: number | null;
       }>(url);
+      if (requestKeyAtStart !== messagesSelectionKeyRef.current) {
+        return;
+      }
+      if (!silent && loadGen !== messagesLoadGenerationRef.current) {
+        return;
+      }
       const list = data?.messages ?? [];
       if (loadOlder) {
         setMessages((prev) => [...list, ...prev]);
@@ -168,9 +189,15 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
       setNextMessagesOffset(typeof data?.next_offset === 'number' ? data.next_offset : offset + list.length);
     } catch (e) {
       console.error('Fetch messages error:', e);
+      if (requestKeyAtStart !== messagesSelectionKeyRef.current) {
+        return;
+      }
+      if (!silent && loadGen !== messagesLoadGenerationRef.current) {
+        return;
+      }
       if (!loadOlder && !silent) setMessages([]);
     } finally {
-      if (!silent) {
+      if (!silent && loadGen === messagesLoadGenerationRef.current) {
         setIsLoadingMessages(false);
         setIsLoadingOlderMessages(false);
       }
@@ -229,10 +256,8 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
 
   const [isSyncing, setIsSyncing] = useState(false);
 
-  const fetchMessagesRef = useRef(fetchMessages);
-  fetchMessagesRef.current = fetchMessages;
-
-  // After async sync starts, poll the API so the UI updates without blocking 1–2 minutes on the request.
+  // After async sync starts, poll stats + conversation list only (not messages — avoids racing
+  // with the open thread and duplicate traffic; the 5s message poller + selection effect refresh the pane).
   useEffect(() => {
     if (!syncPending || !accountId) return;
 
@@ -243,9 +268,6 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
       attempts += 1;
       refreshStats();
       fetchConversations(false, true);
-      if (selectedConversation) {
-        fetchMessagesRef.current(false, true);
-      }
       if (attempts >= maxAttempts) {
         setSyncPending(false);
       }
@@ -254,7 +276,7 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
     tick();
     const id = setInterval(tick, 3000);
     return () => clearInterval(id);
-  }, [syncPending, accountId, selectedConversation, refreshStats, fetchConversations]);
+  }, [syncPending, accountId, refreshStats, fetchConversations]);
 
   const handleSync = useCallback(async () => {
     if (!accountId || isSyncing || syncPending) return;
