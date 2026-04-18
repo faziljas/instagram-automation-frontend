@@ -259,19 +259,9 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
     }
   }, [accountId, selectedConversation, refreshStats, fetchConversations, fetchMessages, isSyncing, session]);
 
-  const loadingAndConvosRef = useRef({ loading: false, length: 0 });
-  loadingAndConvosRef.current = { loading: isLoadingConversations, length: conversations.length };
-
-  // Auto-sync on mount if no conversations found after initial fetch
-  useEffect(() => {
-    if (!accountId || !session?.access_token) return;
-    const t = setTimeout(() => {
-      const { loading, length } = loadingAndConvosRef.current;
-      if (!loading && length === 0) handleSync();
-    }, 2000);
-    return () => clearTimeout(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [accountId, session]);
+  // Intentionally no auto-sync on mount: full Instagram sync is slow (many sequential API
+  // calls + rate-limit retries) and hurts first impression. Users can tap "Sync Conversations"
+  // when they want to pull history from Instagram.
 
   // Automatic polling for messages in selected conversation (instant updates like Instagram)
   // Poll messages every 5 seconds when a conversation is selected and page is visible
@@ -465,12 +455,25 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
             {(() => {
               if (isLoadingConversations) {
                 return (
-                  <div className="flex justify-center items-center h-32">
+                  <div className="flex flex-col justify-center items-center h-32 gap-2 text-sm text-gray-600">
                     <Spinner />
+                    <span>Loading conversations…</span>
                   </div>
                 );
               }
-              
+
+              if (isSyncing && allConversations.length === 0) {
+                return (
+                  <div className="flex flex-col justify-center items-center h-40 gap-2 px-4 text-center text-sm text-gray-600">
+                    <Spinner />
+                    <span className="font-medium text-gray-800">Syncing from Instagram</span>
+                    <span className="text-xs text-gray-500 max-w-xs">
+                      This can take a minute while we fetch your threads. You can leave this page open.
+                    </span>
+                  </div>
+                );
+              }
+
               // Use filtered conversations to respect search query
               const conversationsToRender = filteredConversations.length > 0 
                 ? filteredConversations  // Use filtered results based on search query
@@ -555,7 +558,7 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
                     <div>
                       <p className="mb-2 font-medium">No conversations found</p>
                       <p className="text-xs text-gray-400 mb-3">
-                        Conversations will appear here once messages are sent or received via Instagram.
+                        Tap <span className="font-semibold text-gray-600">Sync Conversations</span> above to load threads from Instagram, or wait for new DMs after your account is connected.
                       </p>
                       <div className="bg-blue-50 border border-blue-200 rounded-md p-3 text-left text-xs text-blue-800">
                         <p className="font-semibold mb-1">💡 How to get conversations:</p>
