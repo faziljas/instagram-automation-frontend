@@ -67,14 +67,19 @@ export function useSubscription() {
   // Use cached data optimistically while loading
   const subscriptionData = data || cachedData;
 
-  // Determine if user has pro plan (use cached data if available)
+  // effective_plan_tier reflects limits/access (incl. promo mode); plan_tier is stored billing tier
   const hasProPlan = useMemo(() => {
-    const planTier = subscriptionData?.plan_tier || subscriptionData?.effective_plan_tier;
+    const planTier =
+      subscriptionData?.effective_plan_tier ||
+      subscriptionData?.plan_tier ||
+      'free';
     return planTier === 'pro' || planTier === 'enterprise';
   }, [subscriptionData]);
 
-  // Plan tier with fallback
-  const planTier = subscriptionData?.plan_tier || subscriptionData?.effective_plan_tier || 'free';
+  const planTier =
+    subscriptionData?.effective_plan_tier ||
+    subscriptionData?.plan_tier ||
+    'free';
 
   return {
     data: subscriptionData,
