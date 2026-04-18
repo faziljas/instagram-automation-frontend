@@ -12,6 +12,7 @@ import {
   ArrowUpIcon,
   ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline';
+import { showUpgradeAndBilling } from '@/lib/monetization';
 
 interface SubscriptionUsageData {
   accounts: number;
@@ -81,11 +82,12 @@ export default function SubscriptionPage() {
   // Open plan selection when arriving with ?choosePlan=1 (e.g. from sidebar or automations)
   useEffect(() => {
     if (searchParams.get('choosePlan') === '1') {
-      setShowPlanModal(true);
-      // Clean URL without reload
       const url = new URL(window.location.href);
       url.searchParams.delete('choosePlan');
       window.history.replaceState({}, '', url.pathname + (url.search || ''));
+      if (showUpgradeAndBilling()) {
+        setShowPlanModal(true);
+      }
     }
   }, [searchParams]);
 
@@ -502,7 +504,7 @@ export default function SubscriptionPage() {
       )}
 
       {/* Plan selection modal: Monthly vs Yearly */}
-      {showPlanModal && (
+      {showPlanModal && showUpgradeAndBilling() && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl border border-gray-200 max-w-md w-full">
             <div className="p-6">
@@ -578,7 +580,9 @@ export default function SubscriptionPage() {
               </span>
             </div>
           </div>
-          {displayPlan === 'free' && subscriptionData.status !== 'cancelled' && (
+          {showUpgradeAndBilling() &&
+            displayPlan === 'free' &&
+            subscriptionData.status !== 'cancelled' && (
             <div>
               <button
                 onClick={() => setShowPlanModal(true)}

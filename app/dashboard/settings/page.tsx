@@ -9,6 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { User } from '@/types';
 import { ExclamationTriangleIcon, CalendarDaysIcon } from '@heroicons/react/24/outline';
 import { mutate } from 'swr';
+import { showUpgradeAndBilling } from '@/lib/monetization';
 
 // Zod validation schemas
 const profileSchema = z.object({
@@ -392,6 +393,7 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
 
 export default function SettingsPage() {
   const router = useRouter();
+  const monetizationUi = showUpgradeAndBilling();
   const {
     user: authUser,
     updateUser,
@@ -400,6 +402,12 @@ export default function SettingsPage() {
     loading: authLoading,
   } = useAuth();
   const [activeTab, setActiveTab] = useState<'general' | 'security' | 'notifications' | 'billing' | 'delete-account'>('general');
+
+  useEffect(() => {
+    if (!monetizationUi && activeTab === 'billing') {
+      setActiveTab('general');
+    }
+  }, [monetizationUi, activeTab]);
 
   // Use the already-loaded auth user for profile/general settings to avoid
   // duplicate /users/me requests and show data as soon as auth context is ready.
@@ -410,13 +418,15 @@ export default function SettingsPage() {
   const {
     data: subscription,
     isLoading: isSubscriptionLoading,
-  } = useFetch<SubscriptionSummary>(activeTab === 'billing' ? '/users/subscription' : null);
+  } = useFetch<SubscriptionSummary>(
+    activeTab === 'billing' && monetizationUi ? '/users/subscription' : null
+  );
   const {
     data: invoicesData,
     error: invoicesError,
     isLoading: isInvoicesLoading,
     mutate: mutateInvoices,
-  } = useFetch<Invoice[]>(activeTab === 'billing' ? '/users/invoices' : null);
+  } = useFetch<Invoice[]>(activeTab === 'billing' && monetizationUi ? '/users/invoices' : null);
   
   // Ensure invoices is always an array - handle cases where API returns error object
   const invoices = Array.isArray(invoicesData) ? invoicesData : [];
@@ -1160,7 +1170,7 @@ export default function SettingsPage() {
     if (activeTab === 'general') return renderGeneralContent();
     if (activeTab === 'security') return renderSecurityContent();
     if (activeTab === 'notifications') return renderNotificationsContent();
-    if (activeTab === 'billing') return renderBillingContent();
+    if (activeTab === 'billing' && monetizationUi) return renderBillingContent();
     if (activeTab === 'delete-account') return renderDeleteAccountContent();
     return null;
   };
@@ -1212,20 +1222,22 @@ export default function SettingsPage() {
               >
                 <span>Notifications</span>
               </button>
-              <button
-                type="button"
-                onClick={() => setActiveTab('billing')}
-                className={`flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-sm font-medium ${
-                  activeTab === 'billing'
-                    ? 'bg-gray-900 text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                <span>Billing</span>
-                <span className="rounded-full bg-blue-50 px-1.5 py-0.5 text-[10px] font-semibold text-blue-700">
-                  Manage
-                </span>
-              </button>
+              {monetizationUi && (
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('billing')}
+                  className={`flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-sm font-medium ${
+                    activeTab === 'billing'
+                      ? 'bg-gray-900 text-white'
+                      : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  <span>Billing</span>
+                  <span className="rounded-full bg-blue-50 px-1.5 py-0.5 text-[10px] font-semibold text-blue-700">
+                    Manage
+                  </span>
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => setActiveTab('delete-account')}
