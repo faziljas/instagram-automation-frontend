@@ -13,7 +13,9 @@ import { ToastProvider } from '@/components/Toast';
 import GettingStartedModal from '@/components/GettingStartedModal';
 import {
   getOnboardingVisitSnapshot,
+  GOOGLE_OAUTH_FROM_LOGIN_SESSION_KEY,
   markOnboardingCompleted,
+  markOnboardingPendingIfUserNotCompleted,
   recordOnboardingDestinationVisit,
   shouldShowOnboardingAuto,
 } from '@/utils/onboarding';
@@ -70,16 +72,28 @@ export default function DashboardLayout({
    * re-check after auth hydrates (first paint can run before session is ready).
    */
   useEffect(() => {
-    if (shouldShowOnboardingAuto()) setShowGettingStarted(true);
+    const uid = supabaseUser?.id;
+    if (typeof window !== 'undefined' && uid) {
+      try {
+        if (window.sessionStorage.getItem(GOOGLE_OAUTH_FROM_LOGIN_SESSION_KEY) === '1') {
+          window.sessionStorage.removeItem(GOOGLE_OAUTH_FROM_LOGIN_SESSION_KEY);
+          markOnboardingPendingIfUserNotCompleted(uid);
+        }
+      } catch {
+        // ignore
+      }
+    }
+    if (shouldShowOnboardingAuto(uid)) setShowGettingStarted(true);
+    else setShowGettingStarted(false);
   }, [supabaseUser?.id]);
 
   /** Record Accounts / Automations / Analytics visits and finish onboarding when all three were opened. */
   useEffect(() => {
-    if (!shouldShowOnboardingAuto()) return;
-    const finished = recordOnboardingDestinationVisit(pathname);
+    if (!shouldShowOnboardingAuto(supabaseUser?.id)) return;
+    const finished = recordOnboardingDestinationVisit(pathname, supabaseUser?.id);
     if (finished) setShowGettingStarted(false);
     setVisitTick((t) => t + 1);
-  }, [pathname]);
+  }, [pathname, supabaseUser?.id]);
 
   const launchAutomationsSpotlightTour = useCallback(() => {
     setSidebarOpen(false);
@@ -99,7 +113,7 @@ export default function DashboardLayout({
           isOpen={showGettingStarted}
           onClose={() => setShowGettingStarted(false)}
           onFinish={() => {
-            markOnboardingCompleted();
+            markOnboardingCompleted(supabaseUser?.id ?? null);
             setShowGettingStarted(false);
           }}
           visitedAccounts={visitSnapshot.accounts}

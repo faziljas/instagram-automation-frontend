@@ -9,7 +9,7 @@ import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { z } from 'zod';
 import Logo from '@/components/Logo';
-import { markOnboardingPending } from '@/utils/onboarding';
+import { GOOGLE_OAUTH_FROM_LOGIN_SESSION_KEY, markOnboardingPending } from '@/utils/onboarding';
 
 // Zod validation schema for signup
 const registerSchema = z
@@ -82,9 +82,13 @@ function LoginPageContent() {
     setError(null);
     setInfoMessage(null);
     try {
-      // Treat as "new user journey" for users who sign up via Google from this screen.
-      // If they're an existing user, the modal is dismissible and can be turned off.
-      markOnboardingPending();
+      if (typeof window !== 'undefined') {
+        try {
+          window.sessionStorage.setItem(GOOGLE_OAUTH_FROM_LOGIN_SESSION_KEY, '1');
+        } catch {
+          // ignore
+        }
+      }
       const currentOrigin = typeof window !== 'undefined' ? window.location.origin : '';
       const redirectTo = `${currentOrigin}/dashboard`;
       
