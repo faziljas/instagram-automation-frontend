@@ -1,13 +1,17 @@
 import {
   clearAutomationsTourRunPending,
   clearTourAfterGettingStartedClose,
-  markTourAfterGettingStartedClose,
 } from '@/utils/automationsSpotlightTour';
 
 export const ONBOARDING_PENDING_KEY = 'logicdm_onboarding_pending';
 export const ONBOARDING_COMPLETED_KEY = 'logicdm_onboarding_completed';
-/** User opened Automations/Analytics from the tour; stop auto-opening until "Getting started" is used again. */
-export const ONBOARDING_ENGAGEMENT_DISMISSED_KEY = 'logicdm_onboarding_engagement_dismissed';
+
+export const ONBOARDING_VISITED_ACCOUNTS_KEY = 'logicdm_onboarding_visited_accounts';
+export const ONBOARDING_VISITED_AUTOMATIONS_KEY = 'logicdm_onboarding_visited_automations';
+export const ONBOARDING_VISITED_ANALYTICS_KEY = 'logicdm_onboarding_visited_analytics';
+
+/** Legacy key — still removed in markOnboardingCompleted for older sessions. */
+const ONBOARDING_ENGAGEMENT_DISMISSED_KEY = 'logicdm_onboarding_engagement_dismissed';
 
 function safeGetItem(key: string): string | null {
   if (typeof window === 'undefined') return null;
@@ -36,13 +40,24 @@ function safeRemoveItem(key: string) {
   }
 }
 
+function clearOnboardingVisitFlags() {
+  safeRemoveItem(ONBOARDING_VISITED_ACCOUNTS_KEY);
+  safeRemoveItem(ONBOARDING_VISITED_AUTOMATIONS_KEY);
+  safeRemoveItem(ONBOARDING_VISITED_ANALYTICS_KEY);
+}
+
+export function isOnboardingPending(): boolean {
+  if (safeGetItem(ONBOARDING_COMPLETED_KEY) === '1') return false;
+  return safeGetItem(ONBOARDING_PENDING_KEY) === '1';
+}
+
 export function markOnboardingPending() {
   safeSetItem(ONBOARDING_PENDING_KEY, '1');
-  markTourAfterGettingStartedClose();
 }
 
 export function clearOnboardingPending() {
   safeRemoveItem(ONBOARDING_PENDING_KEY);
+  clearOnboardingVisitFlags();
   clearTourAfterGettingStartedClose();
   clearAutomationsTourRunPending();
 }
@@ -51,21 +66,49 @@ export function markOnboardingCompleted() {
   safeSetItem(ONBOARDING_COMPLETED_KEY, '1');
   safeRemoveItem(ONBOARDING_PENDING_KEY);
   safeRemoveItem(ONBOARDING_ENGAGEMENT_DISMISSED_KEY);
+  clearOnboardingVisitFlags();
   clearTourAfterGettingStartedClose();
   clearAutomationsTourRunPending();
 }
 
-/** After user follows Automations/Analytics from the modal, do not auto-show the tour on later visits. */
-export function markOnboardingEngagementDismissed() {
-  safeSetItem(ONBOARDING_ENGAGEMENT_DISMISSED_KEY, '1');
-  safeRemoveItem(ONBOARDING_PENDING_KEY);
-  clearTourAfterGettingStartedClose();
-  clearAutomationsTourRunPending();
-}
-
-/** Auto-open welcome modal on dashboard load (signup / pending only). */
+/** True while first-time onboarding is active (show Getting started). */
 export function shouldShowOnboardingAuto(): boolean {
-  if (safeGetItem(ONBOARDING_COMPLETED_KEY) === '1') return false;
-  if (safeGetItem(ONBOARDING_ENGAGEMENT_DISMISSED_KEY) === '1') return false;
-  return safeGetItem(ONBOARDING_PENDING_KEY) === '1';
+  return isOnboardingPending();
+}
+
+export function getOnboardingVisitSnapshot(): {
+  accounts: boolean;
+  automations: boolean;
+  analytics: boolean;
+} {
+  return {
+    accounts: safeGetItem(ONBOARDING_VISITED_ACCOUNTS_KEY) === '1',
+    automations: safeGetItem(ONBOARDING_VISITED_AUTOMATIONS_KEY) === '1',
+    analytics: safeGetItem(ONBOARDING_VISITED_ANALYTICS_KEY) === '1',
+  };
+}
+
+/**
+ * While onboarding is pending, record that the user opened a destination.
+ * @returns true if onboarding was just completed (all three visited).
+ */
+export function recordOnboardingDestinationVisit(pathname: string): boolean {
+  if (!isOnboardingPending()) return false;
+
+  if (pathname.startsWith('/dashboard/accounts')) {
+    safeSetItem(ONBOARDING_VISITED_ACCOUNTS_KEY, '1');
+  }
+  if (pathname.startsWith('/dashboard/automations')) {
+    safeSetItem(ONBOARDING_VISITED_AUTOMATIONS_KEY, '1');
+  }
+  if (pathname.startsWith('/dashboard/analytics')) {
+    safeSetItem(ONBOARDING_VISITED_ANALYTICS_KEY, '1');
+  }
+
+  const v = getOnboardingVisitSnapshot();
+  if (v.accounts && v.automations && v.analytics) {
+    markOnboardingCompleted();
+    return true;
+  }
+  return false;
 }

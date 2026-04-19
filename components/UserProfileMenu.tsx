@@ -7,20 +7,12 @@ import {
   Cog6ToothIcon,
   ArrowRightOnRectangleIcon,
   ExclamationTriangleIcon,
-  QuestionMarkCircleIcon,
   ChevronDownIcon,
   UserCircleIcon,
-  CursorArrowRaysIcon,
 } from '@heroicons/react/24/outline';
 import ReportIssueModal from '@/components/ReportIssueModal';
 
-export default function UserProfileMenu({
-  onStartTour,
-  onStartAutomationsSpotlightTour,
-}: {
-  onStartTour?: () => void;
-  onStartAutomationsSpotlightTour?: () => void;
-}) {
+export default function UserProfileMenu() {
   const { user, supabaseUser, logout } = useAuth();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
@@ -58,17 +50,6 @@ export default function UserProfileMenu({
     setShowReportModal(true);
   };
 
-  const handleStartTour = () => {
-    setIsOpen(false);
-    onStartTour?.();
-  };
-
-  const handleAutomationsSpotlightTour = () => {
-    setIsOpen(false);
-    onStartAutomationsSpotlightTour?.();
-  };
-
-  // Prefer backend user name, then Supabase metadata, then email username as a fallback.
   const fullNameFromBackend =
     user?.firstName && user?.lastName
       ? `${user.firstName} ${user.lastName}`
@@ -91,7 +72,6 @@ export default function UserProfileMenu({
   return (
     <>
       <div className="relative" ref={menuRef}>
-        {/* User Profile Button */}
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-all duration-200"
@@ -115,31 +95,8 @@ export default function UserProfileMenu({
           />
         </button>
 
-        {/* Dropdown Menu */}
         {isOpen && (
           <div className="absolute bottom-full left-0 right-0 mb-2 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
-            {/* Getting started */}
-            {onStartTour && (
-              <button
-                onClick={handleStartTour}
-                className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                <QuestionMarkCircleIcon className="h-5 w-5 mr-3 text-blue-600" />
-                Getting started
-              </button>
-            )}
-
-            {onStartAutomationsSpotlightTour && (
-              <button
-                onClick={handleAutomationsSpotlightTour}
-                className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors whitespace-nowrap"
-              >
-                <CursorArrowRaysIcon className="h-5 w-5 mr-3 shrink-0 text-indigo-600" />
-                <span className="truncate">Automations tour</span>
-              </button>
-            )}
-
-            {/* Account Settings */}
             <button
               onClick={handleAccountSettings}
               className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
@@ -148,7 +105,6 @@ export default function UserProfileMenu({
               Account settings
             </button>
 
-            {/* Report an Issue */}
             <button
               onClick={handleReportIssue}
               className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
@@ -157,10 +113,8 @@ export default function UserProfileMenu({
               Report an issue
             </button>
 
-            {/* Divider */}
             <div className="border-t border-gray-200 my-1" />
 
-            {/* Logout */}
             <button
               onClick={handleLogout}
               className="w-full flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors"
@@ -172,7 +126,6 @@ export default function UserProfileMenu({
         )}
       </div>
 
-      {/* Report Issue Modal */}
       {showReportModal && (
         <ReportIssueModal
           isOpen={showReportModal}

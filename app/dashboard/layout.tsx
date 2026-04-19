@@ -10,20 +10,17 @@ import { ProtectedRoute } from '@/components/ProtectedRoute';
 import UserProfileMenu from '@/components/UserProfileMenu';
 import Logo from '@/components/Logo';
 import { ToastProvider } from '@/components/Toast';
-import GettingStartedModal, { type AutomationGuideStatus } from '@/components/GettingStartedModal';
-import { useFetch } from '@/hooks/useFetch';
+import GettingStartedModal from '@/components/GettingStartedModal';
 import {
+  getOnboardingVisitSnapshot,
   markOnboardingCompleted,
-  markOnboardingEngagementDismissed,
+  recordOnboardingDestinationVisit,
   shouldShowOnboardingAuto,
 } from '@/utils/onboarding';
 import {
   AUTOMATIONS_TOUR_DOM_EVENT,
   AUTOMATIONS_TOUR_QUERY,
-  clearTourAfterGettingStartedClose,
-  consumeTourAfterGettingStartedClose,
   markAutomationsTourRunPending,
-  peekTourAfterGettingStartedClose,
 } from '@/utils/automationsSpotlightTour';
 import {
   Bars3Icon,
@@ -65,42 +62,21 @@ export default function DashboardLayout({
   // Upgrade hook for sidebar upgrade button
   const { handleUpgrade, checkoutLoading } = useUpgrade();
 
-  const { data: accounts, isLoading: accountsLoading } = useFetch<{ id: number }[]>('/users/me/accounts');
-  const { data: rules, isLoading: rulesLoading } = useFetch<{ id: number }[]>('/automation/rules');
-  const hasConnectedAccount = Array.isArray(accounts) && accounts.length > 0;
+  const [visitTick, setVisitTick] = useState(0);
+  const visitSnapshot = useMemo(() => getOnboardingVisitSnapshot(), [visitTick]);
 
-  const automationGuideStatus: AutomationGuideStatus = useMemo(() => {
-    if (rulesLoading && rules === undefined) return 'loading';
-    if (Array.isArray(rules) && rules.length > 0) return 'has_rules';
-    return 'empty';
-  }, [rulesLoading, rules]);
-
-  const automationCount = Array.isArray(rules) ? rules.length : 0;
-
-  /** Open Getting started as soon as the dashboard shell mounts when onboarding is pending. */
+  /** Open Getting started as soon as the dashboard shell mounts when first-time onboarding is pending. */
   useEffect(() => {
     if (shouldShowOnboardingAuto()) setShowGettingStarted(true);
   }, []);
 
-  /** If the user already has an account and automations, skip onboarding without flashing wrong copy. */
+  /** Record Accounts / Automations / Analytics visits and finish onboarding when all three were opened. */
   useEffect(() => {
     if (!shouldShowOnboardingAuto()) return;
-    if (accountsLoading || rulesLoading) return;
-    const hasAcc = Array.isArray(accounts) && accounts.length > 0;
-    const hasAutomation = Array.isArray(rules) && rules.length > 0;
-    if (hasAcc && hasAutomation) {
-      markOnboardingEngagementDismissed();
-      setShowGettingStarted(false);
-    }
-  }, [accountsLoading, rulesLoading, accounts, rules]);
-
-  /** First-session flow: land on Automations so the spotlight can run in context (modal stays on top until dismissed). */
-  useEffect(() => {
-    if (!shouldShowOnboardingAuto()) return;
-    if (pathname === '/dashboard') {
-      router.replace('/dashboard/automations');
-    }
-  }, [pathname, router]);
+    const finished = recordOnboardingDestinationVisit(pathname);
+    if (finished) setShowGettingStarted(false);
+    setVisitTick((t) => t + 1);
+  }, [pathname]);
 
   const launchAutomationsSpotlightTour = useCallback(() => {
     setSidebarOpen(false);
@@ -112,34 +88,20 @@ export default function DashboardLayout({
     }
   }, [pathname, router]);
 
-  const handleGettingStartedClose = useCallback(() => {
-    setShowGettingStarted(false);
-    if (shouldShowOnboardingAuto() && peekTourAfterGettingStartedClose()) {
-      consumeTourAfterGettingStartedClose();
-      launchAutomationsSpotlightTour();
-    }
-  }, [launchAutomationsSpotlightTour]);
-
-  const openGettingStartedFromMenu = useCallback(() => {
-    if (!shouldShowOnboardingAuto()) clearTourAfterGettingStartedClose();
-    setShowGettingStarted(true);
-  }, []);
-
   return (
     <ToastProvider>
       <ProtectedRoute>
       <div className="dashboard-main-bg w-full overflow-x-hidden flex flex-col flex-1 min-h-screen" style={{ backgroundColor: 'rgb(243 244 246)' }}>
         <GettingStartedModal
           isOpen={showGettingStarted}
-          onClose={handleGettingStartedClose}
+          onClose={() => setShowGettingStarted(false)}
           onFinish={() => {
             markOnboardingCompleted();
             setShowGettingStarted(false);
           }}
-          hasConnectedAccount={hasConnectedAccount}
-          automationGuideStatus={automationGuideStatus}
-          automationCount={automationCount}
-          onEngagementNavigate={markOnboardingEngagementDismissed}
+          visitedAccounts={visitSnapshot.accounts}
+          visitedAutomations={visitSnapshot.automations}
+          visitedAnalytics={visitSnapshot.analytics}
           onRequestAutomationsSpotlightTour={launchAutomationsSpotlightTour}
         />
         {/* Mobile sidebar overlay */}
@@ -224,10 +186,7 @@ export default function DashboardLayout({
             
             {/* User Profile Menu */}
             <div className="px-4 pb-6 border-t border-gray-800 pt-4">
-              <UserProfileMenu
-              onStartTour={openGettingStartedFromMenu}
-              onStartAutomationsSpotlightTour={launchAutomationsSpotlightTour}
-            />
+              <UserProfileMenu />
             </div>
         </div>
 
@@ -298,10 +257,7 @@ export default function DashboardLayout({
             
             {/* User Profile Menu */}
             <div className="px-4 pb-6 border-t border-gray-800 pt-4">
-              <UserProfileMenu
-              onStartTour={openGettingStartedFromMenu}
-              onStartAutomationsSpotlightTour={launchAutomationsSpotlightTour}
-            />
+              <UserProfileMenu />
             </div>
           </div>
         </div>
