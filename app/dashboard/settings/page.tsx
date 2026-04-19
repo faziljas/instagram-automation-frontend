@@ -404,7 +404,7 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<'general' | 'security' | 'notifications' | 'billing' | 'delete-account'>('general');
 
   useEffect(() => {
-    if (!monetizationUi && activeTab === 'billing') {
+    if (!monetizationUi && (activeTab === 'billing' || activeTab === 'notifications')) {
       setActiveTab('general');
     }
   }, [monetizationUi, activeTab]);
@@ -1169,7 +1169,7 @@ export default function SettingsPage() {
   const renderContent = () => {
     if (activeTab === 'general') return renderGeneralContent();
     if (activeTab === 'security') return renderSecurityContent();
-    if (activeTab === 'notifications') return renderNotificationsContent();
+    if (activeTab === 'notifications' && monetizationUi) return renderNotificationsContent();
     if (activeTab === 'billing' && monetizationUi) return renderBillingContent();
     if (activeTab === 'delete-account') return renderDeleteAccountContent();
     return null;
@@ -1211,17 +1211,19 @@ export default function SettingsPage() {
               >
                 <span>Security</span>
               </button>
-              <button
-                type="button"
-                onClick={() => setActiveTab('notifications')}
-                className={`flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-sm font-medium ${
-                  activeTab === 'notifications'
-                    ? 'bg-gray-900 text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                <span>Notifications</span>
-              </button>
+              {monetizationUi && (
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('notifications')}
+                  className={`flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-sm font-medium ${
+                    activeTab === 'notifications'
+                      ? 'bg-gray-900 text-white'
+                      : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  <span>Notifications</span>
+                </button>
+              )}
               {monetizationUi && (
                 <button
                   type="button"
