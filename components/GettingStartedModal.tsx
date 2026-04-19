@@ -57,7 +57,6 @@ export default function GettingStartedModal({
           role="dialog"
           aria-modal="true"
           aria-labelledby="getting-started-title"
-          aria-describedby="getting-started-desc"
         >
           <div className="flex items-center justify-between border-b px-6 py-4">
             <div>
@@ -65,10 +64,6 @@ export default function GettingStartedModal({
               <h2 id="getting-started-title" className="text-lg font-semibold text-gray-900">
                 Welcome to LogicDM
               </h2>
-              <p id="getting-started-desc" className="mt-0.5 text-sm text-gray-600">
-                Visit Accounts, Automations, and Analytics once each. This guide closes automatically when you
-                have opened all three (or use Don&apos;t show again anytime).
-              </p>
             </div>
             <button
               type="button"
@@ -220,11 +215,6 @@ export default function GettingStartedModal({
                 </button>
               </div>
             )}
-
-            <p className="mt-4 text-center text-xs text-gray-500">
-              Visiting all three pages completes this guide. Refreshing or signing in again won&apos;t bring it
-              back after that (or after Don&apos;t show again).
-            </p>
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <button
