@@ -106,6 +106,19 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
   }, [accountId, nextConversationsOffset]);
 
   const [syncPending, setSyncPending] = useState(false);
+  const [syncRunMode, setSyncRunMode] = useState<'quick' | 'full' | null>(null);
+  const [lastSyncError, setLastSyncError] = useState<string | null>(null);
+  const convoLengthForAutoSyncRef = useRef(0);
+  const autoQuickSyncFiredRef = useRef<Record<number, boolean>>({});
+  const syncPendingRef = useRef(false);
+
+  useEffect(() => {
+    convoLengthForAutoSyncRef.current = conversations.length;
+  }, [conversations.length]);
+
+  useEffect(() => {
+    syncPendingRef.current = syncPending;
+  }, [syncPending]);
 
   useEffect(() => {
     if (!accountId) {
@@ -113,9 +126,13 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
       setHasMoreConversations(false);
       setNextConversationsOffset(0);
       setSyncPending(false);
+      setSyncRunMode(null);
+      setLastSyncError(null);
       return;
     }
     setSyncPending(false);
+    setSyncRunMode(null);
+    setLastSyncError(null);
     fetchConversations();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accountId]);
@@ -255,27 +272,71 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
   }, [refreshStats, fetchConversations, selectedConversation, fetchMessages]);
 
   const [isSyncing, setIsSyncing] = useState(false);
+  const isSyncingRef = useRef(false);
+  useEffect(() => {
+    isSyncingRef.current = isSyncing;
+  }, [isSyncing]);
 
-  // After async sync starts, poll stats + conversation list only (not messages — avoids racing
-  // with the open thread and duplicate traffic; the 5s message poller + selection effect refresh the pane).
+  // New users: empty inbox → quick sync (thread list only) once per account; skips if user already started sync.
+  useEffect(() => {
+    if (!accountId || !session?.access_token) return;
+    const tid = window.setTimeout(() => {
+      if (autoQuickSyncFiredRef.current[accountId]) return;
+      if (convoLengthForAutoSyncRef.current > 0) return;
+      if (syncPendingRef.current || isSyncingRef.current) return;
+      autoQuickSyncFiredRef.current[accountId] = true;
+      void (async () => {
+        try {
+          const data = await post<{ async?: boolean }>(
+            `/api/instagram/conversations/sync?account_id=${accountId}&mode=quick`,
+            {}
+          );
+          if (data?.async === true) {
+            setSyncRunMode('quick');
+            setSyncPending(true);
+            setLastSyncError(null);
+          }
+        } catch {
+          autoQuickSyncFiredRef.current[accountId] = false;
+        }
+      })();
+    }, 2000);
+    return () => window.clearTimeout(tid);
+  }, [accountId, session?.access_token]);
+
+  // After async sync starts, poll stats + conversation list; check server-reported sync errors.
   useEffect(() => {
     if (!syncPending || !accountId) return;
 
     let attempts = 0;
     const maxAttempts = 40;
 
-    const tick = () => {
+    const tick = async () => {
       attempts += 1;
       refreshStats();
-      fetchConversations(false, true);
+      await fetchConversations(false, true);
+      try {
+        const st = await get<{
+          last_sync_ok?: boolean | null;
+          last_sync_error?: string | null;
+        }>(`/api/instagram/conversations/sync-status?account_id=${accountId}`);
+        if (st.last_sync_ok === false && st.last_sync_error) {
+          setLastSyncError(st.last_sync_error);
+        } else if (st.last_sync_ok === true) {
+          setLastSyncError(null);
+        }
+      } catch {
+        /* ignore */
+      }
       if (attempts >= maxAttempts) {
         setSyncPending(false);
+        setSyncRunMode(null);
       }
     };
 
-    tick();
-    const id = setInterval(tick, 3000);
-    return () => clearInterval(id);
+    void tick();
+    const id = window.setInterval(() => void tick(), 3000);
+    return () => window.clearInterval(id);
   }, [syncPending, accountId, refreshStats, fetchConversations]);
 
   const handleSync = useCallback(async () => {
@@ -290,19 +351,22 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
 
     setIsSyncing(true);
     try {
-      console.log(`🔄 Starting sync for account ${accountId}...`);
+      console.log(`🔄 Starting full sync for account ${accountId}...`);
+      setLastSyncError(null);
+      setSyncRunMode('full');
 
       const data = await post<{
         success?: boolean;
         async?: boolean;
         message?: string;
-      }>(`/api/instagram/conversations/sync?account_id=${accountId}`, {});
+      }>(`/api/instagram/conversations/sync?account_id=${accountId}&mode=full`, {});
 
       if (data?.async === true) {
         console.log('✅ Sync running in background');
         setSyncPending(true);
       } else {
         console.log('✅ Sync completed (blocking mode)');
+        setSyncRunMode(null);
         await new Promise((resolve) => setTimeout(resolve, 500));
         refreshStats();
         fetchConversations();
@@ -310,6 +374,7 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
       }
     } catch (error: unknown) {
       console.error('❌ Error syncing conversations:', error);
+      setSyncRunMode(null);
       alert((error as Error)?.message || 'Failed to sync conversations. Please try again.');
     } finally {
       setIsSyncing(false);
@@ -443,10 +508,29 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
             className="mb-4 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2.5 text-sm text-blue-900"
             role="status"
           >
-            <p className="font-medium">Instagram sync is running in the background</p>
+            <p className="font-medium">
+              {syncRunMode === 'quick'
+                ? 'Loading your conversation list from Instagram'
+                : 'Instagram sync is running in the background'}
+            </p>
             <p className="mt-1 text-xs text-blue-800/90">
-              This usually takes up to a couple of minutes because we talk to Instagram for each thread. Your stats
-              and conversation list refresh automatically — you can keep using this page.
+              {syncRunMode === 'quick'
+                ? 'We fetch your threads first (usually under a minute). Open a chat, then use Sync Conversations if you need full message history loaded.'
+                : 'This can take a couple of minutes because we load recent messages per thread. Your stats and list refresh automatically — you can keep using this page.'}
+            </p>
+          </div>
+        )}
+
+        {lastSyncError && (
+          <div
+            className="mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-sm text-red-900"
+            role="alert"
+          >
+            <p className="font-medium">Instagram reported a problem during the last sync</p>
+            <p className="mt-1 text-xs break-words opacity-90">{lastSyncError}</p>
+            <p className="mt-2 text-xs text-red-800">
+              New accounts often have no DM history in the API until someone messages you after connecting. If this
+              looks like a permissions or token issue, reconnect the Instagram account in Accounts.
             </p>
           </div>
         )}
