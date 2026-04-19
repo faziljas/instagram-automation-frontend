@@ -51,7 +51,17 @@ export function isOnboardingPending(): boolean {
   return safeGetItem(ONBOARDING_PENDING_KEY) === '1';
 }
 
+/**
+ * Start (or restart) first-time onboarding. Clears a previous session’s “completed” flag in
+ * this browser — otherwise a deleted account / new signup on the same device would never
+ * see Getting started because `logicdm_onboarding_completed` stayed set.
+ */
 export function markOnboardingPending() {
+  safeRemoveItem(ONBOARDING_COMPLETED_KEY);
+  safeRemoveItem(ONBOARDING_ENGAGEMENT_DISMISSED_KEY);
+  clearOnboardingVisitFlags();
+  clearTourAfterGettingStartedClose();
+  clearAutomationsTourRunPending();
   safeSetItem(ONBOARDING_PENDING_KEY, '1');
 }
 

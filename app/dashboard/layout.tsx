@@ -51,7 +51,7 @@ export default function DashboardLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, supabaseUser } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [showGettingStarted, setShowGettingStarted] = useState(false);
@@ -65,10 +65,13 @@ export default function DashboardLayout({
   const [visitTick, setVisitTick] = useState(0);
   const visitSnapshot = useMemo(() => getOnboardingVisitSnapshot(), [visitTick]);
 
-  /** Open Getting started as soon as the dashboard shell mounts when first-time onboarding is pending. */
+  /**
+   * Open Getting started when onboarding is pending. Depends on `supabaseUser.id` so we
+   * re-check after auth hydrates (first paint can run before session is ready).
+   */
   useEffect(() => {
     if (shouldShowOnboardingAuto()) setShowGettingStarted(true);
-  }, []);
+  }, [supabaseUser?.id]);
 
   /** Record Accounts / Automations / Analytics visits and finish onboarding when all three were opened. */
   useEffect(() => {
