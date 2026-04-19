@@ -296,6 +296,7 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
         success?: boolean;
         async?: boolean;
         message?: string;
+        history_backfill_started?: boolean;
       }>(`/api/instagram/conversations/sync?account_id=${accountId}`, {});
 
       if (data?.async === true) {
@@ -307,6 +308,10 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
         refreshStats();
         fetchConversations();
         if (selectedConversation) fetchMessages();
+        // Message history may still be loading after the fast thread list sync.
+        if (data?.history_backfill_started) {
+          setSyncPending(true);
+        }
       }
     } catch (error: unknown) {
       console.error('❌ Error syncing conversations:', error);
@@ -415,12 +420,12 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
               onClick={handleSync}
               disabled={isSyncing || syncPending}
               className="px-3 md:px-4 py-2 bg-blue-600 text-white text-xs md:text-sm font-medium rounded-md hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed whitespace-nowrap"
-              title="Pulls threads and recent messages from Instagram. Runs in the background so the page stays responsive."
+              title="Loads your Instagram DM threads first (usually a few seconds), then fills in message history in the background."
             >
               {isSyncing ? (
                 'Starting…'
               ) : syncPending ? (
-                'Sync running…'
+                'Finishing sync…'
               ) : (
                 <>
                   <span className="hidden sm:inline">Sync Conversations</span>
@@ -443,10 +448,11 @@ export default function MessagesView({ accountId }: MessagesViewProps) {
             className="mb-4 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2.5 text-sm text-blue-900"
             role="status"
           >
-            <p className="font-medium">Instagram sync is running in the background</p>
+            <p className="font-medium">Finishing message history from Instagram</p>
             <p className="mt-1 text-xs text-blue-800/90">
-              This usually takes up to a couple of minutes because we talk to Instagram for each thread. Your stats
-              and conversation list refresh automatically — you can keep using this page.
+              Threads should already be visible. We are still loading older messages per chat in the background (this
+              can take a minute or two). Your list and stats refresh automatically — sending and receiving DMs is
+              unchanged.
             </p>
           </div>
         )}
