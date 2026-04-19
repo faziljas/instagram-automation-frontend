@@ -53,3 +53,55 @@ export function primeAutomationsTourFromUrlIfPresent() {
     // ignore
   }
 }
+
+/** Set when `markOnboardingPending()` runs; consumed when Getting started closes to auto-start the spotlight. */
+export const TOUR_AFTER_GETTING_STARTED_CLOSE_KEY = 'logicdm_run_tour_after_getting_started_close';
+
+export function markTourAfterGettingStartedClose() {
+  if (typeof window === 'undefined') return;
+  try {
+    window.sessionStorage.setItem(TOUR_AFTER_GETTING_STARTED_CLOSE_KEY, '1');
+  } catch {
+    // ignore
+  }
+}
+
+export function peekTourAfterGettingStartedClose(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    return window.sessionStorage.getItem(TOUR_AFTER_GETTING_STARTED_CLOSE_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+export function consumeTourAfterGettingStartedClose(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    if (window.sessionStorage.getItem(TOUR_AFTER_GETTING_STARTED_CLOSE_KEY) === '1') {
+      window.sessionStorage.removeItem(TOUR_AFTER_GETTING_STARTED_CLOSE_KEY);
+      return true;
+    }
+  } catch {
+    // ignore
+  }
+  return false;
+}
+
+export function clearTourAfterGettingStartedClose() {
+  if (typeof window === 'undefined') return;
+  try {
+    window.sessionStorage.removeItem(TOUR_AFTER_GETTING_STARTED_CLOSE_KEY);
+  } catch {
+    // ignore
+  }
+}
+
+export function clearAutomationsTourRunPending() {
+  if (typeof window === 'undefined') return;
+  try {
+    window.sessionStorage.removeItem(AUTOMATIONS_TOUR_RUN_PENDING_KEY);
+  } catch {
+    // ignore
+  }
+}

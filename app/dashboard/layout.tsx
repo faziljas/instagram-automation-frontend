@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
+import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
@@ -20,7 +20,10 @@ import {
 import {
   AUTOMATIONS_TOUR_DOM_EVENT,
   AUTOMATIONS_TOUR_QUERY,
+  clearTourAfterGettingStartedClose,
+  consumeTourAfterGettingStartedClose,
   markAutomationsTourRunPending,
+  peekTourAfterGettingStartedClose,
 } from '@/utils/automationsSpotlightTour';
 import {
   Bars3Icon,
@@ -74,25 +77,30 @@ export default function DashboardLayout({
 
   const automationCount = Array.isArray(rules) ? rules.length : 0;
 
-  /** Wait for account + rules before auto-opening so copy matches reality (and skip if already fully set up). */
-  const autoOnboardingIntent = useRef(shouldShowOnboardingAuto());
-  const autoOnboardingResolved = useRef(false);
-
+  /** Open Getting started as soon as the dashboard shell mounts when onboarding is pending. */
   useEffect(() => {
-    if (!autoOnboardingIntent.current || autoOnboardingResolved.current) return;
-    if (accountsLoading || rulesLoading) return;
+    if (shouldShowOnboardingAuto()) setShowGettingStarted(true);
+  }, []);
 
+  /** If the user already has an account and automations, skip onboarding without flashing wrong copy. */
+  useEffect(() => {
+    if (!shouldShowOnboardingAuto()) return;
+    if (accountsLoading || rulesLoading) return;
     const hasAcc = Array.isArray(accounts) && accounts.length > 0;
     const hasAutomation = Array.isArray(rules) && rules.length > 0;
-
-    autoOnboardingResolved.current = true;
-
     if (hasAcc && hasAutomation) {
       markOnboardingEngagementDismissed();
-      return;
+      setShowGettingStarted(false);
     }
-    setShowGettingStarted(true);
   }, [accountsLoading, rulesLoading, accounts, rules]);
+
+  /** First-session flow: land on Automations so the spotlight can run in context (modal stays on top until dismissed). */
+  useEffect(() => {
+    if (!shouldShowOnboardingAuto()) return;
+    if (pathname === '/dashboard') {
+      router.replace('/dashboard/automations');
+    }
+  }, [pathname, router]);
 
   const launchAutomationsSpotlightTour = useCallback(() => {
     setSidebarOpen(false);
@@ -104,13 +112,26 @@ export default function DashboardLayout({
     }
   }, [pathname, router]);
 
+  const handleGettingStartedClose = useCallback(() => {
+    setShowGettingStarted(false);
+    if (shouldShowOnboardingAuto() && peekTourAfterGettingStartedClose()) {
+      consumeTourAfterGettingStartedClose();
+      launchAutomationsSpotlightTour();
+    }
+  }, [launchAutomationsSpotlightTour]);
+
+  const openGettingStartedFromMenu = useCallback(() => {
+    if (!shouldShowOnboardingAuto()) clearTourAfterGettingStartedClose();
+    setShowGettingStarted(true);
+  }, []);
+
   return (
     <ToastProvider>
       <ProtectedRoute>
       <div className="dashboard-main-bg w-full overflow-x-hidden flex flex-col flex-1 min-h-screen" style={{ backgroundColor: 'rgb(243 244 246)' }}>
         <GettingStartedModal
           isOpen={showGettingStarted}
-          onClose={() => setShowGettingStarted(false)}
+          onClose={handleGettingStartedClose}
           onFinish={() => {
             markOnboardingCompleted();
             setShowGettingStarted(false);
@@ -204,7 +225,7 @@ export default function DashboardLayout({
             {/* User Profile Menu */}
             <div className="px-4 pb-6 border-t border-gray-800 pt-4">
               <UserProfileMenu
-              onStartTour={() => setShowGettingStarted(true)}
+              onStartTour={openGettingStartedFromMenu}
               onStartAutomationsSpotlightTour={launchAutomationsSpotlightTour}
             />
             </div>
@@ -278,7 +299,7 @@ export default function DashboardLayout({
             {/* User Profile Menu */}
             <div className="px-4 pb-6 border-t border-gray-800 pt-4">
               <UserProfileMenu
-              onStartTour={() => setShowGettingStarted(true)}
+              onStartTour={openGettingStartedFromMenu}
               onStartAutomationsSpotlightTour={launchAutomationsSpotlightTour}
             />
             </div>

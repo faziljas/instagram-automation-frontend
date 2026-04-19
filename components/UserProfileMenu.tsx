@@ -132,10 +132,10 @@ export default function UserProfileMenu({
             {onStartAutomationsSpotlightTour && (
               <button
                 onClick={handleAutomationsSpotlightTour}
-                className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors whitespace-nowrap"
               >
-                <CursorArrowRaysIcon className="h-5 w-5 mr-3 text-indigo-600" />
-                Automations spotlight tour
+                <CursorArrowRaysIcon className="h-5 w-5 mr-3 shrink-0 text-indigo-600" />
+                <span className="truncate">Automations tour</span>
               </button>
             )}
 

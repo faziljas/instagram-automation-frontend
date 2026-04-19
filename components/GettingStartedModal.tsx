@@ -4,6 +4,7 @@ import { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { XMarkIcon, CursorArrowRaysIcon } from '@heroicons/react/24/outline';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
+import { clearTourAfterGettingStartedClose } from '@/utils/automationsSpotlightTour';
 
 export type AutomationGuideStatus = 'loading' | 'empty' | 'has_rules';
 
@@ -71,7 +72,7 @@ export default function GettingStartedModal({
   const headerEyebrow = completedSteps === totalSteps ? 'Core setup complete' : 'Getting started';
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
+    <div className="fixed inset-0 z-[1000000001] overflow-y-auto">
       <div className="flex min-h-screen items-center justify-center p-4">
         <div className="fixed inset-0 bg-gray-900/60 transition-opacity" onClick={onClose} />
 
@@ -247,29 +248,25 @@ export default function GettingStartedModal({
             </ol>
 
             {onRequestAutomationsSpotlightTour && (
-              <div className="mt-5 rounded-xl border border-blue-100 bg-blue-50/70 p-4">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="flex gap-3">
-                    <CursorArrowRaysIcon className="h-8 w-8 shrink-0 text-blue-600" aria-hidden />
-                    <div>
-                      <p className="text-sm font-semibold text-gray-900">Interactive spotlight tour</p>
-                      <p className="mt-1 text-sm text-gray-600">
-                        Walk the Automations page step by step with highlights on each area.
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      onEngagementNavigate();
-                      onRequestAutomationsSpotlightTour();
-                      onClose();
-                    }}
-                    className="shrink-0 rounded-lg border border-blue-600 bg-white px-3 py-2 text-sm font-semibold text-blue-700 shadow-sm hover:bg-blue-50"
-                  >
-                    Start spotlight tour
-                  </button>
+              <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-blue-100 bg-blue-50/70 px-4 py-3">
+                <div className="flex min-w-0 flex-1 items-center gap-2">
+                  <CursorArrowRaysIcon className="h-5 w-5 shrink-0 text-blue-600" aria-hidden />
+                  <p className="truncate text-sm font-medium text-gray-800">
+                    Spotlight tour — highlights each area on Automations.
+                  </p>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    clearTourAfterGettingStartedClose();
+                    onEngagementNavigate();
+                    onRequestAutomationsSpotlightTour();
+                    onClose();
+                  }}
+                  className="shrink-0 rounded-lg border border-blue-600 bg-white px-3 py-1.5 text-sm font-semibold text-blue-700 shadow-sm hover:bg-blue-50"
+                >
+                  Start tour
+                </button>
               </div>
             )}
 

@@ -1,3 +1,9 @@
+import {
+  clearAutomationsTourRunPending,
+  clearTourAfterGettingStartedClose,
+  markTourAfterGettingStartedClose,
+} from '@/utils/automationsSpotlightTour';
+
 export const ONBOARDING_PENDING_KEY = 'logicdm_onboarding_pending';
 export const ONBOARDING_COMPLETED_KEY = 'logicdm_onboarding_completed';
 /** User opened Automations/Analytics from the tour; stop auto-opening until "Getting started" is used again. */
@@ -32,22 +38,29 @@ function safeRemoveItem(key: string) {
 
 export function markOnboardingPending() {
   safeSetItem(ONBOARDING_PENDING_KEY, '1');
+  markTourAfterGettingStartedClose();
 }
 
 export function clearOnboardingPending() {
   safeRemoveItem(ONBOARDING_PENDING_KEY);
+  clearTourAfterGettingStartedClose();
+  clearAutomationsTourRunPending();
 }
 
 export function markOnboardingCompleted() {
   safeSetItem(ONBOARDING_COMPLETED_KEY, '1');
   safeRemoveItem(ONBOARDING_PENDING_KEY);
   safeRemoveItem(ONBOARDING_ENGAGEMENT_DISMISSED_KEY);
+  clearTourAfterGettingStartedClose();
+  clearAutomationsTourRunPending();
 }
 
-/** After user follows Automations or Analytics from the modal, do not auto-show the tour on later visits. */
+/** After user follows Automations/Analytics from the modal, do not auto-show the tour on later visits. */
 export function markOnboardingEngagementDismissed() {
   safeSetItem(ONBOARDING_ENGAGEMENT_DISMISSED_KEY, '1');
   safeRemoveItem(ONBOARDING_PENDING_KEY);
+  clearTourAfterGettingStartedClose();
+  clearAutomationsTourRunPending();
 }
 
 /** Auto-open welcome modal on dashboard load (signup / pending only). */
@@ -56,4 +69,3 @@ export function shouldShowOnboardingAuto(): boolean {
   if (safeGetItem(ONBOARDING_ENGAGEMENT_DISMISSED_KEY) === '1') return false;
   return safeGetItem(ONBOARDING_PENDING_KEY) === '1';
 }
-
